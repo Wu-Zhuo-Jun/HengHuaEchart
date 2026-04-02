@@ -1,0 +1,33 @@
+
+.editIcon{
+    width: 21px;
+    height: 21px;
+    background-image: url(../../../assets/images/edit_icon.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.addIcon1{
+    width: 21px;
+    height: 21px;
+    background-image: url(../../../assets/images/add_node_icon1.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.addIcon2{
+    width: 21px;
+    height: 21px;
+    background-image: url(../../../assets/images/add_node_icon2.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.deleteIcon{
+    width: 21px;
+    height: 21px;
+    background-image: url(../../../assets/images/delete_icon.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}

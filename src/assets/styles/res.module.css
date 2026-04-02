@@ -1,0 +1,21 @@
+.hp_batch_count {
+  background-image: url("../images/hp_batch_count.png");
+}
+.hp_collect_count {
+  background-image: url("../images/hp_collect_count.png");
+}
+.hp_in_count {
+  background-image: url("../images/hp_in_count.png");
+}
+.hp_in_num {
+  background-image: url("../images/hp_in_num.png");
+}
+.hp_in_rate {
+  background-image: url("../images/hp_in_rate.png");
+}
+.hp_out_count {
+  background-image: url("../images/hp_out_count.png");
+}
+.hp_outside_count {
+  background-image: url("../images/hp_outside_count.png");
+}

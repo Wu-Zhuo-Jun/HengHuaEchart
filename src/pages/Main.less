@@ -1,0 +1,234 @@
+.main-navigation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+}
+.main-header {
+  background: transparent;
+  height: 64px;
+  padding: 0 10px 0 0;
+  display: flex;
+  align-items: center;
+  /* transition: box-shadow 0.3s ease; */
+  z-index: 999;
+}
+
+.main-header-shadow {
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.4);
+}
+
+.main-header-logo {
+  width: 320px;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  margin-right: 32px;
+  /* background: url(/src/assets/images/companylogoBg.png) 100%; */
+  /* background-size: cover;
+  background-repeat: no-repeat; */
+  /* padding: 10px 10px 10px 20px; */
+  /* margin-bottom: 10px; */
+}
+.main-header-logo img {
+  /* width: ; */
+  width: 100%;
+  padding-right: 10px;
+  height: 100%;
+}
+
+.navigation-bar-menu-item {
+  height: 28px;
+  padding: 2px 13px;
+  line-height: 28px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 20px;
+  text-align: left;
+  height: 33px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.navigation-bar-menu-item-selected {
+  height: 28px;
+  padding: 2px 13px;
+  line-height: 28px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 20px;
+  text-align: left;
+  height: 33px;
+  font-weight: bold;
+  cursor: pointer;
+  background: linear-gradient(180deg, rgba(255, 99, 0, 1) 0%, rgba(249, 162, 49, 1) 100%);
+  border-radius: 20px 0px 20px 0px;
+}
+
+.navigation-bar-site-select {
+  width: 278px;
+  height: 42px;
+}
+.navigation-bar-site-select .ant-select-selector {
+  font-size: 16px !important;
+}
+
+.navigation-bar-item-icon {
+  width: 32px;
+  height: 32px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
+.navigation-bar-home-icon {
+  background-image: url(/src/assets/images/home_icon.png);
+}
+.navigation-bar-notify-icon {
+  background-image: url(/src/assets/images/notifity_icon.png);
+}
+.navigation-bar-translate-icon {
+  background-image: url(/src/assets/images/translate_icon.png);
+}
+.navigation-bar-dataView-icon {
+  background-image: url(/src/assets/images/dataView_icon.png);
+}
+
+.navigation-bar-dropdown-title {
+  width: 109px;
+  height: 23px;
+  line-height: 23px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 16px;
+  text-align: right;
+  margin-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.main-content {
+  flex: 1;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #e1e1e1 transparent;
+  padding-top: 10px;
+  min-height: 0; /* 确保 flex 子元素可以正确收缩 */
+}
+
+/* 用户信息弹窗样式 */
+.navigation-bar-user-avatar-wrapper {
+  cursor: pointer;
+}
+
+.user-popover-root {
+  .ant-popover-inner {
+    padding: 0;
+  }
+  .ant-popover-arrow {
+    display: none;
+  }
+}
+.user-popover-panel {
+  width: 260px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-popover-header {
+  background: #3867d6;
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+// .user-popover-avatar {
+//   // width: 48px;
+//   // height: 48px;
+//   // border-radius: 50%;
+//   // background: #5b7fe8;
+//   // display: flex;
+//   // align-items: center;
+//   // justify-content: center;
+//   // flex-shrink: 0;
+// }
+
+.user-popover-avatar img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.user-popover-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.user-popover-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.user-popover-phone {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.user-popover-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fff;
+  color: #3867d6;
+  border: 1px solid #3867d6;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 18px;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.user-popover-content {
+  padding: 8px 0;
+  background: #fff;
+}
+
+.user-popover-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.user-popover-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.user-popover-menu-icon {
+  font-size: 16px;
+  color: #666;
+}
+
+.user-popover-tags {
+  .ant-tag {
+    margin-top: 8px;
+  }
+}

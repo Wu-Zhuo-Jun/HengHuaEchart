@@ -1,0 +1,276 @@
+.online-device-info{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    justify-content: center;
+    row-gap: 26px;
+}
+.online-device-title{
+    line-height: 20px;
+    color: rgba(51,51,51,1);
+    font-size: 14px;
+    text-align: left;
+}
+.online-device-content{
+    padding-left: 14px;
+    padding-top: 9px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.online-device-count{
+    height: 28px;
+    line-height: 28px;
+    color:#3867D6;
+    font-size: 20px;
+    text-align: left;
+    flex: 1;
+    font-weight: 600;
+}
+
+.online-device-rate{
+    flex: 1;
+    height: 20px;
+    line-height: 20px;
+    color: #333333;
+    font-size: 14px;
+    text-align: left;
+}
+
+.badge-dot{
+    width: 11px !important;
+    height: 11px !important;
+}
+
+.bussiness-info{
+    text-align: left;
+    color: #101010;
+    font-size: 16px;
+    line-height: 16px;
+    padding-top: 20px;
+    box-sizing: border-box;
+    font-weight: 500;
+
+}
+.bussiness-info div{
+    margin-bottom: 10px;
+}
+
+.customer-attr-info-vertical{
+    width: 100%;
+    color: #101010;
+}
+
+.customer-attr-info-vertical .customer-attr-max{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding:  0px 20px 15px 20px;
+}
+
+.customer-attr-info{
+    width: 100%;
+    /* height: 100%; */
+    color: #101010;
+    display: flex;
+    flex-direction: row;
+    column-gap: 62px;
+    align-items: center;
+}
+
+.gender-rate{
+    position: relative;
+    height: 26px;
+    width: 100%;
+    flex: 2;
+}
+
+.gender-rate-bar{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: black;
+    position: absolute;
+    /* z-index: 10; */
+}
+.gender-rate-bar-info{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    font-size: 14px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+}
+.gender-rate-bar-info .male{
+    flex: 1;
+    text-align: left;
+    display: flex;
+    align-items: center;
+}
+.gender-rate-bar-info .female{
+    flex: 1;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.gender-rate-bar-info .male::before{
+    content: "";
+    width: 17px;
+    height: 17px;
+    background-image: url(../../assets/images/male.png);
+    background-size: cover;
+    display: inline-block;
+    margin-right: 10px;
+}
+.gender-rate-bar-info .female::after{
+    content: "";
+    width: 17px;
+    height: 17px;
+    background-image: url(../../assets/images/female.png);
+    background-size: cover;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.gender-rate-bar-male{
+    width:50%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(139,173,255,1) 0%,rgba(255,255,255,0) 100%);
+    border: 1px solid rgba(56,103,214,1);
+}
+.gender-rate-bar-female{
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(255,222,180,1) 0%,rgba(255,255,255,0) 100%);
+    border: 1px solid rgba(249,162,49,1);
+}
+
+.customer-attr-max{
+    flex: 1;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: left;
+}
+
+.customer-mood-info{
+    height: 75px;
+    border-left: #3867D6 1px solid;
+    padding-left: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    justify-content: space-evenly;
+}
+.customer-mood-info div{
+    font-size: 14px;
+    height: 20px;
+}
+
+.flow-trend-analysis-info-date{
+    font-size: 12px;
+    text-align: left;
+}
+.flow-trend-analysis-info-date div{
+    height: 20px;
+    line-height: 20px;
+}
+
+.flow-trend-analysis-info-value-content{
+    width: 236px;
+    height: 103px;
+    padding-left: 9px;
+    background-size: cover;
+}
+.flow-trend-analysis-info-value-content div{
+    color:#3867D6 !important;
+    font-weight: bold;
+    text-align: left;
+    font-size: 14px;
+    line-height: 20px;
+    height: 20px;
+}
+.flow-trend-analysis-info-value-content div:first-child{
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+.flow-trend-analysis-info-value-content div:last-child{
+    margin-top: 12px;
+    font-size: 12px;
+}
+
+.flow-trend-analysis-info-peak-img{
+    background-image: url(../../assets/images/peak.png);
+   
+}
+.flow-trend-analysis-info-avg-img{
+    background-image: url(../../assets/images/avg.png);
+    background-size: cover;
+}
+
+.annual-heat-map-info{
+    width: 162px;
+    height: 100%;
+    padding-left: 15px;
+}
+
+.annual-heat-map-info div{
+    text-align: left;
+    font-size: 14px;
+}
+
+.annual-heat-map-info-value,.annual-heat-map-info-unit,.annual-heat-map-info-date{
+    font-size: 16px;
+}
+
+.annual-heat-map-info-value{
+    color: #3867D6;
+}
+
+/* Popover样式 */
+.gender-rate-bar-male-popover,
+.gender-rate-bar-female-popover {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 8px;
+}
+
+.gender-rate-bar-male-popover .gender-rate-bar-male-popover-rock,
+.gender-rate-bar-female-popover .gender-rate-bar-female-popover-rock {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.gender-rate-bar-male-popover .gender-rate-bar-male-popover-rock {
+    background-color: #3867D6;
+}
+
+.gender-rate-bar-female-popover .gender-rate-bar-female-popover-rock {
+    background-color: #F9A231;
+}
+
+.gender-rate-bar-male-popover div,
+.gender-rate-bar-female-popover div {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #000;
+}
+
+/* 确保Popover触发区域可点击 */
+.gender-rate-bar-male,
+.gender-rate-bar-female {
+    cursor: pointer;
+}

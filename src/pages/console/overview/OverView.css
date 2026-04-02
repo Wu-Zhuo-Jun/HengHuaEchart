@@ -1,0 +1,353 @@
+.overview-panel {
+  padding-left: 30px;
+  padding-right: 30px;
+  /* width: 100%; */
+}
+.overview-header {
+  background-image: url(../../../assets/images/overview_header.png);
+  background-size: cover;
+  width: 100%;
+  height: 99px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 20px;
+  column-gap: 41px;
+  border-radius: 10px;
+}
+.overview-header-icon {
+  width: 79px;
+  height: 79px;
+  background-image: url(../../../assets/images/overview_header_icon.png);
+  background-size: cover;
+}
+.overview-header-title {
+  height: 28px;
+  line-height: 28px;
+  color: rgba(16, 16, 16, 1);
+  font-size: 20px;
+  text-align: left;
+}
+.overview-shorcut-list {
+  display: flex;
+  flex-direction: row;
+  /* column-gap: 64px; */
+  justify-content: space-between;
+  align-items: center;
+}
+.overview-shorcut-item {
+  display: flex;
+  flex-direction: column;
+  row-gap: 14px;
+  width: 160px;
+  cursor: pointer;
+}
+.overview-shorcut-item-icon {
+  width: 160px;
+  height: 86px;
+  background-size: cover;
+}
+.overview-shorcut-item-title {
+  width: 100%;
+  white-space: wrap;
+  height: 25px;
+  line-height: 25px;
+  color: rgba(56, 103, 214, 1);
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
+}
+.overview-device-status {
+  display: flex;
+  flex-direction: row;
+  column-gap: 24px;
+  width: 100%;
+  height: 100%;
+}
+.overview-device-status > div {
+  flex: 1;
+  height: 279px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 1);
+  color: rgba(56, 103, 214, 1);
+  border: 1px solid rgba(56, 103, 214, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+.overview-device-status-title {
+  margin-left: 13px;
+  font-size: 18px;
+  text-align: left;
+  font-weight: bold;
+}
+.overview-device-status .online-device-title {
+  height: 23px;
+  line-height: 23px;
+  font-size: 16px;
+  text-align: left;
+  font-weight: bold;
+}
+.overview-device-status .online-device-count {
+  height: 28px;
+  line-height: 28px;
+  color: rgba(56, 103, 214, 1);
+  font-size: 20px;
+  text-align: right;
+  padding-right: 20px;
+}
+
+.overview-site-info-item {
+  display: flex;
+  flex-direction: row;
+  width: 205px;
+  /* max-width: 205px; */
+  height: 70px;
+  column-gap: 10px;
+}
+.overview-site-info-item-icon {
+  flex: 1;
+  min-width: 72px;
+  width: 72px;
+  height: 62px;
+  background-size: cover;
+}
+.overview-site-info-item-content {
+  width: 110px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.overview-site-info-item-label {
+  width: 100%;
+  height: 23px;
+  line-height: 23px;
+  font-size: 16px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.overview-site-info-item-value {
+  width: 100%;
+  height: 25px;
+  line-height: 25px;
+  color: rgba(56, 103, 214, 1);
+  font-size: 18px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.overview-device-count-bar-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.overview-device-count-bar-item-label {
+  height: 20px;
+  line-height: 20px;
+  font-size: 14px;
+  text-align: left;
+  font-weight: bold;
+  padding-left: 60px;
+}
+.overview-device-count-bar-item-content {
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.overview-device-count-bar-item-icon {
+  width: 36px;
+  height: 36px;
+  background-image: url(../../../assets/images/overview_device_count_icon.png);
+  background-size: cover;
+}
+
+.overview-device-count-bar-item-progress {
+  /* width: 430px; */
+  flex-grow: 1;
+  height: 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* column-gap: 17px; */
+}
+
+.overview-device-count-bar-item-progress > .bar {
+  border-radius: 13px;
+  height: 100%;
+  /* padding-right: 17px; */
+}
+.overview-device-count-bar-item-value {
+  text-align: right;
+  height: 28px;
+  line-height: 23px;
+  font-size: 16px;
+}
+
+.overview-time-info {
+  /* width: 100%; */
+  width: 446px;
+  height: 99px;
+  line-height: 17px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, 1);
+  font-size: 12px;
+  text-align: center;
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.overview-time-info div {
+  /* height: 28px; */
+  color: #3867d6;
+  font-size: 18px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.overview-contact {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  column-gap: 6px;
+  align-items: center;
+}
+
+.overview-contact-logo {
+  width: 91px;
+  height: 38px;
+  background-image: url(../../../assets/images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.overview-contact-item {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  /* width: 322px; */
+  height: 69px;
+  line-height: 20px;
+  border-radius: 8px;
+  background-color: rgba(237, 243, 255, 1);
+  color: rgba(16, 16, 16, 1);
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 1);
+  padding: 13px 10px 8px 16px;
+  column-gap: 15px;
+}
+
+.overview-contact-item-content {
+  display: flex;
+  flex-direction: column;
+  row-gap: 3px;
+}
+
+.overview-contact-item-icon {
+  width: 24px;
+  height: 24px;
+  background-image: url(../../../assets/images/two_people_icon.png);
+  background-size: cover;
+}
+.overview-contact-item-label {
+  height: 23px;
+  line-height: 23px;
+  font-size: 16px;
+  text-align: left;
+  font-weight: bold;
+}
+.overview-contact-item-value {
+  height: 23px;
+  line-height: 23px;
+  font-size: 14px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.overview-wechat {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.overview-wechat-icon {
+  width: 64px;
+  height: 64px;
+  background-image: url(../../../assets/images/wechat_icon.png);
+  background-size: cover;
+}
+
+.overview-wechat-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  justify-content: center;
+}
+
+.overview-wechat-content div {
+  font-size: 16px;
+  text-align: center;
+  width: 100%;
+}
+
+.overview-user-info {
+  display: flex;
+  flex-direction: column;
+  row-gap: 26px;
+}
+
+.overview-user-info-item {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.overview-user-info-item-content {
+  display: flex;
+  flex-direction: row;
+  column-gap: 21px;
+  align-items: center;
+}
+
+.overview-user-info-item-icon {
+  width: 46px;
+  height: 47px;
+  background-size: cover;
+}
+.overview-user-info-item-username {
+  font-size: 16px;
+  text-align: left;
+}
+.overview-user-info-item-account {
+  margin-top: 4px;
+  font-size: 14px;
+  text-align: left;
+}
+.overview-user-info-item-rolename {
+  font-size: 16px;
+  text-align: right;
+}
+.overview-user-write {
+  width: 24px;
+  height: 24px;
+  background-image: url(../../../assets/images/overview_write_icon.png);
+  background-size: cover;
+  margin-left: auto;
+  cursor: pointer;
+}

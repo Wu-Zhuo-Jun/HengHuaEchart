@@ -1,0 +1,85 @@
+.custom-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 400px;
+
+  .ant-empty {
+    margin: 0;
+
+    .ant-empty-image {
+      margin-bottom: 16px;
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    }
+
+    .ant-empty-description {
+      color: #999;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .ant-empty-footer {
+      margin-top: 16px;
+    }
+  }
+
+  // 小尺寸样式
+  &.empty-small {
+    min-height: 120px;
+
+    .ant-empty {
+      .ant-empty-image {
+        margin-bottom: 8px;
+      }
+
+      .ant-empty-description {
+        font-size: 12px;
+      }
+    }
+  }
+
+  // 大尺寸样式
+  &.empty-large {
+    min-height: 500px;
+
+    .ant-empty {
+      .ant-empty-image {
+        margin-bottom: 24px;
+      }
+
+      .ant-empty-description {
+        font-size: 16px;
+      }
+    }
+  }
+
+  // 自定义主题样式
+  &.empty-theme-primary {
+    .ant-empty-description {
+      color: #1890ff;
+    }
+  }
+
+  &.empty-theme-success {
+    .ant-empty-description {
+      color: #52c41a;
+    }
+  }
+
+  &.empty-theme-warning {
+    .ant-empty-description {
+      color: #faad14;
+    }
+  }
+
+  &.empty-theme-error {
+    .ant-empty-description {
+      color: #ff4d4f;
+    }
+  }
+}

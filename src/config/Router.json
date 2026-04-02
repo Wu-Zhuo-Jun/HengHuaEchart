@@ -1,0 +1,15 @@
+[
+    {
+        "path": "/",
+        "element": "HomePage",
+        "title": "Home",
+        "id":1
+    },
+    {
+        "path": "/DailyReport",
+        "element":"DailyReport",
+        "title":"Daily Report",
+        "id":2
+    }
+
+]

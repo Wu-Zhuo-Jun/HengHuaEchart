@@ -1,0 +1,32 @@
+.timeGranulePicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: PingFangSC-regular;
+  text-align: center;
+  .ant-picker-dropdown .ant-picker-panel-container .ant-picker-presets {
+    display: block;
+    max-width: 400px;
+    min-width: 240px;
+    border-inline-end: 1px solid rgba(5, 5, 5, 0.06);
+    ul {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* 2等分列 */
+      gap: 12px;
+      height: auto;
+      li {
+        margin-top: 0;
+        height: 26px;
+        line-height: 26px;
+        background: #e6f4ff;
+        color: hsl(0, 0%, 25%);
+        border-radius: 4px;
+        cursor: pointer;
+        &:hover {
+          background-color: #3867d6;
+          color: #fff;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,343 @@
+.venueRanking {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  // padding: 0 10px;
+  // row-gap: 14px;
+  min-width: 1130px;
+  overflow: hidden;
+
+  .venueRankingTabs {
+    background-color: #fff;
+    border-radius: 8px 8px 0 0;
+    box-sizing: border-box;
+    height: 46px;
+    margin: 0 10px;
+    // padding: 0 0;
+    box-shadow: 0px 2px 6px 0 #0006;
+    // z-index: 999;
+
+    .ant-tabs-nav {
+      padding-left: 16px;
+      margin-bottom: 0px;
+      // &::before {
+      //   border-bottom: none;
+      // }
+    }
+  }
+
+  // 客流排行榜页面
+  .flow-ranking-page {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+
+    row-gap: 14px;
+    flex: 1;
+    overflow: hidden;
+    // background-color: #fff;
+    // border-radius: 8px;
+    // box-shadow: 0 2px 6px 0 #0006;
+
+    &__search-bar {
+      // display: flex;
+      // align-items: center;
+      padding: 16px;
+      background-color: #fff;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0px 2px 6px 0 #0006;
+      margin: 0 10px;
+      // font-family: PingFangSC-regular;
+      // text-align: center;
+      // padding: 8px 16px;
+      // margin-bottom: 16px;
+    }
+
+    &__filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 14px;
+      row-gap: 0px;
+    }
+
+    &__filter-item {
+      display: flex;
+      align-items: center;
+    }
+
+    &__filter-label {
+      margin-right: 8px;
+      color: #000;
+    }
+
+    &__stats-period {
+      font-size: 14px;
+      color: #666;
+    }
+
+    &__table-wrapper {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      border-radius: 8px;
+      padding: 8px 16px;
+      background-color: #fff;
+      box-shadow: 0px 2px 6px 0 #0006;
+      margin: 0 10px;
+    }
+
+    &__table-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    &__config-btn {
+      border-color: #3867d6;
+      color: #3867d6;
+    }
+
+    &__table {
+      .ant-table-thead > tr > th {
+        background: #e6f2ff;
+        font-weight: 600;
+        &:hover {
+          background: #d6e4ff;
+        }
+      }
+
+      .ant-table-tbody .ant-table-cell {
+        padding: 10px;
+      }
+    }
+
+    &__site-cell {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    &__site-name {
+      font-size: 14px;
+      color: #000;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__site-info {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__rank-icon {
+      font-size: 18px;
+
+      &--gold {
+        color: #ffd700;
+      }
+
+      &--silver {
+        color: #c0c0c0;
+      }
+
+      &--bronze {
+        color: #cd7f32;
+      }
+    }
+
+    &__placeholder {
+      padding: 40px;
+      text-align: center;
+      color: #999;
+    }
+
+    // 客群属性榜展开筛选样式
+    &__filter-expand {
+      flex-basis: 100%;
+      width: 100%;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out;
+      padding-top: 0;
+      padding-bottom: 0;
+
+      &.flow-ranking-page__filter-expand-open {
+        max-height: 200px;
+        opacity: 1;
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
+    }
+
+    &__filter-row {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      padding-bottom: 8px;
+
+      &:last-child {
+        padding-bottom: 0;
+      }
+
+      .flow-ranking-page__filter-label {
+        margin-right: 14px;
+        min-width: 70px;
+      }
+    }
+
+    &__filter-btn {
+      color: #333;
+      height: 32px;
+      line-height: 32px;
+      border-radius: 6px;
+      padding: 0 15px;
+      background-color: #f0f0f0;
+      margin-right: 14px;
+      min-width: 80px;
+      cursor: pointer;
+      text-align: center;
+      &--selected {
+        color: #1890ff;
+        background-color: #e6f2ff;
+      }
+    }
+  }
+}
+
+// 指标配置弹窗
+.indicator-config-modal {
+  .ant-modal-body {
+    padding: 8px 0px;
+  }
+
+  &__subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  &__body {
+    display: flex;
+    gap: 24px;
+    min-height: 420px;
+  }
+
+  &__left {
+    flex: 1;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  &__right {
+    flex: 1;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  &__section-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #000;
+  }
+
+  &__group {
+    margin-bottom: 12px;
+  }
+
+  &__list {
+    display: flex;
+    // flex-direction: column;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__item {
+    .ant-checkbox-wrapper {
+      font-size: 14px;
+    }
+  }
+
+  &__right-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  &__selected-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__selected-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    cursor: move;
+
+    &:hover {
+      background: #eaeaea;
+    }
+  }
+
+  &__drag-handle {
+    color: #999;
+    font-size: 14px;
+  }
+
+  &__selected-label {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  &__remove {
+    color: #999;
+    cursor: pointer;
+    font-size: 12px;
+
+    &:hover {
+      color: #ff4d4f;
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+
+      &:hover {
+        color: #999;
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    // padding-top: 16px;
+    // border-top: 1px solid #f0f0f0;
+  }
+}
+
+// // 统一两个页面的数据详情底部距离，以出入口对比为标准
+// // 时间对比页面使用 layout-content 有 row-gap: 14px，需要抵消这个间距
+// .layout-content .table-detail {
+//   margin-bottom: 0px;
+// }

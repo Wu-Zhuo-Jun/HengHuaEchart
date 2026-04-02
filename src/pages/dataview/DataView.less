@@ -1,0 +1,482 @@
+// 移动端外层容器：用于居中显示，空余部分留白
+.data-view-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  overflow: hidden;
+}
+
+.data-view-container {
+  // 移动端宽高由JavaScript动态计算并设置，确保始终保持16:9比例
+  overflow: auto;
+  //   background: #0a1e3d;
+  background-image: url("@/assets/dataviewImages/dataViewBg.webp");
+  background-size: cover;
+  padding: 1.25rem;
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  // overflow: hidden;
+  box-sizing: border-box;
+
+  .data-view-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding: 0 1.25rem;
+    flex-shrink: 0;
+
+    .data-view-site-name {
+      color: #fff;
+      font-size: 1.6rem;
+      width: 16rem;
+      font-weight: 500;
+    }
+
+    .data-view-title {
+      text-align: center;
+      font-size: 2.4rem;
+      font-weight: bold;
+      flex: 1;
+      background: linear-gradient(180deg, #ffffff 0%, #00d4ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+    }
+
+    .data-view-time {
+      color: #fff;
+      font-size: 1.6rem;
+      width: 16rem;
+      text-align: end;
+    }
+  }
+
+  .data-view-main-content {
+    flex: 1;
+    display: flex;
+    gap: 1.25rem;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .data-view-left-column,
+  .data-view-right-column {
+    width: 26.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.94rem;
+    min-height: 0;
+    //   overflow-y: auto;
+  }
+
+  .data-view-component-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(56, 135, 253, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.6rem;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 6.25rem;
+    box-sizing: border-box;
+    box-shadow: 0 0.13rem 1rem rgba(0, 0, 0, 0.3), inset 0 0 1.5rem rgba(56, 135, 253, 0.15), inset 0 0 3rem rgba(56, 135, 253, 0.08);
+    transition: all 0.3s ease;
+
+    .component-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      // border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      .component-title-icon {
+        width: 0.23rem;
+        height: 1.6rem;
+        background-color: #3887fd;
+        border-radius: 0.23rem;
+      }
+      .component-title-text {
+        font-size: 1rem;
+        font-weight: bold;
+      }
+    }
+
+    .component-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+
+      .component-placeholder {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.88rem;
+      }
+    }
+  }
+
+  .data-view-center-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.94rem;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .data-view-footer-row {
+    font-size: 0.88rem;
+    color: #fff;
+    text-align: end;
+  }
+
+  // 组件样式
+  .dashboard-panel {
+    display: flex;
+    width: 100%;
+    gap: 0.94rem;
+    flex: 1;
+    .dashboard-panel-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      height: 100%;
+      .dashboard-panel-item-title {
+        font-size: 2rem;
+        height: 3.2rem;
+        width: 12rem;
+        text-align: center;
+        background-size: cover;
+        background-image: url("@/assets/dataviewImages/dashBoradBg.png");
+      }
+      .dashboard-panel-item-count {
+        font-size: 1.6rem;
+        font-weight: bold;
+        display: flex;
+        width: 100%;
+        padding-top: 1rem;
+        z-index: 1;
+        .dashboard-panel-item-count-value {
+          flex: 1;
+          text-align: end;
+        }
+        .dashboard-panel-item-count-value-rate {
+          width: 6.4rem;
+          margin-left: 0.3rem;
+          > span {
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+          }
+        }
+      }
+      .dashboard-panel-item-num {
+        font-size: 1.4rem;
+        font-weight: bold;
+        display: flex;
+        width: 100%;
+        z-index: 1;
+        .dashboard-panel-item-num-value {
+          flex: 1;
+          text-align: end;
+        }
+        .dashboard-panel-item-num-value-rate {
+          width: 6.6rem;
+          margin-left: 0.3rem;
+          > span {
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+          }
+        }
+      }
+      .bottomImg {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        width: 13rem;
+        height: 10rem;
+      }
+    }
+  }
+
+  .festival-flow-progress-container {
+    height: 100%;
+    width: 100%;
+    padding: "0.08rem";
+    .festival-flow-progress {
+      width: 100%;
+      height: 7px;
+      background-color: rgba(197, 214, 255, 1) 1.07%;
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      // align-items: center;
+      .festival-flow-progress-bar {
+        flex: 1;
+        width: 100%;
+        text-align: left;
+        // height: 100%;
+        background: linear-gradient(to right, rgba(197, 214, 255, 1) 1.07%, #00ffff);
+        border-radius: 2px;
+      }
+      // .festival-flow-progress-point {
+      //   content: "";
+      //   margin-right: -7px;
+      //   width: 10px;
+      //   height: 10px;
+      //   border-radius: 50%;
+      //   display: inline-block;
+      //   background-color: #ffffff;
+      //   border: #3867d6 1px solid;
+      //   box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.4);
+      // }
+    }
+  }
+
+  .data-view-customer-portrait-chart {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    .DVcustomerTop {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      .DVcustomerTop-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        font-size: 1.2rem;
+        flex: 1;
+        .DVcustomerTop-left-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          .value {
+            width: 4rem;
+            height: 3rem;
+            font-size: 1.7rem;
+            background-size: contain;
+            background-position: center;
+            line-height: 3rem;
+            text-align: end;
+            background-repeat: no-repeat;
+          }
+          .girlValue {
+            background: url("@/assets/dataviewImages/organgeTriangle.png") no-repeat center center;
+          }
+          .manValue {
+            background: url("@/assets/dataviewImages/blueTriangle.png") no-repeat center center;
+          }
+        }
+      }
+    }
+    .DVcustomerBottom {
+      flex: 1.5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      .DVcustomerBottom-right {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        &.isFullscreen {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  .group-statistics-panel {
+    width: 100%;
+    height: 100%;
+    gap: 0.4rem;
+    .group-statistics-panel-header {
+      display: flex;
+      flex-direction: row;
+      flex-shrink: 0;
+      justify-content: space-between;
+      gap: 0.8rem;
+      flex: 1;
+      height: 100%;
+      overflow: hidden;
+      .group-statistics-panel-header-item {
+        flex: 1;
+        text-align: center;
+        font-weight: bold;
+        padding: 0.08rem;
+        // border: 1px solid #fff;
+        background: url("@/assets/dataviewImages/dashBoradBg.png") no-repeat center center;
+        background-size: cover;
+        display: flex;
+        height: 100%;
+
+        .icon {
+          display: block;
+          height: auto;
+          width: 5.4rem;
+          object-fit: contain;
+        }
+        .total-value-container {
+          flex: 1;
+          font-size: 0.8rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          .total-value {
+            font-size: 0.94rem;
+          }
+        }
+      }
+    }
+  }
+
+  // 水波球
+  @keyframes wave {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .wave-loader {
+    position: relative;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: 0 0 0.1rem 0.2rem rgba(56, 103, 214, 0.2), 0 0 0.3rem rgba(56, 103, 214, 0.4);
+    margin-bottom: 0.2rem;
+    .wave {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      left: -50%;
+      transform-origin: 50% 50%;
+      animation: wave 6s linear infinite;
+    }
+
+    .wave1 {
+      background: rgba(56, 103, 214, 0.8);
+      border-radius: 35%;
+      top: 40%;
+      animation-duration: 6s;
+      filter: blur(2px);
+    }
+
+    .wave1-female {
+      background: rgba(249, 162, 49, 0.8);
+    }
+
+    .wave2 {
+      background: #3867d6;
+      border-radius: 25%;
+      animation-duration: 8s;
+      top: 50%;
+    }
+    .wave2-female {
+      background: #f9a231;
+    }
+    .percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: bold;
+      pointer-events: none;
+    }
+    &.wave-loader-female {
+      box-shadow: 0 0 0.1rem 0.2rem rgba(249, 162, 49, 0.2), 0 0 0.3rem rgba(249, 162, 49, 0.4);
+    }
+  }
+
+  .fullscreen-wave-loader {
+    width: 3.4rem;
+    height: 3.4rem;
+    .percentage {
+      font-size: 1.2rem;
+    }
+  }
+
+  // 滚动条样式
+  ::-webkit-scrollbar {
+    width: 0.38rem;
+    height: 0.38rem;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.19rem;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(56, 135, 253, 0.5);
+    border-radius: 0.19rem;
+
+    &:hover {
+      background: rgba(56, 135, 253, 0.7);
+    }
+  }
+
+  .text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Skeleton 骨架屏样式 - 适配深蓝色背景
+  .ant-skeleton {
+    .ant-skeleton-content {
+      .ant-skeleton-title,
+      .ant-skeleton-paragraph > li {
+        background: linear-gradient(90deg, rgba(56, 135, 253, 0.15) 25%, rgba(56, 135, 253, 0.25) 37%, rgba(56, 135, 253, 0.15) 63%);
+        background-size: 400% 100%;
+      }
+    }
+
+    &.ant-skeleton-active {
+      .ant-skeleton-content {
+        .ant-skeleton-title,
+        .ant-skeleton-paragraph > li {
+          background: linear-gradient(90deg, rgba(56, 135, 253, 0.15) 25%, rgba(56, 135, 253, 0.35) 37%, rgba(56, 135, 253, 0.15) 63%);
+          background-size: 400% 100%;
+          animation: ant-skeleton-loading 1.4s ease infinite;
+        }
+      }
+    }
+  }
+
+  @keyframes ant-skeleton-loading {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
+  }
+}

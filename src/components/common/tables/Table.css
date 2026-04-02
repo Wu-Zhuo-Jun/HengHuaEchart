@@ -1,0 +1,357 @@
+.circle {
+  background-color: #0052d9; /* 圆的背景颜色 */
+  border-radius: 50%;
+  color: #ffffff;
+  text-align: center;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.circle-image {
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.circle-image img {
+  width: 100%;
+  height: 100%;
+}
+.table-ranking {
+  max-width: 100%;
+  /* height: 100%; */
+  border-collapse: collapse;
+}
+
+.table-ranking thead th {
+  font-size: 14px;
+  color: #555555;
+  text-align: center;
+  border-bottom: #bbbbbb 1px solid;
+  min-width: 80px;
+}
+.table-ranking thead th:first-child {
+  min-width: 50px;
+}
+
+.table-ranking tbody tr {
+  height: 27px;
+  border-bottom: #bbbbbb 1px solid;
+  font-size: 12px;
+  color: #101010;
+  text-align: center;
+  height: 27px;
+}
+
+.table-door-ranking {
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.table-door-ranking .ant-spin-nested-loading,
+.table-festival .ant-spin-container {
+  height: 100%;
+}
+.table-door-ranking .ant-table {
+  height: 100%;
+}
+
+.table-door-ranking .ant-table-thead .ant-table-cell {
+  padding: 0;
+  white-space: nowrap;
+}
+
+.table-door-ranking .ant-table-thead .ant-table-cell::before {
+  display: none;
+}
+
+.table-door-ranking .ant-table-tbody .ant-table-row td {
+  white-space: nowrap;
+  height: 27px;
+  padding: 0 10px;
+  border-bottom: #bbbbbb 1px solid;
+  box-sizing: content-box;
+}
+
+.table-festival {
+  height: 100%;
+  width: 100%;
+}
+
+.table-festival .ant-spin-nested-loading,
+.table-festival .ant-spin-container {
+  height: 100%;
+}
+.table-festival .ant-table {
+  height: 100%;
+}
+
+.ant-table-body,
+.ant-table-content {
+  scrollbar-width: thin;
+  scrollbar-color: #eaeaea transparent;
+  scrollbar-gutter: stable;
+}
+
+.table-festival .ant-table-tbody .ant-table-row td {
+  white-space: nowrap;
+  height: 32px;
+  padding: 0 10px;
+  background-color: rgba(56, 103, 214, 0.2);
+  border-radius: 2px;
+  border-bottom: 7px solid white;
+  box-sizing: content-box;
+}
+.table-festival .ant-table-cell-row-hover {
+  background-color: rgba(56, 103, 214, 0.2) !important;
+}
+.table-festival .ant-table-thead .ant-table-cell {
+  padding: 0;
+}
+.table-festival .ant-table-thead .ant-table-cell::before {
+  display: none;
+}
+.table-festival .yoy-rate-item-up,
+.table-festival .yoy-rate-item-down {
+  display: flex;
+  align-items: center;
+}
+.table-festival .yoy-rate-item-up::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-size: cover;
+  border-radius: 50%;
+  background-color: white;
+  background-image: url(../../../assets/images/vup.png);
+  margin-right: 2px;
+}
+.table-festival .yoy-rate-item-down::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-size: cover;
+  border-radius: 50%;
+  background-color: white;
+  background-image: url(../../../assets/images/vdown.png);
+  margin-right: 2px;
+}
+
+.festival-flow-progress {
+  width: 100%;
+  height: 7px;
+  background-color: #b0b0b0;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.festival-flow-progress-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(197, 214, 255, 1) 1.07%, rgba(56, 103, 214, 1) 99.14%);
+  border-radius: 3px;
+}
+.festival-flow-progress-point {
+  content: "";
+  margin-right: -7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: #ffffff;
+  border: #3867d6 1px solid;
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.4);
+}
+
+.table-group-site-ranking {
+  height: 100%;
+  width: 100%;
+}
+.table-group-site-ranking .ant-spin-nested-loading,
+.table-festival .ant-spin-container {
+  height: 100%;
+}
+.table-group-site-ranking .ant-table {
+  height: 100%;
+}
+
+.table-group-site-ranking .ant-table-thead > tr > th {
+  background: none;
+  font-weight: 600;
+}
+
+.table-group-site-ranking .ant-table-thead .ant-table-cell {
+  padding: 0 10px;
+  height: 35px;
+  line-height: 23px;
+  font-size: 14px !important;
+}
+
+.table-group-site-ranking .ant-table-thead .ant-table-cell::before {
+  display: none;
+}
+
+.table-group-site-ranking .ant-table-tbody .ant-table-row td {
+  white-space: nowrap;
+  height: 40px;
+  padding: 0 10px;
+  background-color: unset;
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(51, 51, 51, 1);
+  box-sizing: content-box;
+}
+
+.table-data {
+  height: 660px;
+}
+
+.table-data .ant-table-thead > tr > th {
+  background: #edf3ff;
+  font-weight: 600;
+}
+
+.table-data .ant-table-thead .ant-table-cell {
+  padding: 10px 10px !important;
+  height: 42px;
+  font-size: 15px !important;
+}
+
+.table-data .ant-table-tbody .ant-table-row td {
+  padding: 10px 10px !important;
+  height: 50px;
+  font-size: 14px;
+  box-sizing: border-box !important;
+}
+.table-data .ant-table-thead .ant-table-cell::before {
+  display: none;
+}
+
+.table-data .ant-table-container table > thead > tr:first-child > *:first-child {
+  border-radius: 0 !important;
+}
+
+.table-data .ant-table-body table {
+  border-collapse: separate;
+}
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-body > table > tbody > tr > td,
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr > td {
+  border-inline-end: 1px solid #bbbbbb;
+  border-bottom: 1px solid #bbbbbb;
+}
+.table-data .ant-table-header {
+  border-radius: 0 !important;
+}
+.table-data .ant-table-header table {
+  border-collapse: separate;
+}
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr > th,
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > th {
+  border-top: 1px solid #bbbbbb;
+  border-inline-end: 1px solid #bbbbbb;
+  border-bottom: 1px solid #bbbbbb;
+}
+
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr > th:first-child,
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > th:first-child {
+  border-inline-start: 1px solid #bbbbbb;
+}
+
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-body > table > tbody > tr > td:first-child:not(.row-span-cell),
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr > td:first-child:not(.row-span-cell) {
+  border-inline-start: 1px solid #bbbbbb;
+}
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-body > table > tbody > tr > td:last-child,
+.table-data .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr > td:last-child {
+  right: 0px;
+}
+
+.table-data .ant-table-content table {
+  border-collapse: collapse;
+}
+
+.table-data .ant-table-thead th.ant-table-column-sort {
+  background: #edf3ff !important;
+}
+
+.table-data .ant-table-thead th.ant-table-column-has-sorters:hover {
+  background: #edf3ff !important;
+}
+
+.common-table-data .ant-table-thead > tr > th {
+  background: #edf3ff;
+  font-weight: 600;
+}
+
+.common-table-data .ant-table .ant-table-container {
+  border-start-end-radius: 0;
+  border-start-start-radius: 0;
+}
+
+.common-table-data .ant-table .ant-table-header {
+  border-radius: 0;
+}
+
+.common-table-data .ant-table-container table > thead > tr:first-child > *:first-child {
+  border-start-start-radius: 0;
+}
+
+/* Overlay 模式滚动条 - 不占用布局空间  暂时保存*/
+.common-table-data .ant-table-body {
+  overflow: overlay !important; /* 使用 overlay 模式 */
+  scrollbar-width: thin;
+  /* scrollbar-color: rgba(0, 0, 0, 0.3) transparent; */
+}
+
+/* WebKit 浏览器 Overlay 滚动条样式 */
+.common-table-data .ant-table-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.common-table-data .ant-table-body::-webkit-scrollbar-track {
+  background: transparent; /* 透明背景 */
+}
+
+.common-table-data .ant-table-body::-webkit-scrollbar-thumb {
+  /* background: rgba(0, 0, 0, 0.3); */
+  border-radius: 4px;
+  /* border: 1px solid rgba(255, 255, 255, 0.2); */
+  transition: all 0.2s ease;
+}
+
+/* .common-table-data .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+} */
+
+.common-table-data .ant-table-body::-webkit-scrollbar-thumb:active {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.common-table-data .ant-table-body::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 隐藏滚动条箭头 */
+.common-table-data .ant-table-body::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* 水平滚动条 overlay 样式 */
+.common-table-data .ant-table-body::-webkit-scrollbar:horizontal {
+  height: 8px;
+}
+
+/* 确保滚动条浮在内容上方 */
+.common-table-data .ant-table-body {
+  position: relative;
+  z-index: 1;
+}

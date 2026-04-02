@@ -1,0 +1,12 @@
+---
+description: customerInsight 风格信号（减少 AI 偏离与 token）
+globs: src/pages/flow/customerInsight/**/*.{js,jsx,ts,tsx,less}
+alwaysApply: false
+---
+
+# customerInsight 目录风格信号
+
+- 页面样式文件同级引入：`import "./index.less";`（或组件内 `import "../index.less";`）
+- 组件拆分放在 `components/`，并通过页面入口集中引用
+- 可复用的数据处理逻辑抽工具（如 `ArrayUtils`/`StringUtils`/`CommonUtils`/`TableUtils`）
+- 路径别名统一使用 `@/`（不要写相对路径穿越多层）

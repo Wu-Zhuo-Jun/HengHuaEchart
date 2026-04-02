@@ -1,0 +1,385 @@
+.outletComparison {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 10px;
+  row-gap: 14px;
+  min-width: 1130px;
+  overflow: auto;
+
+  .outletComparisonPage {
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    row-gap: 14px;
+  }
+
+  .ui-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px 0 #00000029;
+    box-sizing: border-box;
+    height: 46px;
+    padding: 0 0;
+    // padding: 8px 16px;
+    width: 100%;
+    display: flex;
+    align-items: start;
+    .ant-tabs-nav {
+      margin-top: 4px;
+      padding-left: 16px;
+      margin-bottom: 22px;
+      &::before {
+        border-bottom: none;
+      }
+    }
+    .ant-tabs-tab {
+      padding: 6px 0;
+      font: 16px PingFangSC-regular;
+    }
+    .ant-tabs-content-holder {
+      width: 100%;
+    }
+    .ant-tabs-ink-bar {
+      height: 4px;
+    }
+    // .ui-content-left {
+    //   display: flex;
+    //   gap: 58px;
+    //   .active {
+    //     color: #3867d6;
+    //     border-bottom: 4px solid #3867d6;
+    //   }
+    //   > div {
+    //     cursor: pointer;
+    //     padding: 4px 0px;
+    //     font-size: 16px;
+    //   }
+    // }
+  }
+
+  .ui-search-bar {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px 0 #0006;
+    box-sizing: border-box;
+    font-family: PingFangSC-regular;
+    padding: 8px 16px;
+    text-align: center;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 222;
+    .timeContrast {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+    }
+    .title {
+      margin-right: 14px;
+    }
+    // .ant-select {
+    //   height: 31.6px;
+    // }
+  }
+
+  .comparisonPart {
+    .comparisonPart-ratio {
+      width: 300px;
+      position: relative;
+      font-size: 12px;
+      .comparisonPart-trapezoid {
+        position: relative;
+        min-width: 300px;
+        max-width: 300px;
+        clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%);
+        height: 24px;
+        background-color: #f9a231;
+        z-index: 1;
+      }
+      .comparisonPart-trapezoid-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        // width: 72%; /* 这个值控制进度百分比 */
+        background: #3867d6;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 10% 100%);
+
+        z-index: 1;
+      }
+      .triangle {
+        top: -6px;
+        display: block;
+        position: absolute;
+        width: 42px;
+        height: 35px;
+        z-index: 10;
+      }
+      .appiontSum {
+        color: #fff;
+        left: 35px;
+        top: 0;
+        position: absolute;
+        z-index: 99;
+      }
+      .comparisonSum {
+        color: #fff;
+        top: 1px;
+        right: 30px;
+        position: absolute;
+        z-index: 99;
+      }
+    }
+    .comparisonPart-info {
+      color: #000;
+      margin-top: 8px;
+      margin-left: 80px;
+      text-align: start;
+      > span {
+        margin: 0 54px 0 40px;
+        color: #3867d6;
+      }
+    }
+  }
+
+  // 出入口对比卡片
+  .outletFlowPanel {
+    .outletFlowCase {
+      color: #000;
+      .outletFlowCase-title {
+        font-size: 20px;
+        font-weight: bold;
+        padding-bottom: 8px;
+        line-height: 20px;
+      }
+      .outletFlowCase-timeRage {
+        font-size: 14px;
+        span {
+          padding: 0 4px;
+        }
+        padding-bottom: 13px;
+      }
+
+      .outletFlowCase-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr; /* 5等分列 */
+        gap: 33px; /* 间距 */
+        padding-bottom: 30px;
+      }
+
+      .outletCardItem {
+        position: relative;
+        padding: 12px 12px;
+        line-height: 20px;
+        border-radius: 14px;
+        color: rgba(16, 16, 16, 1);
+        font-size: 14px;
+        box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        overflow: hidden;
+        .outletCardItem-bg {
+          position: absolute;
+          bottom: 5px;
+          right: 0;
+        }
+        .outletCardItem-name {
+          padding-bottom: 6px;
+          font-weight: bold;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .outletCardItem-info {
+          display: flex;
+          justify-content: space-between;
+          padding-bottom: 16px;
+          div:nth-child(2) {
+            color: #3867d6;
+          }
+        }
+        .outletCardItem-out {
+          font-size: 12px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1px 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          img {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+          }
+        }
+        &.comparison {
+          background-color: #fffae8;
+          .outletCardItem-out {
+            background-color: #ffd298;
+            img {
+              background-color: #f9a333;
+            }
+          }
+        }
+        &.appiont {
+          background-color: #ecf2ff;
+          .outletCardItem-out {
+            color: #fff;
+            background-color: #3867d6;
+            img {
+              background-color: #fff;
+            }
+          }
+        }
+        &.appiontFirst {
+          background-color: #cbdaff;
+        }
+        &.comparisonFirst {
+          background-color: #fff4cc;
+        }
+      }
+
+      // 分页器
+      .ant-pagination {
+        .ant-pagination-simple-pager input {
+          padding: 0;
+          width: 30px;
+        }
+        .ant-pagination-simple-pager {
+          margin: 0;
+        }
+        .ant-pagination-prev {
+          margin: 0;
+        }
+        .ant-pagination-options {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .CustomerAttrChart {
+    color: #000;
+    display: flex;
+    gap: 24px;
+    // gap: 48px;
+    width: 100%;
+    height: 480px;
+    padding-bottom: 30px;
+    .CustomerAttrChart-item {
+      min-width: 0;
+      flex: 1;
+      .CustomerAttrChart-item-title {
+        font-size: 20px;
+        font-weight: bold;
+        padding-bottom: 8px;
+        line-height: 20px;
+      }
+      .CustomerAttrChart-item-timeRage {
+        font-size: 14px;
+        span {
+          padding: 0 4px;
+        }
+        padding-bottom: 15px;
+      }
+    }
+  }
+
+  .CustomerMoodChart {
+    color: #000;
+    display: flex;
+    // width: 100%;
+    height: 420px;
+    .CustomerMoodChart-item {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      .CustomerMoodChart-item-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 16px;
+        line-height: 20px;
+      }
+      .CustomerMoodChart-item-content {
+        display: flex;
+        position: relative;
+        flex: 1;
+      }
+    }
+  }
+
+  .table-detail {
+    position: relative;
+    .table-detail-export-button {
+      position: absolute;
+      min-width: 130px;
+      right: 20px;
+      top: 20px;
+    }
+    // .outlet-comparison-table {
+    //   .ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr:not(:first-child) > th:first-child {
+    //     border-inline-start: none;
+    //   }
+    //   .ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr:first-child > th:first-child {
+    //     border-bottom: 1px solid #bbbbbb;
+    //   }
+
+    //   .ant-table.ant-table-bordered > .ant-table-container > .ant-table-body > table > tbody > tr:nth-child(odd) > td:first-child,
+    //   .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr:nth-child(odd) > td:first-child {
+    //     border-inline-start: none;
+    //   }
+    // }
+
+    // .ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr > th,
+    // .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > th {
+    //   border-bottom: none;
+    // }
+
+    // .ant-table-thead > tr > th {
+    //   background: #edf3ff;
+    //   font-weight: 600;
+    // }
+    // .ant-table-wrapper .ant-table.ant-table-bordered > .ant-table-container {
+    //   border-inline-start: 1px solid #bbbbbb;
+    // }
+
+    // .ant-table-container .ant-table-thead {
+    //   border-bottom: 1px solid #bbbbbb;
+    // }
+    // .ant-table.ant-table-bordered > .ant-table-container > .ant-table-body > table > tbody > tr > td,
+    // .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr > td {
+    //   border-inline-end: 1px solid #bbbbbb;
+    //   border-bottom: 1px solid #bbbbbb;
+    // }
+    // .ant-table-header {
+    //   border-radius: 0 !important;
+    // }
+    // .ant-table-header table {
+    //   border-collapse: separate;
+    // }
+    // .ant-table.ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr > th,
+    // .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > th {
+    //   border-top: 1px solid #bbbbbb;
+    //   border-inline-end: 1px solid #bbbbbb;
+    //   border-bottom: 1px solid #bbbbbb;
+    // }
+
+    // .ant-table.ant-table-bordered > .ant-table-container > .ant-table-header > table > thead > tr > [colspan],
+    // .ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > [colspan] {
+    //   border-bottom: none;
+    // }
+    // .ant-table-cell .ant-table-cell-fix-left .ant-table-cell-fix-left-last {
+    //   border-inline-start: 1px solid #bbbbbb;
+    // }
+  }
+}
+
+// // 统一两个页面的数据详情底部距离，以出入口对比为标准
+// // 时间对比页面使用 layout-content 有 row-gap: 14px，需要抵消这个间距
+// .layout-content .table-detail {
+//   margin-bottom: 0px;
+// }

@@ -1,0 +1,74 @@
+/* body 样式在下面统一定义 */
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+html {
+  height: 100vh;
+  height: 100dvh;
+  /* 动态视口高度，适用于移动设备 */
+  margin: 0;
+  padding: 0;
+  overflow-x: auto; /* 允许横向滚动 */
+  overflow-y: auto; /* 允许纵向滚动 */
+  -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+  box-sizing: border-box;
+  position: relative;
+  /* iOS 缩放支持 - 允许所有触摸手势包括缩放 */
+  touch-action: auto; /* 允许所有默认触摸行为（包括缩放） */
+  -webkit-touch-callout: default; /* 允许长按菜单 */
+  -webkit-user-select: text; /* 允许文本选择 */
+  user-select: text;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  height: 100dvh;
+  /* 动态视口高度，适用于移动设备 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: auto; /* 允许横向滚动 */
+  overflow-y: auto; /* 允许纵向滚动 */
+  -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+  box-sizing: border-box;
+  position: relative;
+  /* iOS 缩放支持 - 允许所有触摸手势包括缩放 */
+  touch-action: auto; /* 允许所有默认触摸行为（包括缩放） */
+  -webkit-touch-callout: default; /* 允许长按菜单 */
+  -webkit-user-select: text; /* 允许文本选择 */
+  user-select: text;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 确保容器元素允许缩放 */
+div,
+section,
+article,
+main,
+header,
+footer,
+aside,
+nav {
+  touch-action: auto !important;
+}
+
+#root {
+  height: 100vh;
+  height: 100dvh;
+  /* height: 100dvh;   动态视口高度，适用于移动设备 */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+  position: relative;
+  /* iOS 缩放支持 - 允许所有触摸手势包括缩放 */
+  touch-action: auto; /* 允许所有默认触摸行为（包括缩放） */
+  -webkit-touch-callout: default; /* 允许长按菜单 */
+}

@@ -1,0 +1,27 @@
+.realFlow{
+    width: 240px;
+    height: 202px;
+    background-image: url(../../../assets/images/real_flow_bg.png);
+    background-size:cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.realFlowValue{
+    margin-top: 50px;
+    line-height: 28px;
+    color: white;
+    font-size: 28px;
+    text-align: center;
+    font-weight: bold;
+}
+.realFlowUnit{
+    margin-top: 10px;
+    line-height: 20px;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+}

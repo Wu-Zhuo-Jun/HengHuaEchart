@@ -1,0 +1,41 @@
+.modalContentTitle{
+    font-size: 14px;
+    text-align:end !important;
+    color: #333333;
+    flex-grow: 1;
+}
+
+.modalValueContent{
+    width: 370px;
+    min-width: 370px;
+    height: 28px;
+    border-radius: 5px;
+    background-color: rgba(228,228,228,1);
+    font-size: 14px;
+    color: #777777;
+    padding: 0 12px;
+    line-height: 28px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+.modalValueInput{
+    width: 370px;
+    min-width: 370px;
+    height: 28px;
+    font-size: 14px;
+}
+.modalValueTextArea{
+    width: 370px;
+    height: 102px;
+}
+.modalValueTextArea>textarea{
+    resize: none;
+}
+
+.modalContentItem{
+    column-gap: 15px;
+    align-items: center;
+    width: 80%;
+    justify-content: center;
+}

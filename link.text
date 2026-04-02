@@ -1,0 +1,284 @@
+groupmanagement/getGroupSelection 获取集团选项
+request{
+
+}
+response{
+	result:错误码,
+	msg:错误信息，
+	data:[
+		{
+			groupId:"1", //集团id
+			parentId:"1", //父节点groupId =0时为没有父节点
+			groupName:"name", //集团名称
+			groupLevel:1, //节点层级 1为最顶级节点
+		}
+	]
+}
+
+areamanagement/getSiteList 获取场地列表
+request{
+	groupIds:集团id(逗号分隔)
+	search:查找关键字
+}
+
+response 
+{
+	result:错误码,
+	msg:错误信息，
+	data:[
+		{
+			siteId:"1" //场地id
+			siteName:"name" //场地名称
+		}
+	]
+}
+
+areamanagement/getSiteAreas 获取场地下的区域列表
+request{
+	siteId:场地id,
+	state:平面图状态 0=全部 -1=待上传 1=已上传
+	search: 查找关键字,可缺省参数
+	page:页码,
+	limit:每页行数,
+	sort:创建时间排序 -1=降序 1=升序
+}
+
+response{
+	result:错误码,
+	msg:错误信息，
+	data:[
+		{
+			name:"name", //区域名称
+			hsCount:1,//热区数量
+			dCount:1,//门口数量
+			imgState:-1//平面图状态 -1=待上传 1=已上传
+			createTime://创建时间戳,
+		}
+	],
+	pager:{
+		page:1,//页码
+		limit:1,//每页行数
+		count:1,//总数
+	}
+}
+
+areamanagement/addArea 添加区域
+request{
+	siteId:场地id,
+	areaInfo:[ //新增区域信息最多只能10个
+		{
+			name:'name' //区域名称
+			sType:1, //汇总类型 1.热区实时汇总 2.出入口实时汇总
+			opHours:[ //运营时间
+				{
+					type:1,//运营时间类型 1.每日固定时间 2.一周不同时间
+					hours:[ //当type=1的时候hours长度只能为1，type=2的时候长度只能为7并且按星期一到星期日排序
+						{
+							sHour:0, //开始时间小时(0-23)
+							eHour:24,//结束时间小时(1-24)
+						}
+					]
+				}
+			]
+		}
+	]
+}
+
+response{
+	result:错误码,(-11403=新增的区域信息格式错误,-10101=用户没有当前场地,-11404=新增的区域个数已超出限制,
+	-11401=区域名称格式错误,-11402=实时统计类型错误,-11405=区域运营时间格式错误,-11406=新增区域失败)
+	msg:错误信息，
+}
+
+areamanagement/editArea 编辑区域
+request{
+	siteId:场地id,
+	areaId:区域id,
+	sType:汇总类型,
+	opHours:{ //运营时间
+				type:1,//运营时间类型 1.每日固定时间 2.一周不同时间
+				hours:[ //当type=1的时候hours长度只能为1，type=2的时候长度只能为7并且按星期一到星期日排序
+					{
+						sHour:0, //开始时间小时(0-23)
+						eHour:24,//结束时间小时(1-24)
+					}
+				]
+			},
+	name:区域名称
+}
+
+response{
+	result:错误码,(-11403=新增的区域信息格式错误,-10101=用户没有当前场地,-11407=区域不存在,
+	-11401=区域名称格式错误,-11402=实时统计类型错误,-11405=区域运营时间格式错误,-11408=修改区域失败)
+	msg:错误信息，
+}
+
+
+areamanagement/getArea 获取指定区域详情
+request{
+	siteId:场地id,
+	areaId:区域id,
+}
+
+response{
+	result:错误码 (-11407=区域不存在),
+	msg:错误信息，
+	data:{
+			name:"name", //区域名称
+			sType:1, //汇总类型
+			opHours:{ //运营时间
+				type:1,//运营时间类型 1.每日固定时间 2.一周不同时间
+				hours:[ //当type=1的时候hours长度只能为1，type=2的时候长度只能为7并且按星期一到星期日排序
+					{
+						sHour:0, //开始时间小时(0-23)
+						eHour:24,//结束时间小时(1-24)
+					}
+				]
+			},
+		}
+}
+
+areamanagement/getAreaDoors 获取指定区域的出入口列表
+request{
+	type:类型, -1=可关联出入口 0=已关联出入口 1=已关联入区计数口 2=已关联外部计数口 
+	siteId:场地id,
+	areaId:区域id,
+	state:映射状态 0=全部 -1=未映射 1=已映射
+	dir:进出方向 1=正向 2=反向
+	search: 查找关键字,可缺省参数
+	page:页码,
+	limit:每页行数,
+	sort:关联时间排序 -1=降序 1=升序(type=0,1,2时生效)
+}
+
+response{
+	result:错误码,
+	msg:错误信息，
+	data:[
+		{
+			doorId:null
+			doorName:"name", //出入口名称
+			state:-1//映射状态 -1=未映射 1=已映射
+			devices:[ //绑定的设备
+				{
+					deviceName:"name",//设备名
+					serialNumber:"code",//设备序列号
+					type:1,//统计类型 1=人数统计 2=区域统计 3=停留统计
+					ruleName:"name",//规则名
+				}
+			]
+			isAllType:0,//是否为总客流 0=否 1=是
+			isOutType:0,//是否为场外客流 0=否 1=是
+			isFloorType:0,//是否为楼层客流 0=否 1=是
+			dir:1,//进出方向 1=正向 2=反向
+			createTime:1//关联时间戳(只在请求参数type=0,1,2时返回)
+		}
+	],
+	pager:{
+		page:1,//页码
+		limit:1,//每页行数
+		count:1,//总数
+	}
+}
+
+
+areamanagement/addAssocDoor 出入口关联区域
+request{
+	type:类型,1=入区计数口 2=外部计数口 
+	siteId:场地id,
+	areaId:区域id,
+	doorIds:出入口id(多个出入口是逗号分隔)
+}
+
+response 
+{
+	result:错误码(-10613=出入口不存在,-11407=区域不存在,-11409=关联类型错误 -11410=重复关联区域),
+	msg:错误信息，
+} 
+
+
+areamanagement/removeAssocDoor 出入口解除关联区域
+request{
+	siteId:场地id,
+	areaId:区域id,
+	doorId:出入口id,
+}
+
+response 
+{
+	result:错误码(-10613=出入口不存在,-11407=区域不存在),
+	msg:错误信息，
+}
+
+
+groupmanagement/getGroupSelection 获取集团选项
+request{
+
+}
+response{
+	result:错误码,
+	msg:错误信息，
+	data:[
+		{
+			groupId:"1", //集团id
+			parentId:"1", //父节点groupId =0时为没有父节点
+			groupName:"name", //集团名称
+			groupLevel:1, //节点层级 1为最顶级节点
+		}
+	]
+}
+
+
+
+groupanalysis/getGroupFlowRanking 获取集团客流排名
+request{
+	groupIds:集团id(缺省时查询所有集团的场地，["0","1","2"]逗号分隔为查指定集团下的场地,["0"]=没有集团的场地)
+	clearTime:清0时间 (0-23)
+	startDate:开始日期
+	endDate:结束日期
+}
+
+response{
+	result:错误码,
+	msg:错误信息，
+	data:[
+	{
+		siteId:"1",//场地id
+		groupId:"1", //集团id
+		siteName:"name",//场地名称
+		area:1,//面积
+		inNum: 0, //进人数
+		outNum: 0,//出人数
+		inCount: 0,//进人次
+		outCount: 0,//出人次
+		passNum: 0, //徘徊人数
+		osInNum: 0, //门外进人数
+		osOutNum: 0, //门外出人数
+		osInCount: 0, //门外进人次
+		osOutCount: 0, //门外出人次
+		batchCount: 0, //客流批次
+	}
+	]
+}
+
+groupanalysis/getGroupFaceRanking 获取集团客流排名
+request{
+	groupIds:集团id(缺省时查询所有集团的场地，["0","1","2"]逗号分隔为查指定集团下的场地,["0"]=没有集团的场地)
+	clearTime:清0时间 (0-23)
+	startDate:开始日期
+	endDate:结束日期
+}
+
+response{
+	result:错误码,
+	msg:错误信息，
+	data:[
+	{
+		siteId:"1",//场地id
+		groupId:"1", //集团id
+		siteName:"name",//场地名称
+		age:[0,0,0,0,0,0],//各年龄段人数,数组下标对应年龄 0=婴儿 1=儿童 2=青年 3=壮年 4=中老年 5=未知
+		gender:[0,0,0],//各性别人数,数组下标对应性别 0=男性 1=女性 2=未知
+	}
+	]
+}

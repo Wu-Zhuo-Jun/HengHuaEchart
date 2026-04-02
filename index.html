@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.svg" />
+    <meta name="viewport" content="width=1480, initial-scale=1.0, maximum-scale=10.0, minimum-scale=0.1, user-scalable=yes" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="恒华客流管理系统" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>恒华客流</title>
+    <script>
+      // 动态设置 viewport，避免初始放大
+      // 使用 width=1380 允许缩放，但通过计算合适的 initial-scale 避免初始放大
+      (function () {
+        const viewportWidth = 1480;
+        // 使用 screen.width 获取设备物理宽度（更准确）
+        const deviceWidth = window.screen.width || 375;
+        // 计算合适的 initial-scale
+        // 如果设备宽度小于 1380，按比例缩小；否则保持 1.0
+        let initialScale = deviceWidth < viewportWidth ? deviceWidth / viewportWidth : 1.0;
+        // 限制最小缩放比例为 0.3，避免太小看不清
+        initialScale = Math.max(0.1, Math.min(1.0, initialScale));
+
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.setAttribute("content", `width=${viewportWidth}, initial-scale=${initialScale.toFixed(2)}, maximum-scale=10.0, minimum-scale=0.1, user-scalable=yes`);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>

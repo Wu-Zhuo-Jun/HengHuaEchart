@@ -1,0 +1,84 @@
+.kpiPanel{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    /* column-gap: 28px; */
+    /* justify-content: space-evenly; */
+    row-gap: 19px;
+    /* flex-wrap: wrap; */
+}
+.kipContetGroup{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.kpiContent{
+    width: 304px;
+    height: 108px;
+    border-radius: 4px;
+    background: url(../../../assets/images/kpi_bg.png);
+    background-size:cover;
+    color: rgba(85,85,85,1);
+    display: flex;
+    flex-direction: column;
+    row-gap: 7px;
+    padding: 14px 19px 10px 19px;
+    box-sizing:border-box;
+}
+.kpiTitleContent{
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+}
+.title{
+    line-height: 20px;
+    font-size: 14px;
+    text-align: left;
+}
+.date{
+    line-height: 17px;
+    color: rgba(16,16,16,1);
+    font-size: 12px;
+    text-align: left;
+}
+.value{
+    font-weight: bold;
+    line-height: 28px;
+    color: rgba(16,16,16,1);
+    font-size: 20px;
+    text-align: left;
+}
+.kpiRateContent{
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}
+.rateItem{
+    display: flex;
+    align-items: center;
+}
+.rateTitle{
+    line-height: 17px;
+    color: rgba(16,16,16,1);
+    font-size: 12px;
+    text-align: left;
+}
+.upIcon{
+    width: 9px;
+    height: 9px;
+    background-image: url(../../../assets/images/vup.png);
+    background-size:cover;
+}
+.downIcon{
+    width: 9px;
+    height: 9px;
+    background-image: url(../../../assets/images/vdown.png);
+    background-size:cover;
+}
+.rateValue{
+    line-height: 17px;
+    color: rgba(51,51,51,1);
+    font-size: 12px;
+    text-align: left;
+}

@@ -1,0 +1,52 @@
+.main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  row-gap: 14px;
+}
+.chartContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  column-gap: 14px;
+}
+.leftChartContent {
+  /* width: 1423px;
+    min-width: 1423px;
+    max-width: 1423px; */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+  flex: 1;
+}
+.rightChartContent {
+  display: flex;
+  flex-direction: column;
+  row-gap: 14px;
+}
+.fullRow {
+  height: 320px;
+  width: 100%;
+}
+.dualRow {
+  display: flex;
+  flex-direction: row;
+  column-gap: 14px;
+  row-gap: 14px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.dualRowContent {
+  flex: 1;
+  height: 100%;
+  width: 704px;
+  min-width: 704px;
+  /* max-width: 704px; */
+  height: 345px;
+}
+.singleRow {
+  width: 420px;
+  height: 260px;
+}

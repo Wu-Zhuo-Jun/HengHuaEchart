@@ -1,0 +1,27 @@
+---
+description: antd(按需插件)引入与使用规范（参考 customerInsight）
+globs: src/**/*.{js,jsx,ts,tsx}
+alwaysApply: true
+---
+
+# antd 引入与使用（按需插件）
+
+- 统一从 `antd` 包入口引入组件（按需由工程插件处理）
+  - ✅ `import { Button, Select, message, Spin } from "antd";`
+  - ✅ 图标：`import { DownOutlined } from "@ant-design/icons";`
+  - ❌ 不要从 `antd/es/...`、`antd/lib/...` 深层路径引入（避免破坏按需/样式策略）
+- 反馈统一使用 `message`，并沿用项目写法：
+  - `message.warning({ content: "..." })` / `message.error({ content: "..." })`
+  - 页面级可按需设置 `message.config({ maxCount: 3 })`
+- Loading/空态优先使用项目封装与 antd 配合（参考 `customerInsight/index.jsx`）：
+  - 页面加载：`<UIContentLoading loading={loading}>...</UIContentLoading>`
+  - Suspense fallback：`<Suspense fallback={<Spin size="large" />}>`
+  - 空态：`<Empty />`（来自 `@/components/common/Empty`）
+
+# 组件/页面组织（贴合 customerInsight）
+
+- 页面目录通常包含：
+  - `index.jsx` + `index.less`
+  - `components/` 拆分子组件（如 `TableDetail.jsx`、`Charts.jsx`）
+- React 组件优先函数组件，重渲染敏感子组件可用 `React.memo`
+- 计算/派生数据优先 `useMemo`；事件处理优先 `useCallback`

@@ -1,0 +1,23 @@
+---
+description: 表格/面板/导出等 UI 约定（参考 customerInsight）
+globs: src/**/*.{js,jsx,ts,tsx}
+alwaysApply: false
+---
+
+# 表格优先用项目封装
+
+- 数据表格优先使用 `CommonDataTable`（`@/components/common/tables/Table`），而不是直接用 antd `Table`
+- 列定义优先独立到 `*Columns.jsx` 并导出常量（参考 `TableDetailColumns.jsx`）
+- 表格宽度/滚动策略优先沿用项目工具与写法：
+  - 宽度计算：`TableUtils.calculateTableWidth(columns)`
+  - `scroll.x` 用计算宽度或 `"max-content"`，`scroll.y` 固定高度
+  - `loading` 直接走表格/封装组件的 `loading` 属性，不自造 spinner 状态
+
+# 面板/布局优先用项目封装
+
+- 容器优先 `UIPanel`（`@/components/ui/UIComponent`），用 `title` + `extra` 组织右上角操作按钮
+- 操作按钮区域优先 antd `Button`，主要动作 `type="primary"`
+
+# 导出/下载
+
+- 导出逻辑优先使用 `ExportUtils`（如 `exportDynamicMerge`），并复用列配置与导出数据映射

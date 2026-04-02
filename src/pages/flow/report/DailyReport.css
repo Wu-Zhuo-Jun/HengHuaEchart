@@ -1,0 +1,15 @@
+.date-picker {
+    height: 30px;
+    border-radius: 15px;
+    background-color: rgba(255,255,255,1);
+    border: 1px solid rgba(187,187,187,1);
+    padding: 0 11px;
+}
+.date-picker div {
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+.date-picker-selected {
+    color: #3867D6;
+}
