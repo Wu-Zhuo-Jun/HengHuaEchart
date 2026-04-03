@@ -19,6 +19,9 @@ export const TzDataViewMap = {
   5: { moduleLabel: "服务人群分析", value: "customerPortrait", type: 5, percentage: 40 },
   6: { moduleLabel: "服务热力排行榜", value: "groupStatistics", type: 6, percentage: 40 },
   7: { moduleLabel: "阵地数量", value: "fieldNumber", type: 7, percentage: 20 },
+  8: { moduleLabel: "阵地服务实时趋势", value: "todayTrend", type: 8, percentage: 30 },
+  9: { moduleLabel: "近7日工作日、周末分析", value: "recentSevenDays", type: 9, percentage: 35 },
+  // 10: { moduleLabel: "当前统计客流数据", value: "dashboard", type: 10, percentage: 30 },
 };
 
 // 大屏模块字典反转

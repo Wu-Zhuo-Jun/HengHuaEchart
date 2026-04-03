@@ -10,7 +10,6 @@ import {
   DV12MonthsFlowTrendChart,
   DVFloorConverPieChart,
   DVFloorConverPieChartRose,
-  DVcustomerTopChart,
   DVcustomerBottomChart,
 } from "@/components/common/charts/Chart";
 import { Skeleton } from "antd";
@@ -25,6 +24,16 @@ import { useSite } from "@/context/SiteContext";
 import blueTriangle from "@/assets/dataviewImages/blueTriangle.png";
 import orangeTriangle from "@/assets/dataviewImages/organgeTriangle.png";
 import Wave from "./TzWave";
+
+// 今日客流趋势面板
+export const TodayTrendPanel = React.memo(({ chartData, isFullscreen, isLoading }) => {
+  return <TrendChart chartData={chartData} isFullscreen={isFullscreen} isLoading={isLoading} />;
+});
+
+// 近7日工作日、周末分析面板
+export const RecentSevenDaysPanel = React.memo(({ chartData, isLoading }) => {
+  return <RecentSevenDaysChart chartData={chartData} isLoading={isLoading} />;
+});
 
 // 数据视图-客流趋势
 export const TrendChart = React.memo(({ chartData, isFullscreen, isLoading }) => {
@@ -261,43 +270,94 @@ export const DeviceInfoChart = React.memo(({ chartData, isFullscreen }) => {
 
 // 数据视图-客户画像分析
 export const CustomerPortraitChart = React.memo(({ chartData, isFullscreen, isLoading }) => {
-  const { maleTotal, femaleTotal, maleRate, femaleRate, seriesData, yAxis, maleMaxDescForDv, femaleMaxDescForDv } = chartData || {};
+  const { maleTotal, femaleTotal, maleRate, femaleRate, seriesData, yAxis } = chartData || {};
+
+  const { maleMainLabel, maleMainPct, femaleMainLabel, femaleMainPct } = useMemo(() => {
+    const mData = seriesData?.[0]?.data;
+    const fData = seriesData?.[1]?.data;
+    const y = yAxis || [];
+    let maleMainLabel = "—";
+    let maleMainPct = "0";
+    let femaleMainLabel = "—";
+    let femaleMainPct = "0";
+    if (mData?.length && maleTotal > 0) {
+      const max = Math.max(...mData.map((v) => Number(v) || 0));
+      const idx = mData.findIndex((v) => (Number(v) || 0) === max);
+      if (idx >= 0 && max > 0) {
+        maleMainLabel = y[idx] || "—";
+        maleMainPct = StringUtils.toFixed((max / maleTotal) * 100, 0);
+      }
+    }
+    if (fData?.length && femaleTotal > 0) {
+      const max = Math.max(...fData.map((v) => Number(v) || 0));
+      const idx = fData.findIndex((v) => (Number(v) || 0) === max);
+      if (idx >= 0 && max > 0) {
+        femaleMainLabel = y[idx] || "—";
+        femaleMainPct = StringUtils.toFixed((max / femaleTotal) * 100, 0);
+      }
+    }
+    return { maleMainLabel, maleMainPct, femaleMainLabel, femaleMainPct };
+  }, [seriesData, yAxis, maleTotal, femaleTotal]);
+
+  const maleRateNum = Number(maleRate) || 0;
+  const femaleRateNum = Number(femaleRate) || 0;
+
   return (
-    <div className="data-view-customer-portrait-chart">
+    <div className="TZdata-view-customer-portrait-chart">
       {isLoading ? (
         <Skeleton active style={{ width: "100%", height: "100%" }} />
       ) : (
         <>
-          <div className="DVcustomerTop">
-            <div className="DVcustomerTop-left">
-              <div className="DVcustomerTop-left-item">
-                <div>男性客流人次</div>
-                <div className="value manValue">{maleRate ? maleRate?.toFixed(0) : 0}%</div>
-              </div>
-              <div className="DVcustomerTop-left-item">
-                <div>女性客流人次</div>
-                <div className="value girlValue">{femaleRate ? femaleRate?.toFixed(0) : 0}%</div>
+          <div className="DVportrait-row DVportrait-row--gauges">
+            <div className="DVportrait-gauge">
+              <div className={`DVportrait-gauge__circle ${isFullscreen ? "DVportrait-gauge__circle--fs" : ""}`}>
+                <Wave
+                  fillPercent={maleRateNum}
+                  showPercentage={false}
+                  portraitSize
+                  isFullscreen={isFullscreen}
+                  gender="male"
+                />
+                <div className="DVportrait-gauge__text">
+                  <div className="DVportrait-gauge__count">{maleTotal ?? 0}</div>
+                  <div className="DVportrait-gauge__rate DVportrait-gauge__rate--male">{maleRateNum.toFixed(2)}%</div>
+                </div>
               </div>
             </div>
-            <div style={{ flex: 1, overflow: "hidden", width: "100%", height: "100%" }}>
-              <DVcustomerTopChart data={{ maleTotal, femaleTotal }} />
+            <div className="DVportrait-gauge">
+              <div className={`DVportrait-gauge__circle ${isFullscreen ? "DVportrait-gauge__circle--fs" : ""}`}>
+                <Wave
+                  fillPercent={femaleRateNum}
+                  showPercentage={false}
+                  portraitSize
+                  isFullscreen={isFullscreen}
+                  gender="female"
+                />
+                <div className="DVportrait-gauge__text">
+                  <div className="DVportrait-gauge__count">{femaleTotal ?? 0}</div>
+                  <div className="DVportrait-gauge__rate DVportrait-gauge__rate--female">{femaleRateNum.toFixed(2)}%</div>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="DVcustomerBottom">
-            <div className="DVcustomerBottom-left" style={{ flex: 3, width: "100%", height: "100%" }}>
-              <DVcustomerBottomChart data={{ seriesData, yAxis }} />
-            </div>
-            <div className={`DVcustomerBottom-right ${isFullscreen ? "isFullscreen" : ""}`} style={{ flex: 1, overflow: "hidden", width: "100%", height: "100%" }}>
-              <div>今日主力</div>
-              <div>
-                <Wave percentage={maleRate} isFullscreen={isFullscreen} gender="male" />
-                <div>{maleMaxDescForDv}</div>
-              </div>
-              <div>
-                <Wave percentage={femaleRate} isFullscreen={isFullscreen} gender="female" />
-                <div>{femaleMaxDescForDv}</div>
+          <div className="DVportrait-row DVportrait-row--cards">
+            <div className="DVportrait-card DVportrait-card--male">
+              <div className="DVportrait-card__title">{Language.NAN}</div>
+              <div className="DVportrait-card__sub">
+                今日主力：{maleMainLabel}
+                {maleMainPct}%
               </div>
             </div>
+            <div className="DVportrait-card DVportrait-card--female">
+              <div className="DVportrait-card__title">{Language.NV}</div>
+              <div className="DVportrait-card__sub">
+                今日主力：{femaleMainLabel}
+                {femaleMainPct}%
+              </div>
+            </div>
+          </div>
+          <div className="DVportrait-row DVportrait-row--bar">
+            <DVcustomerBottomChart data={{ seriesData, yAxis, portraitBar: true }} />
           </div>
         </>
       )}

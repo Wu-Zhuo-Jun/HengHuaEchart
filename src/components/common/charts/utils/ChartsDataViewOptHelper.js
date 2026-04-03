@@ -21,7 +21,6 @@ class ChartsDataViewOptHelper {
     AvgLineColor: ["rgb(255,67,0)", "rgb(67,214,56)"],
     DataViewLineColor: "#00FFFF",
   };
-  F9A231;
 
   /**客流趋势  */
   static createDVFlowTrendChartOpt({ xAxis, seriesData }) {
@@ -688,8 +687,8 @@ class ChartsDataViewOptHelper {
   }
 
   // 客户年龄图
-  static createDVcustomerBottomChartOpt({ yAxis, seriesData }) {
-    var barWidth = 24;
+  static createDVcustomerBottomChartOpt({ yAxis, seriesData, portraitBar }) {
+    var barWidth = portraitBar ? 14 : 24;
     var option = {
       tooltip: {
         trigger: "axis",
@@ -721,12 +720,14 @@ class ChartsDataViewOptHelper {
           return str;
         },
       },
-      grid: {
-        left: 0,
-        top: 0,
-        bottom: 0,
-        containLabel: true,
-      },
+      grid: portraitBar
+        ? { left: 6, right: 6, top: 22, bottom: 2, containLabel: true }
+        : {
+            left: 0,
+            top: 0,
+            bottom: 0,
+            containLabel: true,
+          },
       xAxis: {
         type: "category",
         data: yAxis ? yAxis : [Language.YINGER, Language.ERTONG, Language.SHAONIAN, Language.QINGNIAN, Language.ZHUANGNIAN, Language.ZHONGLAONIAN, Language.WEIZHI],
@@ -740,10 +741,10 @@ class ChartsDataViewOptHelper {
           show: true,
           rotate: 0,
           interval: 0, // 强制显示所有标签
-          margin: 10,
+          margin: portraitBar ? 8 : 10,
           textStyle: {
             color: "#ffffff",
-            fontSize: 10,
+            fontSize: portraitBar ? 11 : 10,
           },
         },
       },
@@ -754,7 +755,7 @@ class ChartsDataViewOptHelper {
         // minInterval: 1,
         splitLine: {
           lineStyle: {
-            color: ChartsDataViewOptHelper.Colors.ColorLine[0],
+            color: portraitBar ? "rgba(255, 255, 255, 0.28)" : ChartsDataViewOptHelper.Colors.ColorLine[0],
             width: 1,
             type: "dashed",
           },
@@ -781,10 +782,32 @@ class ChartsDataViewOptHelper {
             color,
           },
           barWidth,
+          barCategoryGap: portraitBar ? "48%" : undefined,
           data: item.data,
         };
 
         option.series.push(data);
+      }
+      if (portraitBar && option.series.length > 0) {
+        const yLabels = yAxis || [];
+        const totals = yLabels.map((_, col) =>
+          seriesData.reduce((sum, s) => sum + (Number(s.data[col]) || 0), 0),
+        );
+        const lastIdx = option.series.length - 1;
+        option.series[lastIdx] = {
+          ...option.series[lastIdx],
+          label: {
+            show: true,
+            position: "top",
+            distance: 4,
+            color: "#ffffff",
+            fontSize: 11,
+            formatter: (p) => {
+              const v = totals[p.dataIndex];
+              return v > 0 ? String(v) : "";
+            },
+          },
+        };
       }
       if (max == 0) {
         option.yAxis.max = 500;

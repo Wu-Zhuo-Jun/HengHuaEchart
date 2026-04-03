@@ -8,7 +8,63 @@ import "swiper/css";
 import { Language } from "@/language/LocaleContext";
 import groupCountIcon from "@/assets/dataviewImages/groupCountIcon.webp";
 import groupNumIcon from "@/assets/dataviewImages/groupNumIcon.webp";
+import fieldBlock from "@/assets/dataviewImages/fieldBlock.png";
+import fieldBeam from "@/assets/dataviewImages/field.png";
+import TzFieldOne from "@/assets/dataviewImages/TzFieldOne.png";
+import TzFieldTwo from "@/assets/dataviewImages/TzFieldTwo.png";
+import TzFieldThree from "@/assets/dataviewImages/TzFieldThree.png";
+import TzFieldFour from "@/assets/dataviewImages/TzFieldFour.png";
 import { Skeleton } from "antd";
+
+const DEFAULT_FIELD_POSITION_ITEMS = [
+  { label: "区级", value: 1, icon: TzFieldOne },
+  { label: "街道乡镇级", value: 29, icon: TzFieldTwo },
+  { label: "社区村级", value: 459, icon: TzFieldThree },
+  { label: "网络级", value: 7, icon: TzFieldFour },
+];
+
+/**
+ * 阵地数量面板：左侧总面积 + 底座图，右侧四级阵地数量 2×2 网格
+ */
+export const FieldNumberPanel = React.memo(({ areaMainText = "21.35", areaSubText = "万平方米", areaLabel = "阵地面积", items = DEFAULT_FIELD_POSITION_ITEMS }) => {
+  return (
+    <div className="tz-field-position-pane">
+      <div className="tz-field-position-pane__body">
+        <div className="tz-field-position-pane__left">
+          <div className="tz-field-position-pane__left-inner">
+            <div className="tz-field-position-pane__area-value">
+              <span className="tz-field-position-pane__area-main">{areaMainText}</span>
+              <span className="tz-field-position-pane__area-sub">{areaSubText}</span>
+            </div>
+            <div className="tz-field-position-pane__area-label">{areaLabel}</div>
+            {/* <div className="tz-field-position-pane__beam-wrap"><img className="tz-field-position-pane__beam" src={fieldBeam} alt="" /></div> */}
+            <img className="tz-field-position-pane__pedestal" src={middleDataBottom} alt="" />
+          </div>
+        </div>
+        <div className="tz-field-position-pane__grid">
+          {items.map((row, idx) => (
+            <div key={`${row.label}-${idx}`} className="tz-field-position-pane__card">
+              {/* <div className="tz-field-position-pane__card-bg" style={{ backgroundImage: `url(${fieldBlock})` }} /> */}
+              <div className="tz-field-position-pane__card-inner">
+                <div className="tz-field-position-pane__card-icon-wrap">
+                  <img className="tz-field-position-pane__card-icon" src={row.icon} alt="" />
+                </div>
+                <div className="tz-field-position-pane__card-text">
+                  <div className="tz-field-position-pane__card-label">{row.label}</div>
+                  {/* <div className="tz-field-position-pane__card-value-wrap"> */}
+                  <div className="tz-field-position-pane__card-value">{row.value}</div>
+                  <img className="tz-field-position-pane__card-beam" src={fieldBeam} alt="" />
+
+                  {/* </div> */}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+});
 
 export const DashboardPanel = ({ dashboardData, deduplication }) => {
   const {

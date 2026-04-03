@@ -73,6 +73,7 @@
     gap: 1.25rem;
     min-height: 0;
     overflow: hidden;
+    padding: 0 1.25rem;
   }
 
   .TZdata-view-left-column,
@@ -86,9 +87,11 @@
   }
 
   .TZdata-view-component-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(56, 135, 253, 0.3);
-    border-radius: 0.5rem;
+    background-image: url("@/assets/dataviewImages/componentBorder.png");
+    background-size: 100% 100%;
+    // background: rgba(255, 255, 255, 0.05);
+    // border: 1px solid rgba(56, 135, 253, 0.3);
+    border-radius: 0.2rem;
     padding: 0.6rem 0.6rem;
     color: #fff;
     display: flex;
@@ -106,15 +109,23 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      .component-title-icon {
-        width: 0.23rem;
-        height: 1.6rem;
-        background-color: #3887fd;
-        border-radius: 0.23rem;
-      }
+      // .component-title-icon {
+      //   width: 0.23rem;
+      //   height: 1.6rem;
+      //   background-color: #3887fd;
+      //   border-radius: 0.23rem;
+      // }
       .component-title-text {
         font-size: 1rem;
         font-weight: bold;
+        background-image: url("@/assets/dataviewImages/TzTitle.png");
+        background-size: cover;
+        padding-left: 3rem;
+        padding-right: 0.2rem;
+        height: 2rem;
+        font-weight: 600;
+        font-style: italic;
+        font-family: "Microsoft YaHei", "PingFang SC", "Heiti SC", sans-serif;
       }
     }
 
@@ -254,61 +265,381 @@
   .TZdata-view-customer-portrait-chart {
     height: 100%;
     width: 100%;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    .DVcustomerTop {
-      flex: 1;
+    gap: 0.42rem;
+
+    .DVportrait-row--gauges {
+      flex: 0 0 auto;
       display: flex;
-      justify-content: space-between;
+      flex-direction: row;
+      justify-content: space-around;
       align-items: center;
       width: 100%;
-      height: 100%;
-      .DVcustomerTop-left {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-        font-size: 1.2rem;
-        flex: 1;
-        .DVcustomerTop-left-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          .value {
-            width: 4rem;
-            height: 3rem;
-            font-size: 1.7rem;
-            background-size: contain;
-            background-position: center;
-            line-height: 3rem;
-            text-align: end;
-            background-repeat: no-repeat;
-          }
-          .girlValue {
-            background: url("@/assets/dataviewImages/organgeTriangle.png") no-repeat center center;
-          }
-          .manValue {
-            background: url("@/assets/dataviewImages/blueTriangle.png") no-repeat center center;
-          }
-        }
+    }
+
+    .DVportrait-gauge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .DVportrait-gauge__circle {
+      position: relative;
+      width: 3.75rem;
+      height: 3.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.DVportrait-gauge__circle--fs {
+        width: 4.35rem;
+        height: 4.35rem;
       }
     }
-    .DVcustomerBottom {
-      flex: 1.5;
+
+    .DVportrait-gauge__text {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
-      .DVcustomerBottom-right {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.7rem;
-        &.isFullscreen {
-          font-size: 0.9rem;
-        }
+      justify-content: center;
+      pointer-events: none;
+      text-align: center;
+      line-height: 1.12;
+    }
+
+    .DVportrait-gauge__count {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.65);
+    }
+
+    .DVportrait-gauge__circle--fs .DVportrait-gauge__count {
+      font-size: 1.12rem;
+    }
+
+    .DVportrait-gauge__rate {
+      font-size: 0.68rem;
+      font-weight: 600;
+      margin-top: 0.04rem;
+      text-shadow: 0 0 0.15rem rgba(0, 0, 0, 0.5);
+
+      &--male {
+        color: #7ed8ff;
       }
+
+      &--female {
+        color: #ffcc80;
+      }
+    }
+
+    .DVportrait-gauge__circle--fs .DVportrait-gauge__rate {
+      font-size: 0.78rem;
+    }
+
+    .DVportrait-row--cards {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: row;
+      gap: 0.45rem;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .DVportrait-card {
+      flex: 1;
+      min-width: 0;
+      padding: 0.32rem 0.48rem;
+      border-radius: 0.12rem;
+      background: rgba(0, 24, 58, 0.62);
+
+      &--male {
+        box-shadow:
+          0 0 0 1px rgba(110, 200, 255, 0.42),
+          0 0 0.45rem rgba(56, 135, 253, 0.28),
+          inset 0 0 0.55rem rgba(56, 135, 253, 0.14);
+      }
+
+      &--female {
+        box-shadow:
+          0 0 0 1px rgba(255, 170, 90, 0.42),
+          0 0 0.45rem rgba(249, 162, 49, 0.22),
+          inset 0 0 0.55rem rgba(249, 162, 49, 0.1);
+      }
+
+      &__title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.12rem;
+      }
+
+      &__sub {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.35;
+        word-break: break-all;
+      }
+    }
+
+    .DVportrait-row--bar {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  // 阵地数量面板（FieldPositionPane）
+  .tz-field-position-pane {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    box-sizing: border-box;
+
+    &__title-text {
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-style: italic;
+      font-family: "Microsoft YaHei", "PingFang SC", "Heiti SC", sans-serif;
+      letter-spacing: 0.03em;
+      color: #fff;
+      text-shadow: 0 0.05rem 0.16rem rgba(0, 40, 100, 0.5);
+    }
+
+    &__body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 0.42rem;
+    }
+
+    &__left {
+      flex: 0 0 28%;
+      min-width: 0;
+      display: flex;
+      // align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    &__left-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      // justify-content: flex-end;
+      overflow: hidden;
+      padding-bottom: 0.06rem;
+    }
+
+    &__area-value {
+      // position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.08rem;
+      line-height: 1.15;
+    }
+
+    &__area-main {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    &__area-sub {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: rgba(230, 247, 255, 0.95);
+    }
+
+    &__area-label {
+      position: relative;
+      z-index: 2;
+      margin-top: 0.15rem;
+      font-size: 1rem;
+      // color: #8bd4ff;
+      letter-spacing: 0.04em;
+    }
+
+    &__beam-wrap {
+      position: absolute;
+      bottom: 1.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6.5rem;
+      height: 4.8rem;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    &__beam {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: bottom center;
+      opacity: 0.5;
+      filter: blur(0.6px);
+    }
+
+    &__pedestal {
+      // position: relative;
+      position: absolute;
+      bottom: 0;
+      z-index: 0;
+      display: block;
+      width: 8rem;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+      margin-top: -0.25rem;
+    }
+
+    &__grid {
+      flex: 1;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 0.28rem 0.32rem;
+      align-content: stretch;
+    }
+
+    &__card {
+      background: url("@/assets/dataviewImages/fieldBlock.png");
+      background-size: cover;
+      position: relative;
+      min-height: 0;
+      border-radius: 0.08rem;
+      overflow: hidden;
+      // background-size: 100% 100%;
+      background-size: contain;
+      background-repeat: round;
+      // background-position: center;
+      // background-repeat: no-repeat;
+    }
+
+    // &__card-bg {
+    //   position: absolute;
+    //   inset: 0;
+
+    //   opacity: 0.9;
+    // }
+
+    &__card-inner {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      // padding: 0.16rem 0.32rem 0.25rem 0.22rem;
+      padding: 0.2rem 1rem;
+      box-sizing: border-box;
+    }
+
+    &__card-icon {
+      width: 2rem;
+      height: auto;
+      max-height: 2.6rem;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 0.05rem 0.18rem rgba(0, 140, 255, 0.28));
+    }
+
+    &__card-text {
+      height: 100%;
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      // align-items: flex-end;
+      align-items: center;
+      justify-content: space-between;
+      text-align: right;
+      padding-left: 0.12rem;
+    }
+
+    &__card-label {
+      margin-top: 0.4rem;
+      font-size: 0.7rem;
+      color: #fff;
+      // color: #b8e6ff;
+      line-height: 1.15;
+      margin-bottom: 0.1rem;
+      max-width: 4.5rem;
+      text-align: right;
+    }
+
+    // &__card-value-wrap {
+    //   position: relative;
+    //   display: flex;
+    //   align-items: center;
+    //   justify-content: center;
+    //   min-width: 2rem;
+    //   min-height: 1.55rem;
+    //   &::before {
+    //     content: "";
+    //     position: absolute;
+    //     inset: -0.1rem 0;
+    //     background: radial-gradient(ellipse at center bottom, rgba(0, 140, 255, 0.45) 0%, transparent 75%);
+    //     filter: blur(0.25rem);
+    //     pointer-events: none;
+    //     z-index: 0;
+    //   }
+    // }
+
+    &__card-beam {
+      position: absolute;
+
+      width: 2.8rem;
+      height: 1.45rem;
+
+      object-fit: contain;
+      // object-position: bottom center;
+      opacity: 0.72;
+      // filter: blur(0.1rem);
+      pointer-events: none;
+      // text-align: center;
+      bottom: 0.4rem;
+    }
+
+    &__card-value {
+      // background: url("@/assets/dataviewImages/field.png") no-repeat center center;
+      // background-size: contain;
+      // position: relative;
+      width: 3.6rem;
+      height: 1.6rem;
+      z-index: 1;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+      text-align: center;
+
+      // text-shadow: 0 0 0.3rem rgba(0, 180, 255, 0.38);
     }
   }
 
@@ -376,6 +707,17 @@
     overflow: hidden;
     box-shadow: 0 0 0.1rem 0.2rem rgba(56, 103, 214, 0.2), 0 0 0.3rem rgba(56, 103, 214, 0.4);
     margin-bottom: 0.2rem;
+
+    .wave-loader__clip {
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
     .wave {
       position: absolute;
       width: 200%;
@@ -420,6 +762,17 @@
     }
     &.wave-loader-female {
       box-shadow: 0 0 0.1rem 0.2rem rgba(249, 162, 49, 0.2), 0 0 0.3rem rgba(249, 162, 49, 0.4);
+    }
+
+    &.portrait-wave-loader {
+      width: 3.75rem;
+      height: 3.75rem;
+      margin-bottom: 0;
+
+      &.fullscreen-wave-loader {
+        width: 4.35rem;
+        height: 4.35rem;
+      }
     }
   }
 

@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { TzDataViewMap } from "@/data/const";
 import Http from "@/config/Http";
-import { TrendChart, RecentSevenDaysChart, Last12MonthsFlowTrendChart, FloorConversionChart, DeviceInfoChart, CustomerPortraitChart } from "./TzComponents/TzChart";
-import { FestivalFlowPanel, OutLetFlowPanel, GroupStatisticsPanel } from "./TzComponents/TzPanel";
+import {
+  TodayTrendPanel,
+  RecentSevenDaysPanel,
+  TrendChart,
+  RecentSevenDaysChart,
+  Last12MonthsFlowTrendChart,
+  FloorConversionChart,
+  DeviceInfoChart,
+  CustomerPortraitChart,
+} from "./TzComponents/TzChart";
+import { FestivalFlowPanel, OutLetFlowPanel, GroupStatisticsPanel, FieldNumberPanel, DashboardPanel } from "./TzComponents/TzPanel";
 import TimeUtils from "@/utils/TimeUtils";
 import CommonUtils from "@/utils/CommonUtils";
 import StringUtils from "@/utils/StringUtils";
@@ -13,22 +22,20 @@ import dayjs from "dayjs";
 import User from "@/data/UserData";
 import "./TzDataView.less";
 
-// 默认大屏配置
+// 通州默认大屏配置
+
 const DEFAULT_CONFIG = {
   siteId: null,
   title: "北京市通州区党群服务阵地体系一屏通览",
   showSiteName: 1,
   deduplication: 0,
   leftComponents: [
-    { component: "floorConversion", percentage: 30 },
-    { component: "entranceExit", percentage: 30 },
-    { component: "holidayFlow", percentage: 40 },
-  ],
-  rightComponents: [
     { component: "deviceInfo", percentage: 10 },
+    { component: "fieldNumber", percentage: 20 },
+    { component: "todayTrend", percentage: 30 },
     { component: "customerPortrait", percentage: 40 },
-    { component: "groupStatistics", percentage: 40 },
   ],
+  rightComponents: [{ component: "groupStatistics", percentage: 40 }],
 };
 
 const DataView = () => {
@@ -852,6 +859,8 @@ const DataView = () => {
   const renderComponent = (componentType) => {
     // 根据组件类型传递相应的 props
     switch (componentType) {
+      case "fieldNumber":
+        return <FieldNumberPanel />;
       case "floorConversion":
         return <FloorConversionChart chartData={floorTransformData} isLoading={isLoadingData.floorTransformData} />;
       case "deviceInfo":
@@ -864,6 +873,10 @@ const DataView = () => {
         return <FestivalFlowPanel data={festivalData?.list || []} />;
       case "groupStatistics":
         return <GroupStatisticsPanel data={groupAnalysisMemberData} deduplication={config.deduplication} isLoading={isLoadingData.groupAnalysisMemberDataLoading} />;
+      case "todayTrend":
+        return <TodayTrendPanel chartData={trendData.chartData} isFullscreen={isFullscreen} isLoading={isLoadingData.trendData} />;
+      case "recentSevenDays":
+        return <RecentSevenDaysPanel chartData={recentSevenDaysData} isLoading={isLoadingData.recentSevenDaysData} />;
       default:
         return <div style={{ color: "#fff", padding: "20px" }}>组件内容区域</div>;
     }
@@ -896,7 +909,7 @@ const DataView = () => {
                   return (
                     <div key={index} className="TZdata-view-component-item" style={{ height: `${item.percentage}%` }}>
                       <div className="component-title">
-                        <div className="component-title-icon"></div>
+                        {/* <div className="component-title-icon"></div> */}
                         <div className="component-title-text">{getComponentLabel(item.component)}</div>
                       </div>
                       <div className="component-content">{renderComponent(item.component)}</div>
@@ -907,7 +920,7 @@ const DataView = () => {
 
           {/* 中间区域 */}
           <div className="TZdata-view-center-area">
-            <div className="TZdata-view-component-item" style={{ flex: 4 }}>
+            <div style={{ flex: 4 }}>
               {/* <div className="component-title">
                 <div className="component-title-icon"></div>
                 <div className="component-title-text">当前统计客流数据</div>
@@ -937,7 +950,7 @@ const DataView = () => {
               </div> */}
               <div style={{ flex: 3, display: "flex", flexDirection: "column" }}>
                 <div className="component-title">
-                  <div className="component-title-icon"></div>
+                  {/* <div className="component-title-icon"></div> */}
                   <div className="component-title-text">12个月服务人次趋势图</div>
                 </div>
                 <div className="component-content" style={{ flex: 1 }}>
@@ -956,7 +969,7 @@ const DataView = () => {
                   return (
                     <div key={index} className="TZdata-view-component-item" style={{ height: `${item.percentage}%` }}>
                       <div className="component-title">
-                        <div className="component-title-icon"></div>
+                        {/* <div className="component-title-icon"></div> */}
                         <div className="component-title-text">{getComponentLabel(item.component)}</div>
                       </div>
                       <div className="component-content">{renderComponent(item.component)}</div>
@@ -965,7 +978,7 @@ const DataView = () => {
                 })}
           </div>
         </div>
-        {isNeutralDomain ? null : <div className="TZdata-view-footer-row">由广州恒华科技提供技术支持，经理热线:13380018134梁工</div>}
+        {/* {isNeutralDomain ? null : <div className="TZdata-view-footer-row">由广州恒华科技提供技术支持，经理热线:13380018134梁工</div>} */}
       </div>
     </div>
   );
