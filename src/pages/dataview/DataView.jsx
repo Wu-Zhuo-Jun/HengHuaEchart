@@ -808,6 +808,7 @@ const DataView = () => {
     let year = data.year;
     let lastYear = data.lastyear;
     let lastYearMap = {};
+    let maxNumber = 0;
 
     for (let i = 0; i < lastYear.length; i++) {
       let item = lastYear[i];
@@ -819,6 +820,9 @@ const DataView = () => {
       let item = year[i];
       let inCount = Number(item.ic);
       total += inCount;
+      if (inCount > maxNumber) {
+        maxNumber = inCount;
+      }
     }
     let list = [];
 
@@ -847,7 +851,7 @@ const DataView = () => {
       }
       list.push(data);
     }
-    setFestivalData({ list: list });
+    setFestivalData({ list: list, maxNumber });
   };
 
   const getSiteCustomerAttrData = (data) => {
@@ -893,7 +897,7 @@ const DataView = () => {
       case "entranceExit":
         return <OutLetFlowPanel data={doorRankingData} deduplication={config.deduplication} isLoading={isLoadingData.doorRankingData} />;
       case "holidayFlow":
-        return <FestivalFlowPanel data={festivalData?.list || []} />;
+        return <FestivalFlowPanel data={festivalData?.list || []} maxNumber={festivalData?.maxNumber || 0} />;
       case "groupStatistics":
         return <GroupStatisticsPanel data={groupAnalysisMemberData} deduplication={config.deduplication} isLoading={isLoadingData.groupAnalysisMemberDataLoading} />;
       default:

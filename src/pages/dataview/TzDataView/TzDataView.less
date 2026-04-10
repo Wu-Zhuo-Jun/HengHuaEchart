@@ -268,7 +268,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.42rem;
+    // gap: 0.42rem;
 
     .DVportrait-row--gauges {
       flex: 0 0 auto;
@@ -277,6 +277,7 @@
       justify-content: space-around;
       align-items: center;
       width: 100%;
+      margin-bottom: 0.42rem;
     }
 
     .DVportrait-gauge {
@@ -288,15 +289,15 @@
 
     .DVportrait-gauge__circle {
       position: relative;
-      width: 3.75rem;
-      height: 3.75rem;
+      width: 3.2rem;
+      height: 3.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
 
       &.DVportrait-gauge__circle--fs {
-        width: 4.35rem;
-        height: 4.35rem;
+        width: 3.7rem;
+        height: 3.7rem;
       }
     }
 
@@ -360,26 +361,17 @@
       padding: 0.32rem 0.48rem;
       border-radius: 0.12rem;
       background: rgba(0, 24, 58, 0.62);
-
-      &--male {
-        box-shadow:
-          0 0 0 1px rgba(110, 200, 255, 0.42),
-          0 0 0.45rem rgba(56, 135, 253, 0.28),
-          inset 0 0 0.55rem rgba(56, 135, 253, 0.14);
-      }
-
-      &--female {
-        box-shadow:
-          0 0 0 1px rgba(255, 170, 90, 0.42),
-          0 0 0.45rem rgba(249, 162, 49, 0.22),
-          inset 0 0 0.55rem rgba(249, 162, 49, 0.1);
-      }
-
+      text-align: center;
+      background: url("@/assets/dataviewImages/TzCusomerCard.png");
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
       &__title {
         font-size: 0.95rem;
         font-weight: 700;
         color: #fff;
         margin-bottom: 0.12rem;
+        text-align: center;
       }
 
       &__sub {
@@ -391,7 +383,7 @@
     }
 
     .DVportrait-row--bar {
-      flex: 1;
+      flex: 1.5;
       min-height: 0;
       width: 100%;
       display: flex;
@@ -688,6 +680,102 @@
     }
   }
 
+  // // 水波球
+  // @keyframes wave {
+  //   0% {
+  //     transform: rotate(0deg);
+  //   }
+  //   100% {
+  //     transform: rotate(360deg);
+  //   }
+  // }
+
+  // .wave-loader {
+  //   position: relative;
+  //   width: 2.8rem;
+  //   height: 2.8rem;
+  //   border-radius: 50%;
+  //   background: rgba(255, 255, 255, 0.1);
+  //   overflow: hidden;
+  //   box-shadow: 0 0 0.1rem 0.2rem rgba(56, 103, 214, 0.2), 0 0 0.3rem rgba(56, 103, 214, 0.4);
+  //   margin-bottom: 0.2rem;
+
+  //   .wave-loader__clip {
+  //     position: absolute;
+  //     left: 0;
+  //     top: 0;
+  //     right: 0;
+  //     bottom: 0;
+  //     border-radius: 50%;
+  //     overflow: hidden;
+  //   }
+
+  //   .wave {
+  //     position: absolute;
+  //     width: 200%;
+  //     height: 200%;
+  //     left: -50%;
+  //     transform-origin: 50% 50%;
+  //     animation: wave 6s linear infinite;
+  //   }
+
+  //   .wave1 {
+  //     background: rgba(56, 103, 214, 0.8);
+  //     border-radius: 35%;
+  //     top: 40%;
+  //     animation-duration: 6s;
+  //     filter: blur(2px);
+  //   }
+
+  //   .wave1-female {
+  //     background: rgba(249, 162, 49, 0.8);
+  //   }
+
+  //   .wave2 {
+  //     background: #3867d6;
+  //     border-radius: 25%;
+  //     animation-duration: 8s;
+  //     top: 50%;
+  //   }
+  //   .wave2-female {
+  //     background: #f9a231;
+  //   }
+  //   .percentage {
+  //     position: absolute;
+  //     top: 50%;
+  //     left: 50%;
+  //     transform: translate(-50%, -50%);
+  //     text-align: center;
+  //     z-index: 10;
+  //     color: #fff;
+  //     font-size: 0.8rem;
+  //     font-weight: bold;
+  //     pointer-events: none;
+  //   }
+  //   &.wave-loader-female {
+  //     box-shadow: 0 0 0.1rem 0.2rem rgba(249, 162, 49, 0.2), 0 0 0.3rem rgba(249, 162, 49, 0.4);
+  //   }
+
+  //   &.portrait-wave-loader {
+  //     width: 3.75rem;
+  //     height: 3.75rem;
+  //     margin-bottom: 0;
+
+  //     &.fullscreen-wave-loader {
+  //       width: 4.35rem;
+  //       height: 4.35rem;
+  //     }
+  //   }
+  // }
+
+  // .fullscreen-wave-loader {
+  //   width: 3.4rem;
+  //   height: 3.4rem;
+  //   .percentage {
+  //     font-size: 1.2rem;
+  //   }
+  // }
+
   // 水波球
   @keyframes wave {
     0% {
@@ -700,24 +788,13 @@
 
   .wave-loader {
     position: relative;
-    width: 2.8rem;
-    height: 2.8rem;
+    width: 3.4rem;
+    height: 3.4rem;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     overflow: hidden;
     box-shadow: 0 0 0.1rem 0.2rem rgba(56, 103, 214, 0.2), 0 0 0.3rem rgba(56, 103, 214, 0.4);
     margin-bottom: 0.2rem;
-
-    .wave-loader__clip {
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-      overflow: hidden;
-    }
-
     .wave {
       position: absolute;
       width: 200%;
@@ -748,31 +825,31 @@
     .wave2-female {
       background: #f9a231;
     }
+    .total-num {
+      position: absolute;
+      width: 100%;
+      top: 32%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      font-size: 0.7rem;
+      color: #fff;
+    }
     .percentage {
       position: absolute;
-      top: 50%;
+      top: 65%;
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
       z-index: 10;
       color: #fff;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       font-weight: bold;
       pointer-events: none;
     }
     &.wave-loader-female {
       box-shadow: 0 0 0.1rem 0.2rem rgba(249, 162, 49, 0.2), 0 0 0.3rem rgba(249, 162, 49, 0.4);
-    }
-
-    &.portrait-wave-loader {
-      width: 3.75rem;
-      height: 3.75rem;
-      margin-bottom: 0;
-
-      &.fullscreen-wave-loader {
-        width: 4.35rem;
-        height: 4.35rem;
-      }
     }
   }
 
@@ -783,7 +860,6 @@
       font-size: 1.2rem;
     }
   }
-
   // 滚动条样式
   ::-webkit-scrollbar {
     width: 0.38rem;
@@ -838,6 +914,17 @@
     }
     100% {
       background-position: 0 50%;
+    }
+  }
+
+  // 近七日分析表格行渐变样式 - 渐变背景
+  .recent-seven-days-table-row {
+    background: linear-gradient(90deg, rgba(56, 135, 253, 0) 0%, rgba(56, 135, 253, 0.8) 75%, rgba(56, 135, 253, 0) 100%);
+    border-radius: 0.12rem;
+    // border: ;
+
+    &:not(:last-child) {
+      margin-bottom: 0.1rem;
     }
   }
 }

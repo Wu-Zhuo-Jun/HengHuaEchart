@@ -23,7 +23,7 @@ class ChartsDataViewOptHelper {
   };
 
   /**客流趋势  */
-  static createDVFlowTrendChartOpt({ xAxis, seriesData }) {
+  static createDVFlowTrendChartOpt({ xAxis, seriesData, isTongZhou }) {
     // 将数据数组转换为 ECharts 系列配置对象
     const lineColor = "#00FFFF"; // 青色线条
     const series =
@@ -79,7 +79,7 @@ class ChartsDataViewOptHelper {
         const value = params[0].value || 0;
         const markerColor = ChartsDataViewOptHelper.Colors.DataViewLineColor;
         const customMarker = `<span style="display:inline-block;margin-right:4px;border-radius:50%;width:10px;height:10px;background-color:${markerColor};"></span>`;
-        return `${date}<br>${customMarker}${Language.JINCHANGRENCI}：${value}`;
+        return `${date}<br>${customMarker}${isTongZhou ? "服务人次" : Language.JINCHANGRENCI}：${value}`;
       },
     };
 
@@ -790,9 +790,7 @@ class ChartsDataViewOptHelper {
       }
       if (portraitBar && option.series.length > 0) {
         const yLabels = yAxis || [];
-        const totals = yLabels.map((_, col) =>
-          seriesData.reduce((sum, s) => sum + (Number(s.data[col]) || 0), 0),
-        );
+        const totals = yLabels.map((_, col) => seriesData.reduce((sum, s) => sum + (Number(s.data[col]) || 0), 0));
         const lastIdx = option.series.length - 1;
         option.series[lastIdx] = {
           ...option.series[lastIdx],

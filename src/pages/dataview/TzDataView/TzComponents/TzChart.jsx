@@ -4,14 +4,7 @@ import { UIPanel, UISelect } from "@/components/ui/UIComponent";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import {
-  DVFlowTrendChart,
-  DVSevenDaysAnalysisChart,
-  DV12MonthsFlowTrendChart,
-  DVFloorConverPieChart,
-  DVFloorConverPieChartRose,
-  DVcustomerBottomChart,
-} from "@/components/common/charts/Chart";
+import { DVFlowTrendChart, DVSevenDaysAnalysisChart, DV12MonthsFlowTrendChart, DVFloorConverPieChart, DVFloorConverPieChartRose, DVcustomerBottomChart } from "@/components/common/charts/Chart";
 import { Skeleton } from "antd";
 import { Language, text } from "@/language/LocaleContext";
 import StringUtils from "@/utils/StringUtils";
@@ -37,7 +30,7 @@ export const RecentSevenDaysPanel = React.memo(({ chartData, isLoading }) => {
 
 // 数据视图-客流趋势
 export const TrendChart = React.memo(({ chartData, isFullscreen, isLoading }) => {
-  const { xAxis, series } = chartData || {};
+  const { xAxis, series, isTongZhou = true } = chartData || {};
   const seriesData = series?.[0] || [];
 
   useEffect(() => {
@@ -49,7 +42,9 @@ export const TrendChart = React.memo(({ chartData, isFullscreen, isLoading }) =>
     };
   }, [isFullscreen]);
 
-  return <div style={{ width: "100%", height: "100%" }}>{isLoading ? <Skeleton active style={{ width: "100%", height: "100%" }} /> : <DVFlowTrendChart data={{ xAxis, seriesData }} />}</div>;
+  return (
+    <div style={{ width: "100%", height: "100%" }}>{isLoading ? <Skeleton active style={{ width: "100%", height: "100%" }} /> : <DVFlowTrendChart data={{ xAxis, seriesData, isTongZhou }} />}</div>
+  );
 });
 
 // 数据视图-近七日分析
@@ -86,8 +81,9 @@ export const RecentSevenDaysChart = React.memo(({ chartData, isLoading }) => {
             style={{
               width: "100%",
               color: "#fff",
-              fontSize: "1rem",
-              borderCollapse: "collapse",
+              fontSize: "0.7rem",
+              borderCollapse: "separate",
+              borderSpacing: "0 0.4rem",
               boxSizing: "border-box",
               display: "table",
               tableLayout: "fixed",
@@ -95,24 +91,29 @@ export const RecentSevenDaysChart = React.memo(({ chartData, isLoading }) => {
               maxHeight: "100%",
             }}>
             <thead>
-              <tr style={{ color: "#00FFFF" }}>
-                <th style={{ textAlign: "center", fontWeight: "bold", wordBreak: "break-all", padding: "0.08rem", width: "30%" }}>时段</th>
-                <th style={{ textAlign: "center", fontWeight: "bold", wordBreak: "break-all", padding: "0.08rem" }}>{Language.GONGZUORI}</th>
-                <th style={{ textAlign: "center", fontWeight: "bold", wordBreak: "break-all", padding: "0.08rem" }}>{Language.ZHOUMO}</th>
-                <th style={{ textAlign: "center", fontWeight: "bold", wordBreak: "break-all", padding: "0.08rem" }}>{Language.ZHENGTI}</th>
+              <tr>
+                <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", width: "30%" }}>时段</th>
+                <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem" }}>{Language.GONGZUORI}</th>
+                <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem" }}>{Language.ZHOUMO}</th>
+                <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem" }}>{Language.ZHENGTI}</th>
               </tr>
             </thead>
 
-            <tbody style={{ fontSize: "0.96rem" }}>
+            <tbody style={{ fontSize: "0.74rem" }}>
               {timeLabels.map((item, index) => (
-                <tr key={index} style={{ wordBreak: "break-all", lineHeight: "1.1" }}>
+                <tr
+                  key={index}
+                  style={{
+                    wordBreak: "break-all",
+                    lineHeight: "1.1",
+                  }}
+                  className="recent-seven-days-table-row">
                   <td style={{ wordBreak: "break-all", padding: "0.08rem", width: "30%" }}>
                     <div style={{ textAlign: "center", lineHeight: "1.1" }}>{item.name.split("(")[0]}</div>
-                    {/* <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.7)", lineHeight: "1.1" }}>{item.range}</div> */}
                   </td>
-                  <td style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", lineHeight: "1.1" }}>{data1[index] || 0}</td>
-                  <td style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", lineHeight: "1.1" }}>{data2[index] || 0}</td>
-                  <td style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", lineHeight: "1.1" }}>{data3[index] || 0}</td>
+                  <td style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", lineHeight: "1.1" }}>{CommonUtils.formatNumberToUnit(data1[index]).fullText || 0}</td>
+                  <td style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", lineHeight: "1.1" }}>{CommonUtils.formatNumberToUnit(data2[index]).fullText || 0}</td>
+                  <td style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", lineHeight: "1.1" }}>{CommonUtils.formatNumberToUnit(data3[index]).fullText || 0}</td>
                 </tr>
               ))}
             </tbody>
@@ -311,32 +312,20 @@ export const CustomerPortraitChart = React.memo(({ chartData, isFullscreen, isLo
           <div className="DVportrait-row DVportrait-row--gauges">
             <div className="DVportrait-gauge">
               <div className={`DVportrait-gauge__circle ${isFullscreen ? "DVportrait-gauge__circle--fs" : ""}`}>
-                <Wave
-                  fillPercent={maleRateNum}
-                  showPercentage={false}
-                  portraitSize
-                  isFullscreen={isFullscreen}
-                  gender="male"
-                />
-                <div className="DVportrait-gauge__text">
+                <Wave totalNum={maleTotal} fillPercent={maleRateNum} showPercentage={false} portraitSize isFullscreen={isFullscreen} gender="male" />
+                {/* <div className="DVportrait-gauge__text">
                   <div className="DVportrait-gauge__count">{maleTotal ?? 0}</div>
                   <div className="DVportrait-gauge__rate DVportrait-gauge__rate--male">{maleRateNum.toFixed(2)}%</div>
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="DVportrait-gauge">
               <div className={`DVportrait-gauge__circle ${isFullscreen ? "DVportrait-gauge__circle--fs" : ""}`}>
-                <Wave
-                  fillPercent={femaleRateNum}
-                  showPercentage={false}
-                  portraitSize
-                  isFullscreen={isFullscreen}
-                  gender="female"
-                />
-                <div className="DVportrait-gauge__text">
+                <Wave totalNum={femaleTotal} fillPercent={femaleRateNum} showPercentage={false} portraitSize isFullscreen={isFullscreen} gender="female" />
+                {/* <div className="DVportrait-gauge__text">
                   <div className="DVportrait-gauge__count">{femaleTotal ?? 0}</div>
                   <div className="DVportrait-gauge__rate DVportrait-gauge__rate--female">{femaleRateNum.toFixed(2)}%</div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

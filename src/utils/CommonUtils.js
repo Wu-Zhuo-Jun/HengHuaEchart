@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 class CommonUtils {
   /**
-   * 根据时间范围dayjs对象和粒度生成x轴数据(自然周、自然月)
+   * 根据时间范围dayjs对象和粒度生成x轴数据(自然周、自然月) 传入dayjs对象可以是同一天自动做了实际结束时间处理
    * @param {Array} timeRange
    * @param {string} timeGranule
    * @param {string} type 自定义类型type normal、customerInsight

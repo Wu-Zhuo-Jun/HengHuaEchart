@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { TzDataViewMap } from "@/data/const";
+import { TzDataViewMap, festivalNameMap } from "@/data/const";
+import { siteMap } from "./siteMap";
 import Http from "@/config/Http";
 import {
   TodayTrendPanel,
@@ -15,15 +16,16 @@ import { FestivalFlowPanel, OutLetFlowPanel, GroupStatisticsPanel, FieldNumberPa
 import TimeUtils from "@/utils/TimeUtils";
 import CommonUtils from "@/utils/CommonUtils";
 import StringUtils from "@/utils/StringUtils";
+import ArrayUtils from "@/utils/ArrayUtils";
 import Constant from "@/common/Constant";
 import DataConverter from "@/data/DataConverter";
 import { Language } from "@/language/LocaleContext";
 import dayjs from "dayjs";
 import User from "@/data/UserData";
 import "./TzDataView.less";
+import { siteList as mockSiteList } from "./mockData";
 
 // 通州默认大屏配置
-
 const DEFAULT_CONFIG = {
   siteId: null,
   title: "北京市通州区党群服务阵地体系一屏通览",
@@ -35,7 +37,11 @@ const DEFAULT_CONFIG = {
     { component: "todayTrend", percentage: 30 },
     { component: "customerPortrait", percentage: 40 },
   ],
-  rightComponents: [{ component: "groupStatistics", percentage: 40 }],
+  rightComponents: [
+    { component: "recentSevenDays", percentage: 30 },
+    { component: "holidayFlow", percentage: 30 },
+    { component: "groupStatistics", percentage: 40 },
+  ],
 };
 
 const DataView = () => {
@@ -93,6 +99,9 @@ const DataView = () => {
   });
   const isNeutralDomain = window.localStorage.getItem("isNeutralDomain") === "true";
   const [isMobile, setIsMobile] = useState(false);
+  const [tagList, setTagList] = useState([]);
+  const [siteList, setSiteList] = useState([]);
+  const [selectSiteList, setSelectSiteList] = useState([]);
   // 移动端viewport处理：保持PC端比例，允许缩放查看
   useEffect(() => {
     // 检测是否是移动设备
@@ -265,6 +274,33 @@ const DataView = () => {
     }
   }, []);
 
+  useEffect(() => {
+    initTagAndSiteData();
+  }, []);
+
+  const initTagAndSiteData = () => {
+    Http.getTagManagementGetTagList(
+      {},
+      (res) => {
+        setTagList(res.data || []);
+        Http.getTagManagementGetAssocSites(
+          { tagIds: null },
+          (res2) => {
+            setSiteList(res2.data || []);
+          },
+          null,
+          (error) => console.error("getAssocSites 失败:", error)
+        );
+      },
+      null,
+      (error) => {
+        console.error("getTagList 失败:", error);
+        setSiteList([...mockSiteList]);
+        setSelectSiteList([...mockSiteList]);
+      }
+    );
+  };
+
   // 每分钟请求一次数据
   useEffect(() => {
     if (!siteIdRef.current) return;
@@ -292,7 +328,8 @@ const DataView = () => {
     const dateString = new Date().toISOString().split("T")[0];
     const [endDateLast7Days, startDateLast7Days] = TimeUtils.getLast7DaysRange();
     const [endDateLast12Months, startDateLast12Months] = TimeUtils.getLast12MonthsRange();
-
+    const ids = selectSiteList.length === siteList.length ? null : selectSiteList.map((item) => item.siteId); // 请求场地id 全部请求就缺省null 否则 [1,2,3..]
+    const year = dayjs(dateString).year();
     if (isFirstLoad) {
       setIsFirstLoad(false);
       setIsLoadingData({
@@ -305,17 +342,133 @@ const DataView = () => {
         groupAnalysisMemberDataLoading: true,
       });
     }
-    Http.getHomeData(
-      { siteId: siteId },
+
+    Http.getDeviceOnlineInfo(
+      { siteIds: ids },
       (res) => {
-        getSiteDeviceData(res.data.deviceData);
-        getSiteFestivalData(res.data.festivalData); // 节日客流情况
+        getSiteDeviceData(res.data);
       },
       null,
       (error) => {
         console.error("请求数据失败:", error);
       }
     );
+
+    Http.getFlowTrend(
+      { siteIds: ids, clearTime: 0, startDate: dateString, endDate: dateString },
+      (res) => {
+        const timeRange = [dayjs(dateString), dayjs(dateString)];
+        setFlowTrendData(Constant.TIME_TYPE.TODAY, "inCount", timeRange, [res.data.inCount]);
+      },
+      null,
+      (error) => {
+        console.error("请求数据失败:", error);
+      }
+    );
+
+    Http.getFaceTotal(
+      { siteIds: ids, clearTime: 0, startDate: dateString, endDate: dateString },
+      (res) => {
+        getSiteCustomerAttrData(res.data);
+      },
+      null,
+      (error) => {
+        console.error("请求数据失败:", error);
+      }
+    );
+
+    // 请求近12个月以及本年度客流
+    const TimeReuqestList = TimeUtils.getLast12MonthsRangeArray();
+    Promise.all(
+      TimeReuqestList.map(({ start, end }) =>
+        httpToPromise(Http.getFlowTotal, {
+          siteIds: ids,
+          clearTime: 0,
+          startDate: start,
+          endDate: end,
+        })
+      )
+    )
+      .then((results) => {
+        const Last12MonthsArray = [];
+        results.forEach((item) => {
+          if (item.result == 1) {
+            Last12MonthsArray.unshift(item?.data?.inCount || 0);
+          } else {
+            Last12MonthsArray.unshift(0);
+          }
+        });
+        getLast12MonthsFlowTrendData(Last12MonthsArray, [startDateLast12Months, endDateLast12Months]);
+        setIsLoadingData((prevData) => ({
+          ...prevData,
+          last12MonthsFlowTrendData: false,
+        }));
+      })
+      .catch((error) => {
+        console.error("请求数据失败:", error);
+      });
+
+    // 请求节假日
+    const currentYear = year;
+    const lastYear = year - 1;
+    Promise.all([
+      // 节假日今年
+      httpToPromise(Http.getFestivalTotal, { siteIds: ids, year: currentYear, clearTime: 0 }),
+      // 节假日去年
+      httpToPromise(Http.getFestivalTotal, { siteIds: ids, year: lastYear, clearTime: 0 }),
+      // 7-9月今年
+      httpToPromise(Http.getFlowTotal, { siteIds: ids, clearTime: 0, startDate: TimeUtils.getJulyToSeptemberRange(currentYear).start, endDate: TimeUtils.getJulyToSeptemberRange(currentYear).end }),
+      // 7-9月去年
+      httpToPromise(Http.getFlowTotal, { siteIds: ids, clearTime: 0, startDate: TimeUtils.getJulyToSeptemberRange(lastYear).start, endDate: TimeUtils.getJulyToSeptemberRange(lastYear).end }),
+      // 1-2月今年
+      httpToPromise(Http.getFlowTotal, {
+        siteIds: ids,
+        clearTime: 0,
+        startDate: TimeUtils.getJanuaryToFebruaryRange(currentYear).start,
+        endDate: TimeUtils.getJanuaryToFebruaryRange(currentYear).end,
+      }),
+      // 1-2月去年
+      httpToPromise(Http.getFlowTotal, { siteIds: ids, clearTime: 0, startDate: TimeUtils.getJanuaryToFebruaryRange(lastYear).start, endDate: TimeUtils.getJanuaryToFebruaryRange(lastYear).end }),
+    ])
+      .then((results) => {
+        console.log("节假日客流数据:", results[0], results[1]);
+        console.log("暑期(7-9月)客流数据:", results[2], results[3]);
+        console.log("寒假(1-2月)客流数据:", results[4], results[5]);
+
+        const summerHolidayThisYear = results[2].data.inCount;
+        const summerHolidayLastYear = results[3].data.inCount;
+        const winterHolidayThisYear = results[4].data.inCount;
+        const winterHolidayLastYear = results[5].data.inCount;
+        let year = [];
+        let lastYear = [];
+
+        results[0]?.data?.inCount.forEach((item, i) => {
+          year.push({ festivalKey: results[0]?.data?.festival[i], inCount: item });
+        });
+        year.push({ festivalKey: "shujia", inCount: summerHolidayThisYear });
+        year.push({ festivalKey: "hanjia", inCount: winterHolidayThisYear });
+        results[1]?.data?.inCount.forEach((item, i) => {
+          lastYear.push({ festivalKey: results[1]?.data?.festival[i], inCount: item });
+        });
+        lastYear.push({ festivalKey: "shujia", inCount: summerHolidayLastYear });
+        lastYear.push({ festivalKey: "hanjia", inCount: winterHolidayLastYear });
+        getSiteFestivalData({ year: year, lastYear: lastYear });
+      })
+      .catch((error) => {
+        console.error("请求数据失败:", error);
+      });
+
+    Http.getSiteRanking(
+      { siteIds: ids, clearTime: 0, startDate: dateString, endDate: dateString },
+      (res) => {
+        console.log(res);
+      },
+      null,
+      (error) => {
+        console.error("请求数据失败:", error);
+      }
+    );
+
     Http.getHomeStat(
       { siteId: siteId, timeType: 1 },
       (res) => {
@@ -334,10 +487,9 @@ const DataView = () => {
           dailyNumRate,
         }));
 
-        setFlowTrendData(Constant.TIME_TYPE.TODAY, "inCount", res.data.flowTrends); // 客流趋势
         getSiteFloorTransformData("inCount", res.data.floorTransform); // 楼层转化
         getSiteDoorRankingData(res.data.doorsRanking); // 出入口客流情况
-        getSiteCustomerAttrData(res.data.faceData); // 客户画像分析
+        // getSiteCustomerAttrData(res.data.faceData); // 客户画像分析
 
         setIsLoadingData((prevData) => ({
           ...prevData,
@@ -375,36 +527,6 @@ const DataView = () => {
       }
     );
 
-    // Http.getAnnualStats(
-    //   {
-    //     siteId: siteId,
-    //     startDate: startDateLast12Months,
-    //   },
-    //   (res) => {
-    //     console.log("res", res);
-    //   }
-    // );
-    // // 请求最近12个月数据
-    // Http.getDailyStats(
-    //   {
-    //     siteId: siteId,
-    //     timeType: 0,
-    //     startDate: startDateLast12Months,
-    //     endDate: endDateLast12Months,
-    //   },
-    //   (res) => {
-    //     getLast12MonthsFlowTrendData(res.data.flowTrend?.list?.[0]?.total, [startDateLast12Months, endDateLast12Months]);
-    //     setIsLoadingData((prevData) => ({
-    //       ...prevData,
-    //       last12MonthsFlowTrendData: false,
-    //     }));
-    //   },
-    //   null,
-    //   (error) => {
-    //     console.error("请求最近12个月数据失败:", error);
-    //   }
-    // );
-
     Http.getWeeklyStats(
       {
         siteId: siteId,
@@ -431,6 +553,7 @@ const DataView = () => {
         console.error("请求数据失败:", error);
       }
     );
+
     Http.getMonthlyStats(
       {
         siteId: siteId,
@@ -457,86 +580,27 @@ const DataView = () => {
       }
     );
 
-    // 请求近12个月以及本年度客流
-    const isSameYear = TimeUtils.isSameYearByDayjs(dayjs(startDateLast12Months), dayjs(endDateLast12Months));
-    const get12monthPromiseArray = isSameYear
-      ? [
-          httpToPromise(Http.getAnnualStats, {
-            siteId: siteId,
-            timeType: 0,
-            startDate: endDateLast12Months,
-          }),
-        ]
-      : [
-          httpToPromise(Http.getAnnualStats, {
-            siteId: siteId,
-            timeType: 0,
-            startDate: endDateLast12Months,
-          }),
-          httpToPromise(Http.getAnnualStats, {
-            siteId: siteId,
-            timeType: 0,
-            startDate: startDateLast12Months,
-          }),
-        ];
-
-    Promise.all(get12monthPromiseArray)
-      .then((res) => {
-        const [annualStatsRes, annualStatsRes2] = res;
-
-        // 处理年度统计数据
-        const flowStats = annualStatsRes.data.flowStats;
-        const { curFlow, lastFlow } = flowStats;
-        const { inCount: annualCount, inNum: annualNum } = curFlow;
-        const { inCount: lastCount, inNum: lastNum } = lastFlow;
-
-        const annualCountRate = lastCount === 0 ? 100 : StringUtils.toFixed(((annualCount - lastCount) / lastCount) * 100, 2);
-        const annualNumRate = lastNum === 0 ? 100 : StringUtils.toFixed(((annualNum - lastNum) / lastNum) * 100, 2);
-        setDashboardData((prevData) => ({
-          ...prevData,
-          annualCount,
-          annualNum,
-          annualCountRate,
-          annualNumRate,
-        }));
-
-        // 处理近12个月数据
-        if (isSameYear) {
-          getLast12MonthsFlowTrendData(annualStatsRes.data.flowTrend?.curFlowTrend, [startDateLast12Months, endDateLast12Months]);
-        } else {
-          getLast12MonthsFlowTrendData([...annualStatsRes.data.flowTrend?.curFlowTrend, ...annualStatsRes2.data.flowTrend?.curFlowTrend], [startDateLast12Months, endDateLast12Months]);
-        }
-
-        setIsLoadingData((prevData) => ({
-          ...prevData,
-          last12MonthsFlowTrendData: false,
-        }));
-      })
-      .catch((error) => {
-        console.error("请求数据失败:", error);
-      });
-
-    Http.getGroupAnalysisMember(
-      {
-        siteId: siteId,
-      },
-      (res) => {
-        if (res.result == 1) {
-          const data = Array.isArray(res?.data) ? res?.data.sort((a, b) => (b.result || 0) - (a.result || 0)) : null;
-          setGroupAnalysisMemberData(data);
-          setIsLoadingData((prevData) => ({
-            ...prevData,
-            groupAnalysisMemberDataLoading: false,
-          }));
-        }
-      },
-      null,
-      (error) => {}
-    );
+    // Http.getGroupAnalysisMember(
+    //   {
+    //     siteId: siteId,
+    //   },
+    //   (res) => {
+    //     if (res.result == 1) {
+    //       const data = Array.isArray(res?.data) ? res?.data.sort((a, b) => (b.result || 0) - (a.result || 0)) : null;
+    //       setGroupAnalysisMemberData(data);
+    //       setIsLoadingData((prevData) => ({
+    //         ...prevData,
+    //         groupAnalysisMemberDataLoading: false,
+    //       }));
+    //     }
+    //   },
+    //   null,
+    //   (error) => {}
+    // );
   };
 
-  // 客流趋势(copy by homePage)
-  const setFlowTrendData = (timeType = Constant.TIME_TYPE.TODAY, flowType = "inCount", data) => {
+  // 客流趋势
+  const setFlowTrendData = (timeType = Constant.TIME_TYPE.TODAY, flowType = "inCount", timeRange, data) => {
     const legendMap = {
       [Constant.TIME_TYPE.TODAY]: [Language.JINRIKELIU, Language.ZUORIKELIU, Language.SHANGZHOUTONGQI],
       [Constant.TIME_TYPE.WEEK]: [Language.JINZHOUKELIU, Language.SHANGZHOUKELIU],
@@ -544,103 +608,114 @@ const DataView = () => {
       [Constant.TIME_TYPE.YEAR]: [Language.JINNIANKELIU, Language.SHANGNIANKELIU],
       [Constant.TIME_TYPE.DATE]: [Language.KELIUQUSHI],
     };
-    const rangeFuncMap = {
-      [Constant.TIME_TYPE.TODAY]: TimeUtils.getTsHourRangeByTs,
-      [Constant.TIME_TYPE.WEEK]: TimeUtils.getTsDayRangeByTs,
-      [Constant.TIME_TYPE.MONTH]: TimeUtils.getTsDayRangeByTs,
-      [Constant.TIME_TYPE.YEAR]: TimeUtils.getTsMonthRangeByTs,
-    };
-    const dateFormatMap = {
-      [Constant.TIME_TYPE.TODAY]: "HH:00",
-      [Constant.TIME_TYPE.WEEK]: "MM-dd",
-      [Constant.TIME_TYPE.MONTH]: "MM-dd",
-      [Constant.TIME_TYPE.YEAR]: "yyyy-MM",
-    };
-    const todayData = data?.todayData || null;
-    const list = data.list;
+    const { xAxis } = CommonUtils.generateXAxisFromTimeRange(timeRange, "hour");
+    const xAxisLength = xAxis.length;
     const legend = legendMap[timeType];
-    const xAxis = [];
     const series = [];
-    if (timeType != Constant.TIME_TYPE.DATE) {
-      const seriesArr = [];
-      for (let i = 0; i < list.length; i++) {
-        let item = list[i];
-        let data = item.data;
-        let startTime = Number(item.startTime);
-        let endTime = Number(item.endTime);
-        let rangeFunc = rangeFuncMap[timeType];
-        let range = rangeFunc(startTime, endTime);
-        let dataMap = {};
-        let dataArr = [];
-        if (i == 0 && todayData) {
-          dataMap[todayData.dataTime] = Number(todayData[flowType]);
-        }
-        for (let j = 0; j < data.length; j++) {
-          let dataItem = data[j];
-          let dataTime = dataItem.dataTime;
-          if (dataMap[dataTime] == null) {
-            dataMap[dataTime] = 0;
-          }
-          dataMap[dataTime] += Number(dataItem[flowType]);
-        }
-        for (let j = 0; j < range.length; j++) {
-          let dataTime = range[j];
-          if (i == 0) {
-            xAxis.push(TimeUtils.ts2Date(dataTime, dateFormatMap[timeType]));
-          }
-          if (dataMap[dataTime] && dataMap[dataTime] > 0) {
-            dataArr.push(dataMap[dataTime]);
-          } else {
-            dataArr.push(0);
-          }
-        }
-        seriesArr.push(dataArr);
-        series.push([]);
-      }
-      for (let i = 0; i < xAxis.length; i++) {
-        for (let j = 0; j < seriesArr.length; j++) {
-          if (seriesArr[j].length > i) {
-            series[j].push(seriesArr[j][i]);
-          } else {
-            series[j].push(0);
-          }
-        }
-      }
-    } else {
-      let startTime = Number(list[0].startTime);
-      let endTime = Number(list[0].endTime);
-      let isHour = endTime - startTime < 86400;
-      let range = isHour ? TimeUtils.getTsHourRangeByTs(startTime, endTime) : TimeUtils.getTsDayRangeByTs(startTime, endTime);
-      let dataMap = {};
-      let data = list[0].data;
-      series.push([]);
-      if (todayData) {
-        dataMap[todayData.dataTime] = Number(todayData[flowType]);
-      }
-      for (let i = 0; i < data.length; i++) {
-        let dataTime = data[i].dataTime;
-        dataMap[dataTime] = Number(data[i][flowType]);
-      }
-      for (let i = 0; i < range.length; i++) {
-        let dataTime = range[i];
-        if (isHour) {
-          xAxis.push(TimeUtils.ts2Date(dataTime, "HH:00"));
-        } else {
-          xAxis.push(TimeUtils.ts2Date(dataTime, "MM-dd"));
-        }
-        if (dataMap[dataTime]) {
-          series[0].push(dataMap[dataTime]);
-        } else {
-          series[0].push(0);
-        }
-      }
+
+    for (let i = 0; i < legend.length; i++) {
+      // 当后端 API 数据长度小于 xAxisLength 时，用 0 填充至完整长度
+      const rawData = data[i] || [];
+      series[i] = rawData.length < xAxisLength ? [...rawData, ...Array(xAxisLength - rawData.length).fill(0)] : rawData.slice(0, xAxisLength);
     }
+
+    // const rangeFuncMap = {
+    //   [Constant.TIME_TYPE.TODAY]: TimeUtils.getTsHourRangeByTs,
+    //   [Constant.TIME_TYPE.WEEK]: TimeUtils.getTsDayRangeByTs,
+    //   [Constant.TIME_TYPE.MONTH]: TimeUtils.getTsDayRangeByTs,
+    //   [Constant.TIME_TYPE.YEAR]: TimeUtils.getTsMonthRangeByTs,
+    // };
+    // const dateFormatMap = {
+    //   [Constant.TIME_TYPE.TODAY]: "HH:00",
+    //   [Constant.TIME_TYPE.WEEK]: "MM-dd",
+    //   [Constant.TIME_TYPE.MONTH]: "MM-dd",
+    //   [Constant.TIME_TYPE.YEAR]: "yyyy-MM",
+    // };
+    // const todayData = data?.todayData || null;
+    // const list = data.list;
+    // const legend = legendMap[timeType];
+    // const xAxis = [];
+    // const series = [];
+    // if (timeType != Constant.TIME_TYPE.DATE) {
+    //   const seriesArr = [];
+    //   for (let i = 0; i < list.length; i++) {
+    //     let item = list[i];
+    //     let data = item.data;
+    //     let startTime = Number(item.startTime);
+    //     let endTime = Number(item.endTime);
+    //     let rangeFunc = rangeFuncMap[timeType];
+    //     let range = rangeFunc(startTime, endTime);
+    //     let dataMap = {};
+    //     let dataArr = [];
+    //     if (i == 0 && todayData) {
+    //       dataMap[todayData.dataTime] = Number(todayData[flowType]);
+    //     }
+    //     for (let j = 0; j < data.length; j++) {
+    //       let dataItem = data[j];
+    //       let dataTime = dataItem.dataTime;
+    //       if (dataMap[dataTime] == null) {
+    //         dataMap[dataTime] = 0;
+    //       }
+    //       dataMap[dataTime] += Number(dataItem[flowType]);
+    //     }
+    //     for (let j = 0; j < range.length; j++) {
+    //       let dataTime = range[j];
+    //       if (i == 0) {
+    //         xAxis.push(TimeUtils.ts2Date(dataTime, dateFormatMap[timeType]));
+    //       }
+    //       if (dataMap[dataTime] && dataMap[dataTime] > 0) {
+    //         dataArr.push(dataMap[dataTime]);
+    //       } else {
+    //         dataArr.push(0);
+    //       }
+    //     }
+    //     seriesArr.push(dataArr);
+    //     series.push([]);
+    //   }
+    //   for (let i = 0; i < xAxis.length; i++) {
+    //     for (let j = 0; j < seriesArr.length; j++) {
+    //       if (seriesArr[j].length > i) {
+    //         series[j].push(seriesArr[j][i]);
+    //       } else {
+    //         series[j].push(0);
+    //       }
+    //     }
+    //   }
+    // } else {
+    // let startTime = Number(list[0].startTime);
+    // let endTime = Number(list[0].endTime);
+    // let isHour = endTime - startTime < 86400;
+    // let range = isHour ? TimeUtils.getTsHourRangeByTs(startTime, endTime) : TimeUtils.getTsDayRangeByTs(startTime, endTime);
+    // let dataMap = {};
+    // let data = list[0].data;
+    // series.push([]);
+    // if (todayData) {
+    //   dataMap[todayData.dataTime] = Number(todayData[flowType]);
+    // }
+    // for (let i = 0; i < data.length; i++) {
+    //   let dataTime = data[i].dataTime;
+    //   dataMap[dataTime] = Number(data[i][flowType]);
+    // }
+    // for (let i = 0; i < range.length; i++) {
+    //   let dataTime = range[i];
+    //   if (isHour) {
+    //     xAxis.push(TimeUtils.ts2Date(dataTime, "HH:00"));
+    //   } else {
+    //     xAxis.push(TimeUtils.ts2Date(dataTime, "MM-dd"));
+    //   }
+    //   if (dataMap[dataTime]) {
+    //     series[0].push(dataMap[dataTime]);
+    //   } else {
+    //     series[0].push(0);
+    //   }
+    // }
+    // }
+
     let chartData = {
       xAxis,
       series,
       legend,
     };
-
     setTrendData({ ...trendData, chartData: chartData, flowType: "inCount", data: data });
   };
 
@@ -650,26 +725,10 @@ const DataView = () => {
     if (flowTrend == null) return;
     const { xAxis, xAxisTime, xAxisTooltips } = CommonUtils.generateXAxisFromTimeRange(timeRangeReal, "month");
 
-    const yAxisInCount = new Array(); // 进场人次
-
-    // 根据x轴长度生成对应的y轴数据
-    for (let i = 0; i < xAxis.length; i++) {
-      // 获取当前时间段的时间戳范围
-      const currentTimeSlot = CommonUtils.getTimeSlotByIndex(xAxisTime[i], xAxisTime[i + 1]);
-      let inCount = 0;
-      // 当前时间段数据
-      flowTrend.forEach((item) => {
-        if (item.dataTime >= currentTimeSlot.startTime && item.dataTime < currentTimeSlot.endTime) {
-          inCount += item.inCount || 0;
-        }
-      });
-
-      yAxisInCount.push(inCount);
-    }
     let chartData = {
       xAxis: xAxis,
       xAxisTooltips,
-      data: yAxisInCount,
+      data: flowTrend,
     };
     setLast12MonthsFlowTrendData(chartData);
   };
@@ -761,76 +820,106 @@ const DataView = () => {
     setDoorRankingData(rankingData);
   };
 
-  // 节日客流情况（copy by homePage)
+  // 节日客流情况
   const getSiteFestivalData = (data) => {
-    const festivalNameMap = {
-      yuandan: Language.YUANDAN,
-      chunjie: Language.CHUNJIE,
-      qingming: Language.QINGMINGJIE,
-      laodong: Language.LAODONGJIE,
-      duanwu: Language.DUANWUJIE,
-      zhongqiu: Language.ZHONGQIUJIE,
-      guoqing: Language.GUOQINGJIE,
-      qingren: Language.QINGRENJIE,
-      funv: Language.FUNVJIE,
-      muqin: Language.MUQINJIE,
-      ertong: Language.ERTONGJIE,
-      fuqin: Language.FUQINJIE,
-      qixi: Language.QIXIJIE,
-      jiaoshi: Language.JIAOSHIJIE,
-      wansheng: Language.WANSHENGJIE,
-      shuangshiyi: Language.SHUANGSHIYI,
-      dongzhi: Language.DONGZHI,
-      shengdan: Language.SHENGDANJIE,
-    };
     let year = data.year;
-    let lastYear = data.lastyear;
+    let lastYear = data.lastYear;
     let lastYearMap = {};
+    let maxNumber = 0;
 
+    // 构建去年数据Map，便于查询
     for (let i = 0; i < lastYear.length; i++) {
       let item = lastYear[i];
-      lastYearMap[item.f] = item;
+      lastYearMap[item.festivalKey] = item;
     }
-    let total = 0;
 
-    for (let i = 0; i < year.length; i++) {
-      let item = year[i];
-      let inCount = Number(item.ic);
-      total += inCount;
-    }
+    // 按指定顺序筛选并处理节日数据
+    const filterFestivalKeys = ["yuandan", "chunjie", "funv", "laodong", "duanwu", "shujia", "zhongqiu", "guoqing", "hanjia"];
     let list = [];
 
-    for (let i = 0; i < year.length; i++) {
-      let item = year[i];
-      let inCount = Number(item.ic);
-      let data = {
-        key: i,
-        name: festivalNameMap[item.f],
-        value: inCount,
-        rate: 0,
-        yoy: 0,
-      };
-      if (total > 0) {
-        data.rate = ((inCount / total) * 100).toFixed(2);
+    for (let i = 0; i < filterFestivalKeys.length; i++) {
+      let festivalKey = filterFestivalKeys[i];
+      let yearItem = year.find((item) => item.festivalKey === festivalKey);
+      let inCount = yearItem ? Number(yearItem.inCount) : 0;
+
+      // 计算最大 inCount 值
+      if (inCount > maxNumber) {
+        maxNumber = inCount;
       }
+
       let lastYearInCount = 0;
-      if (lastYearMap[item.f]) {
-        lastYearInCount = Number(lastYearMap[item.f].ic);
-        let yoyValue = inCount - lastYearInCount;
-        if (inCount > 0 && lastYearInCount == 0) {
-          data.yoy = 100;
-        } else if (lastYearInCount > 0) {
-          data.yoy = ((yoyValue / lastYearInCount) * 100).toFixed(2);
-        }
+      if (lastYearMap[festivalKey]) {
+        lastYearInCount = Number(lastYearMap[festivalKey].inCount);
       }
-      list.push(data);
+
+      let rate = 0;
+      if (inCount > 0 && lastYearInCount === 0) {
+        rate = 100;
+      } else if (inCount > 0 && lastYearInCount > 0) {
+        rate = Number(StringUtils.toFixed(((inCount - lastYearInCount) / lastYearInCount) * 100, 2));
+      }
+
+      list.push({
+        key: i,
+        name: festivalNameMap[festivalKey],
+        value: inCount,
+        rate: rate,
+      });
     }
-    setFestivalData({ list: list });
+
+    setFestivalData({ list: list, maxValue: maxNumber });
   };
 
   const getSiteCustomerAttrData = (data) => {
-    let chartData = DataConverter.getCustomerAttrConvertData(data);
-    setCustomerAttr(chartData);
+    let chartData = DataConverter.getNewCustomerAttrConvertData(data);
+
+    // 合并seriesData[0].data和seriesData[1].data的第0、1项，并删除最后一项 最后简化为幼儿、青少年、中年、老年四项
+    if (chartData && chartData.seriesData && chartData.seriesData.length >= 2) {
+      // 对每个seriesData的data处理
+      chartData.seriesData.forEach((series) => {
+        if (series.data && series.data.length >= 2) {
+          // 合并第0项和第1项
+          series.data[0] = series.data[0] + series.data[1];
+          // 删除第1项
+          series.data.splice(1, 1);
+        }
+        // 删除最后一项
+        series.data.pop();
+      });
+    }
+    // 通州项目处理
+    let ageAttrArr = ["幼年", "青少年", "中年", "老年"];
+    const ageMale = chartData.seriesData[0].data;
+    const ageFemale = chartData.seriesData[1].data;
+    let total = chartData?.maleTotal + chartData?.femaleTotal;
+    let maleMaxRate = 0;
+    let femaleMaxRate = 0;
+    let maleMaxDesc = null;
+    let femaleMaxDesc = null;
+    let maleMax = ArrayUtils.getMaxValue(ageMale);
+    let femaleMax = ArrayUtils.getMaxValue(ageFemale);
+    if (maleMax > 0 && total > 0) {
+      maleMaxRate = StringUtils.toFixed((maleMax / total) * 100, 2);
+      maleMaxDesc = `${ageAttrArr[ageMale.indexOf(maleMax)]}${StringUtils.toFixed(maleMaxRate, 0)}%`;
+    }
+    if (femaleMax > 0 && total > 0) {
+      femaleMaxRate = StringUtils.toFixed((femaleMax / total) * 100, 2);
+      femaleMaxDesc = `${ageAttrArr[ageFemale.indexOf(femaleMax)]}    ${Language.NV}  ${Language.ZHANBI} ${StringUtils.toFixed(femaleMaxRate, 0)}%`;
+    }
+    const seriesData = [
+      { name: Language.NAN, data: ageMale },
+      { name: Language.NV, data: ageFemale },
+    ];
+    const convertData = {
+      ...chartData,
+      seriesData,
+      maleMaxRate,
+      femaleMaxRate,
+      maleMaxDesc,
+      femaleMaxDesc,
+      yAxis: ageAttrArr,
+    };
+    setCustomerAttr(convertData);
   };
 
   // 更新时间
@@ -870,7 +959,7 @@ const DataView = () => {
       case "entranceExit":
         return <OutLetFlowPanel data={doorRankingData} deduplication={config.deduplication} isLoading={isLoadingData.doorRankingData} />;
       case "holidayFlow":
-        return <FestivalFlowPanel data={festivalData?.list || []} />;
+        return <FestivalFlowPanel data={festivalData?.list || []} maxNumber={festivalData?.maxValue || 0} />;
       case "groupStatistics":
         return <GroupStatisticsPanel data={groupAnalysisMemberData} deduplication={config.deduplication} isLoading={isLoadingData.groupAnalysisMemberDataLoading} />;
       case "todayTrend":

@@ -1,3 +1,4 @@
+import { Language } from "@/language/LocaleContext";
 // 大屏模块字典
 export const dataViewMap = {
   0: { moduleLabel: "未知", value: undefined, type: 0, percentage: 0 },
@@ -42,4 +43,58 @@ export const percentageOptionsDict = {
   deviceInfo: 20,
   customerPortrait: 40,
   groupStatistics: 40,
+};
+
+// 年龄枚举
+export const ageEnums = {
+  1: { title: Language.YINGER, key: 1 },
+  2: { title: Language.ERTONG, key: 2 },
+  4: { title: Language.QINGNIAN, key: 4 },
+  5: { title: Language.ZHUANGNIAN, key: 5 },
+  6: { title: Language.ZHONGLAONIAN, key: 6 },
+  7: { title: Language.WEIZHI, key: 7 },
+};
+
+// 性别枚举
+export const genderEnums = {
+  1: { title: Language.NAN, key: 1 },
+  2: { title: Language.NV, key: 2 },
+  // 3: { title: Language.WEIZHI, key: 3 },
+};
+
+// 表情枚举
+export const faceEnums = {
+  1: { title: Language.FENNU, key: 1 },
+  2: { title: Language.KUNHUO, key: 2 },
+  3: { title: Language.GAOXIN, key: 3 },
+  4: { title: Language.PINGJING, key: 4 },
+  5: { title: Language.JINGYA, key: 5 },
+  6: { title: Language.HAIPA, key: 6 },
+  7: { title: Language.YANWU, key: 7 },
+  8: { title: Language.BEISHANG, key: 8 },
+  9: { title: Language.WEIZHI, key: 9 },
+};
+
+// 节假日枚举
+export const festivalNameMap = {
+  yuandan: Language.YUANDAN,
+  chunjie: Language.CHUNJIE,
+  qingming: Language.QINGMINGJIE,
+  laodong: Language.LAODONGJIE,
+  duanwu: Language.DUANWUJIE,
+  zhongqiu: Language.ZHONGQIUJIE,
+  guoqing: Language.GUOQINGJIE,
+  qingren: Language.QINGRENJIE,
+  funv: Language.FUNVJIE,
+  muqin: Language.MUQINJIE,
+  ertong: Language.ERTONGJIE,
+  fuqin: Language.FUQINJIE,
+  qixi: Language.QIXIJIE,
+  jiaoshi: Language.JIAOSHIJIE,
+  wansheng: Language.WANSHENGJIE,
+  shuangshiyi: Language.SHUANGSHIYI,
+  dongzhi: Language.DONGZHI,
+  shengdan: Language.SHENGDANJIE,
+  shujia: Language.SHUJIA,
+  hanjia: Language.HANJIA,
 };

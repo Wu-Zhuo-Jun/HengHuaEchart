@@ -154,6 +154,8 @@ export class Language {
   static SHUANGSHIYI = text("SHUANGSHIYI");
   static DONGZHI = text("DONGZHI");
   static SHENGDANJIE = text("SHENGDANJIE");
+  static SHUJIA = text("SHUJIA");
+  static HANJIA = text("HANJIA");
   static SHIQU = text("SHIQU");
   static XIAOSHI = text("XIAOSHI");
   static KELIUDUIBI = text("KELIUDUIBI");

@@ -93,6 +93,8 @@ export class Cmd {
   static CMD_GET_FLOW_TREND = Config.API_URL + "/siteAnalysis/getFlowTrend";
   static CMD_GET_FACE_TOTAL = Config.API_URL + "/siteAnalysis/getFaceTotal";
   static CMD_GET_SITE_RANKING = Config.API_URL + "/siteAnalysis/getSiteRanking";
+  static CMD_GET_FLOW_TOTAL = Config.API_URL + "/siteAnalysis/getFlowTotal";
+  static CMD_GET_FESTIVAL_TOTAL = Config.API_URL + "/siteAnalysis/getFestivalTotal";
 }
 
 class Http {
@@ -475,12 +477,12 @@ class Http {
   }
 
   /** 标签管理-获取标签列表-通州 */
-  static getTagList(params, success, token, error) {
+  static getTagManagementGetTagList(params, success, token, error) {
     Http.post(Cmd.CMD_GET_TAG_LIST, params, success, token, error);
   }
 
   /** 标签管理-获取标签关联场地-通州 */
-  static getAssocSites(params, success, token, error) {
+  static getTagManagementGetAssocSites(params, success, token, error) {
     Http.post(Cmd.CMD_GET_ASSOC_SITES, params, success, token, error);
   }
 
@@ -502,6 +504,16 @@ class Http {
   /** 场地分析-获取场地排行-通州 */
   static getSiteRanking(params, success, token, error) {
     Http.post(Cmd.CMD_GET_SITE_RANKING, params, success, token, error);
+  }
+
+  /** 场地分析-获取指定日期合计-通州 */
+  static getFlowTotal(params, success, token, error) {
+    Http.post(Cmd.CMD_GET_FLOW_TOTAL, params, success, token, error);
+  }
+
+  /** 场地分析-获取指定日期节假日人次-通州 */
+  static getFestivalTotal(params, success, token, error) {
+    Http.post(Cmd.CMD_GET_FESTIVAL_TOTAL, params, success, token, error);
   }
 }
 export default Http;

@@ -283,6 +283,8 @@ response{
 	]
 }
 
+
+
 tagManagement/getTagList 获取标签列表
 request{
 
@@ -307,103 +309,15 @@ request{
 response{
 	result:错误码,
 	msg:错误信息，
-	data:[
+	data:
 		{
 			siteId:"1", //场地id
 			siteName:"name", //场地名称
 			tagIds:"1,2",//所属标签(场地可关联多个标签,多标签是为逗号分隔标签id)
 		}
-	]
+	
 }
 
-
-siteAnalysis/getDeviceOnlineInfo //获取设备在线离线数量信息
-
-request{
-	siteIds:场地id(缺省或null时查询所有,["1","2"]逗号分隔场地id查询多个场地)
-}
-
-response{
-	result:错误码,
-	msg:错误信息，
-	data:[
-		{
-			onlineCount:1, //在线数量
-			offlineCount:1, //离线数量
-		}
-	]
-}
-
-siteAnalysis/getFlowTrend //获取场地的趋势
-request{
-	siteIds:场地id(缺省时查询所有场地，["1","2"]逗号分隔为查多个场地)
-	clearTime:清0时间 (0-23)
-	startDate:开始日期
-	endDate:结束日期
-}
-
-response{
-	result:错误码,
-	msg:错误信息，
-	data:[ //选择单日返回每小时合计,多日返回每天合计
-	{	
-		
-		inNum: 0, //进人数
-		outNum: 0,//出人数
-		inCount: 0,//进人次
-		outCount: 0,//出人次
-		passNum: 0, //徘徊人数
-		batchCount: 0, //客流批次
-		dataTime:0,//时间戳
-	}
-	]
-}
-
-siteAnalysis/getFaceTotal 获取场地的人群分析
-request{
-	siteIds:场地id(缺省时查询所有场地，["1","2"]逗号分隔为查多个场地)
-	clearTime:清0时间 (0-23)
-	startDate:开始日期
-	endDate:结束日期
-}
-
-response{
-	result:错误码,
-	msg:错误信息，
-	data:[ 
-	{	
-		face:0, //心情
-		age:0, //年龄
-		gender:0, //性别
-		count:0, //人次
-	}
-	]
-}
-
-siteAnalysis/getFlowTrend //获取场地的趋势
-request{
-	siteIds:场地id(缺省时查询所有场地，["1","2"]逗号分隔为查多个场地)
-	clearTime:清0时间 (0-23)
-	startDate:开始日期
-	endDate:结束日期
-}
-
-response{
-	result:错误码,
-	msg:错误信息，
-	data:[
-	{	
-		siteId:"1",//场地id
-		siteName:"name",//场地名称
-		inNum: 0, //进人数
-		outNum: 0,//出人数
-		inCount: 0,//进人次
-		outCount: 0,//出人次
-		passNum: 0, //徘徊人数
-		batchCount: 0, //客流批次
-	}
-	]
-}
 
 siteAnalysis/getDeviceOnlineInfo //获取设备在线离线数量信息
 
@@ -456,10 +370,10 @@ response{
 	result:错误码,
 	msg:错误信息，
 	data:{ 
-		face:[0], //心情
-		age:[0], //年龄
-		gender:[0], //性别
-		count:[0], //人次
+		face:[6, 7, 9, 6, 7, 8, 9, 6, 7, 6, 7, 8, 1, 2, 3, 5, 6, 7, 8, 9, 1, 2, 3, 5, 6, 7, 8, 9, 1, 3, 5, 6, 7, 8, 9, 5, 6, 7, 8, 9, 6, 7, 9], //心情
+		age:[2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7], //年龄
+		gender:[1, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2], //性别
+		count:[7, 1, 9, 6, 4, 1, 16, 6, 1, 6, 1, 1, 1, 2, 3, 2, 210, 44, 22, 200, 1, 2, 1, 1, 124, 49, 14, 179, 1, 1, 2, 127, 34, 17, 53, 2, 67, 30, 10, 26, 2, 1, 14], //人次
 	}
 }
 
@@ -483,5 +397,43 @@ response{
 		outCount: [0],//出人次
 		passNum: [0], //徘徊人数
 		batchCount: [0], //客流批次
+	}
+}
+
+siteAnalysis/getFlowTotal //获取指定日期合计
+request{
+	siteIds:场地id(缺省时查询所有场地，["1","2"]逗号分隔为查多个场地)
+	clearTime:清0时间 (0-23)
+	startDate:开始日期
+	endDate:结束日期
+}
+
+response{
+	result:错误码,
+	msg:错误信息，
+	data:{
+		inNum: [0], //进人数
+		outNum: [0],//出人数
+		inCount: [0],//进人次
+		outCount: [0],//出人次
+		passNum: [0], //徘徊人数
+		batchCount: [0], //客流批次
+	}
+}
+
+
+siteAnalysis/getFestivalTotal //获取指定日期节假日人次
+request{
+	siteIds:场地id(缺省时查询所有场地，["1","2"]逗号分隔为查多个场地)
+	clearTime:清0时间 (0-23)
+	year:年
+}
+
+response{
+	result:错误码,
+	msg:错误信息，
+	data:{
+		festival: ["yuandan","chunjie"], //所属节假日(已排好序)
+		inCount: [0,0],//进人次
 	}
 }

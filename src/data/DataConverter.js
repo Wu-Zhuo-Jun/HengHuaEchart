@@ -335,6 +335,83 @@ export default class DataConverter {
       maleMaxDescForDv,
       femaleMaxDescForDv,
     };
+    console.log(convertData, 338);
+
+    return convertData;
+  };
+
+  // 新的客户属性转换
+  static getNewCustomerAttrConvertData = (data) => {
+    let ageAttrMap = {
+      1: 0,
+      2: 1,
+      4: 2,
+      5: 3,
+      6: 4,
+      7: 5,
+    };
+    let ageAttrArr = [Language.YINGER, Language.ERTONG, Language.QINGNIAN, Language.ZHUANGNIAN, Language.ZHONGLAONIAN, Language.WEIZHI];
+    let genderArr = [0, 0, 0];
+    let ageArr = [
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+    ];
+    let total = 0;
+    for (let i = 0; i < data.count.length; i++) {
+      let gender = Number(data.gender[i]) || 0;
+      let age = Number(data.age[i]) || 0;
+      let count = Number(data.count[i]) || 0;
+      genderArr[gender - 1] += count;
+      if (gender < 3) {
+        //不计算未知性别
+        ageArr[gender - 1][ageAttrMap[age]] += count;
+      }
+      total += count;
+    }
+
+    const maleTotal = genderArr[0]; // 男性总数
+    const femaleTotal = genderArr[1]; // 女性总数
+    let genderAll = maleTotal + femaleTotal;
+    let maleRate = genderAll > 0 ? StringUtils.toFixed((maleTotal / genderAll) * 100, 2) : 0;
+    let femaleRate = genderAll > 0 ? StringUtils.toFixed((10000 - maleRate * 100) / 100, 2) : 0;
+    let maleMaxRate = 0;
+    let femaleMaxRate = 0;
+    let maleMaxDesc = null;
+    let femaleMaxDesc = null;
+    let maleMaxDescForDv = null;
+    let femaleMaxDescForDv = null;
+    let maleMax = ArrayUtils.getMaxValue(ageArr[0]);
+    let femaleMax = ArrayUtils.getMaxValue(ageArr[1]);
+    if (maleMax > 0 && total > 0) {
+      maleMaxRate = StringUtils.toFixed((maleMax / total) * 100, 2);
+      maleMaxDesc = `${ageAttrArr[ageArr[0].indexOf(maleMax)]}    ${Language.NAN}  ${Language.ZHANBI} ${StringUtils.toFixed(maleMaxRate, 0)}%`;
+      maleMaxDescForDv = `${ageAttrArr[ageArr[0].indexOf(maleMax)]}  ${Language.NAN}`;
+    }
+    if (femaleMax > 0 && total > 0) {
+      femaleMaxRate = StringUtils.toFixed((femaleMax / total) * 100, 2);
+      femaleMaxDesc = `${ageAttrArr[ageArr[1].indexOf(femaleMax)]}    ${Language.NV}  ${Language.ZHANBI} ${StringUtils.toFixed(femaleMaxRate, 0)}%`;
+      femaleMaxDescForDv = `${ageAttrArr[ageArr[1].indexOf(femaleMax)]}  ${Language.NV}`;
+    }
+    const seriesData = [
+      { name: Language.NAN, data: ageArr[0] },
+      { name: Language.NV, data: ageArr[1] },
+    ];
+    const convertData = {
+      seriesData,
+      maleMaxRate,
+      femaleMaxRate,
+      maleMaxDesc,
+      femaleMaxDesc,
+      maleRate,
+      femaleRate,
+      maleTotal,
+      femaleTotal,
+      yAxis: ageAttrArr,
+      maleMaxDescForDv,
+      femaleMaxDescForDv,
+    };
+
     return convertData;
   };
 

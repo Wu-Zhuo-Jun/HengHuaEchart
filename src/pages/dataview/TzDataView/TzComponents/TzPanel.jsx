@@ -197,7 +197,7 @@ export const DashboardPanel = ({ dashboardData, deduplication }) => {
 };
 
 // 数据视图-节假日客流情况
-export const FestivalFlowPanel = React.memo(({ data }) => {
+export const FestivalFlowPanel = React.memo(({ data, maxNumber }) => {
   // 计算每行高度，用于限制显示5行
   const rowHeight = useMemo(() => {
     // 根据 lineHeight: "1.1" 和 padding: "0.08rem" 计算
@@ -213,18 +213,18 @@ export const FestivalFlowPanel = React.memo(({ data }) => {
   }, [data]);
 
   return (
-    <div style={{ width: "100%", height: "100%", minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column", color: "#fff", fontSize: "1.1rem" }}>
+    <div style={{ width: "100%", height: "100%", minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column", color: "#fff", fontSize: "1rem" }}>
       {/* 表头 */}
-      <div style={{ display: "flex", flexDirection: "row", color: "#00FFFF", flexShrink: 0 }}>
-        <div style={{ flex: "0 0 6rem", textAlign: "center", fontWeight: "bold", padding: "0.08rem" }}>{Language.MINGCHENG}</div>
-        <div style={{ flex: 3, textAlign: "center", fontWeight: "bold", padding: "0.08rem" }}>{Language.KELIU}</div>
-        <div style={{ flex: 1, textAlign: "center", fontWeight: "bold", padding: "0.08rem" }}>{Language.TONGBISHANGNIAN}</div>
+      <div style={{ display: "flex", flexDirection: "row", flexShrink: 0, marginBottom: "0.4rem" }}>
+        <div style={{ flex: "0 0 6rem", textAlign: "left", padding: "0.08rem", paddingLeft: "0.7rem" }}>节日</div>
+        <div style={{ flex: 3, textAlign: "left", padding: "0.08rem" }}>服务人次</div>
+        <div style={{ flex: 1, textAlign: "left", padding: "0.08rem" }}>{Language.TONGBISHANGNIAN}</div>
       </div>
       {/* 数据行 */}
       <div style={{ flex: 1, minHeight: 0, height: `calc(${rowHeight} * 7)` }}>
         <Swiper
           direction="vertical"
-          slidesPerView={7}
+          slidesPerView={5}
           modules={[Autoplay]}
           autoplay={{
             delay: 3000,
@@ -275,7 +275,7 @@ export const FestivalFlowPanel = React.memo(({ data }) => {
                             {item.name || "-"}
                           </div>
                           <div style={{ flex: 3, padding: "0.08rem", lineHeight: "1.1", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <FestivalProgressItem value={item.value} rate={rate} />
+                            <FestivalProgressItem value={item.value} maxNumber={maxNumber} />
                           </div>
                           <div
                             style={{
@@ -306,12 +306,14 @@ export const FestivalFlowPanel = React.memo(({ data }) => {
   );
 });
 
-const FestivalProgressItem = ({ value, rate }) => {
+const FestivalProgressItem = ({ value, maxNumber }) => {
+  const radio = ((value / maxNumber) * 100).toFixed(2);
+  // console.log(radio, 311);
   return (
     <div className="festival-flow-progress-container">
       <div style={{ textAlign: "right", lineHeight: "1.1" }}>{value}</div>
       <div className="festival-flow-progress">
-        <div className="festival-flow-progress-bar" style={{ width: `${rate > 100 ? 100 : rate}%` }}></div>
+        <div className="festival-flow-progress-bar" style={{ width: `${radio}%` }}></div>
         {/* <div className="festival-flow-progress-point"></div> */}
       </div>
     </div>

@@ -567,6 +567,20 @@ class TimeUtils {
     return [end, start];
   }
 
+  // 返回最近12个月每个月的头天和尾天数组，例如 [{end:'2026-04-30',start:'2026-04-01'}, {end:'2026-03-31',start:'2026-03-01'}, ...]
+  static getLast12MonthsRangeArray() {
+    const result = [];
+    let current = dayjs();
+
+    for (let i = 0; i < 12; i++) {
+      const start = current.startOf("month").format("YYYY-MM-DD");
+      const end = current.endOf("month").format("YYYY-MM-DD");
+      result.push({ start, end });
+      current = current.subtract(1, "month");
+    }
+    return result;
+  }
+
   /**
    * 判断两个dayjs对象是否在同一年
    * @param {Object} dayjs1 第一个dayjs对象
@@ -598,6 +612,31 @@ class TimeUtils {
 
     const days = Math.floor(diffSeconds / 86400); // 86400秒 = 1天
     return days;
+  }
+
+  /**
+   * 获取某年7月1日到9月30日的日期范围
+   * @param {number} year 年份
+   * @returns {Object} 包含 start 和 end 的对象
+   */
+  static getJulyToSeptemberRange(year) {
+    return {
+      start: `${year}-07-01`,
+      end: `${year}-09-30`,
+    };
+  }
+
+  /**
+   * 获取某年1月1日到2月底的日期范围（自动处理闰年）
+   * @param {number} year 年份
+   * @returns {Object} 包含 start 和 end 的对象
+   */
+  static getJanuaryToFebruaryRange(year) {
+    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    return {
+      start: `${year}-01-01`,
+      end: `${year}-02-${isLeapYear ? 29 : 28}`,
+    };
   }
 }
 
