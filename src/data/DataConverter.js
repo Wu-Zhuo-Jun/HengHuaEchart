@@ -130,6 +130,102 @@ export default class DataConverter {
     return convertData;
   };
 
+  /**
+   * 转换新的峰值数据（区分工作日和周末，区分时段）
+   * @param {*} type 1=饼图时段分布, 其他=折线图
+   * @param {weekdayData, weekendData, weekdayDays, weekendDays} data
+   *   weekdayData/weekendData: 数组，每小时一个值，共24小时
+   *   weekdayDays/weekendDays: 工作日/周末天数
+   * @returns
+   */
+  static getNewVisitingPeakConvertData = (type, data) => {
+    if (data == null) {
+      return;
+    }
+    const weekdayData = data.weekdayData || [];
+    const weekendData = data.weekendData || [];
+    const weekdayDays = Number(data.weekdayDays) || 5;
+    const weekendDays = Number(data.weekendDays) || 2;
+    const totalDays = weekdayDays + weekendDays;
+
+    // 时段定义：凌晨、早上、中午、下午、傍晚、晚上
+    // 凌晨 0:00-6:00 (小时 0-5)
+    // 早上 6:00-11:00 (小时 6-10)
+    // 中午 11:00-14:00 (小时 11-13)
+    // 下午 14:00-17:00 (小时 14-16)
+    // 傍晚 17:00-19:00 (小时 17-18)
+    // 晚上 19:00-24:00 (小时 19-23)
+    const peakTimeArr = [
+      text(Language.PARAM_LINGCHEN, { value: "(0:00-6:00)" }),
+      text(Language.PARAM_ZAOSHANG, { value: "(6:00-11:00)" }),
+      text(Language.PARAM_ZHONGWU, { value: "(11:00-14:00)" }),
+      text(Language.PARAM_XIAWU, { value: "(14:00-17:00)" }),
+      text(Language.PARAM_BANGWAN, { value: "(17:00-19:00)" }),
+      text(Language.PARAM_WANSHANG, { value: "(19:00-24:00)" }),
+    ];
+
+    // 每个时段的小时数：[6, 5, 3, 3, 2, 5]
+    const hoursPerPeriod = [6, 5, 3, 3, 2, 5];
+
+    // 时段边界：每小时属于哪个时段 (0-5 -> 0, 6-10 -> 1, 11-13 -> 2, 14-16 -> 3, 17-18 -> 4, 19-23 -> 5)
+    const zone = [5, 10, 13, 16, 18, 23];
+
+    // 初始化各时段累计值
+    let weekdayPeriodTotal = [0, 0, 0, 0, 0, 0]; // 工作日各时段累计
+    let weekendPeriodTotal = [0, 0, 0, 0, 0, 0]; // 周末各时段累计
+    let totalPeriodTotal = [0, 0, 0, 0, 0, 0]; // 整体各时段累计
+
+    // 遍历24小时数据，累加到对应时段
+    for (let i = 0; i < 24; i++) {
+      const weekdayValue = Number(weekdayData[i]) || 0;
+      const weekendValue = Number(weekendData[i]) || 0;
+      const totalValue = weekdayValue + weekendValue;
+
+      // 找到该小时属于哪个时段
+      for (let j = 0; j < zone.length; j++) {
+        if (i <= zone[j]) {
+          weekdayPeriodTotal[j] += weekdayValue;
+          weekendPeriodTotal[j] += weekendValue;
+          totalPeriodTotal[j] += totalValue;
+          break;
+        }
+      }
+    }
+
+    // 计算各时段平均值
+    const weekdayAvgData = weekdayPeriodTotal.map((v) => (weekdayDays > 0 ? Math.ceil(v / weekdayDays) : 0));
+    const weekendAvgData = weekendPeriodTotal.map((v) => (weekendDays > 0 ? Math.ceil(v / weekendDays) : 0));
+    const totalAvgData = totalPeriodTotal.map((v) => (totalDays > 0 ? Math.ceil(v / totalDays) : 0));
+
+    // 处理负值
+    for (let i = 0; i < 6; i++) {
+      weekdayAvgData[i] = weekdayAvgData[i] < 0 ? 0 : weekdayAvgData[i];
+      weekendAvgData[i] = weekendAvgData[i] < 0 ? 0 : weekendAvgData[i];
+      totalAvgData[i] = totalAvgData[i] < 0 ? 0 : totalAvgData[i];
+    }
+
+    let convertData = {};
+
+    if (type == 1) {
+      // 返回饼图格式数据
+      convertData = {
+        data1: weekdayAvgData,
+        data2: weekendAvgData,
+        data3: totalAvgData,
+      };
+    } else {
+      // 返回折线图格式数据
+      const legend = [Language.GONGZUORIPINGJUNKELIU, Language.ZHOUMOPINGJUNKELIU, Language.ZHENGTIPINGJUNKELIU];
+      convertData = {
+        legend,
+        xAxis: peakTimeArr,
+        series: [weekdayAvgData, weekendAvgData, totalAvgData],
+      };
+    }
+
+    return convertData;
+  };
+
   static getDooorRankingConvertData = (data) => {
     let total = 0;
     let convertData = [];

@@ -553,6 +553,22 @@ class TimeUtils {
     return [end, start];
   }
 
+  // 获取近7天每天的日期和星期信息（用于区分工作日和周末）
+  static getLast7DaysWithWeekday() {
+    const days = [];
+    const today = new Date();
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date(today - i * 24 * 60 * 60 * 1000);
+      const dayOfWeek = date.getDay();
+      days.push({
+        date: date.toISOString().slice(0, 10),
+        dayOfWeek, // 0=周日, 1=周一, ..., 6=周六
+        isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+      });
+    }
+    return days;
+  }
+
   // 最近12个月的日期范围，endDate 根据今天动态计算，startDate 为12个月前的那个月的1号
   static getLast12MonthsRange() {
     const today = new Date();

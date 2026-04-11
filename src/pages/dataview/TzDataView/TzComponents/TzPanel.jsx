@@ -307,8 +307,7 @@ export const FestivalFlowPanel = React.memo(({ data, maxNumber }) => {
 });
 
 const FestivalProgressItem = ({ value, maxNumber }) => {
-  const radio = ((value / maxNumber) * 100).toFixed(2);
-  // console.log(radio, 311);
+  const radio = maxNumber !== 0 ? ((value / maxNumber) * 100).toFixed(2) : 0;
   return (
     <div className="festival-flow-progress-container">
       <div style={{ textAlign: "right", lineHeight: "1.1" }}>{value}</div>

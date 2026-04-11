@@ -141,7 +141,7 @@ export const DashboardPanel = ({ dashboardData, deduplication }) => {
 };
 
 // 数据视图-节假日客流情况
-export const FestivalFlowPanel = React.memo(({ data }) => {
+export const FestivalFlowPanel = React.memo(({ data, maxNumber }) => {
   // 计算每行高度，用于限制显示5行
   const rowHeight = useMemo(() => {
     // 根据 lineHeight: "1.1" 和 padding: "0.08rem" 计算
@@ -219,7 +219,7 @@ export const FestivalFlowPanel = React.memo(({ data }) => {
                             {item.name || "-"}
                           </div>
                           <div style={{ flex: 3, padding: "0.08rem", lineHeight: "1.1", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <FestivalProgressItem value={item.value} rate={rate} />
+                            <FestivalProgressItem value={item.value} maxNumber={maxNumber} />
                           </div>
                           <div
                             style={{
@@ -250,12 +250,14 @@ export const FestivalFlowPanel = React.memo(({ data }) => {
   );
 });
 
-const FestivalProgressItem = ({ value, rate }) => {
+const FestivalProgressItem = ({ value, maxNumber }) => {
+  const radio = maxNumber !== 0 ? ((value / maxNumber) * 100).toFixed(2) : 0;
+
   return (
     <div className="festival-flow-progress-container">
       <div style={{ textAlign: "right", lineHeight: "1.1" }}>{value}</div>
       <div className="festival-flow-progress">
-        <div className="festival-flow-progress-bar" style={{ width: `${rate > 100 ? 100 : rate}%` }}></div>
+        <div className="festival-flow-progress-bar" style={{ width: `${radio}%` }}></div>
         {/* <div className="festival-flow-progress-point"></div> */}
       </div>
     </div>

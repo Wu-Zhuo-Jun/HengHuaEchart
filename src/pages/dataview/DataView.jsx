@@ -385,6 +385,7 @@ const DataView = () => {
       },
       (res) => {
         let chartData = DataConverter.getVisitingPeakConvertData(1, res.data.visitingPeak);
+        console.log(chartData, 388);
         setRecentSevenDaysData(chartData);
         setIsLoadingData((prevData) => ({
           ...prevData,

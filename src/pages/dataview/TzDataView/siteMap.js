@@ -92,7 +92,7 @@ export const siteMap = {
   199: { siteId: 199, typeIds: "1004", siteName: "潞邑街道通瑞嘉苑社区党群服务中心", siteCoord: null },
   200: { siteId: 200, typeIds: "1002,1004", siteName: "永顺镇党群服务中心", siteCoord: null },
   201: { siteId: 201, typeIds: "1002,1004", siteName: "梨园镇党群服务中心", siteCoord: null },
-  202: { siteId: 202, typeIds: "1008", siteName: "梨园镇新城乐居社��党群服务中心", siteCoord: null },
+  202: { siteId: 202, typeIds: "1008", siteName: "梨园镇新城乐居社党群服务中心", siteCoord: null },
   203: { siteId: 203, typeIds: "1002", siteName: "宋庄镇党群服务中心", siteCoord: null },
   204: { siteId: 204, typeIds: "1002,1005", siteName: "宋庄艺术区党群服务中心", siteCoord: null },
   205: { siteId: 205, typeIds: "1004", siteName: "宋庄镇含章园二社区党群服务中心", siteCoord: null },
@@ -118,5 +118,4 @@ export const siteMap = {
   225: { siteId: 225, typeIds: "1003,1006", siteName: "中关村通州园党群服务中心", siteCoord: null },
   226: { siteId: 226, typeIds: "1003,1006", siteName: "运河商务区党群服务中心", siteCoord: null },
   227: { siteId: 227, typeIds: "1000", siteName: "北京城市副中心党群服务中心", siteCoord: null },
-  233: { siteId: 233, typeIds: "1007", siteName: "永乐店镇西槐庄科技小院党群服务中心", siteCoord: null },
 };

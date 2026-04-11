@@ -12,6 +12,7 @@ import {
   DeviceInfoChart,
   CustomerPortraitChart,
 } from "./TzComponents/TzChart";
+import { TzMapDrawBoard } from "./TzComponents/TzMapDrawBoard";
 import { FestivalFlowPanel, OutLetFlowPanel, GroupStatisticsPanel, FieldNumberPanel, DashboardPanel } from "./TzComponents/TzPanel";
 import TimeUtils from "@/utils/TimeUtils";
 import CommonUtils from "@/utils/CommonUtils";
@@ -330,6 +331,7 @@ const DataView = () => {
     const [endDateLast12Months, startDateLast12Months] = TimeUtils.getLast12MonthsRange();
     const ids = selectSiteList.length === siteList.length ? null : selectSiteList.map((item) => item.siteId); // 请求场地id 全部请求就缺省null 否则 [1,2,3..]
     const year = dayjs(dateString).year();
+
     if (isFirstLoad) {
       setIsFirstLoad(false);
       setIsLoadingData({
@@ -359,6 +361,10 @@ const DataView = () => {
       (res) => {
         const timeRange = [dayjs(dateString), dayjs(dateString)];
         setFlowTrendData(Constant.TIME_TYPE.TODAY, "inCount", timeRange, [res.data.inCount]);
+        setIsLoadingData((prevData) => ({
+          ...prevData,
+          trendData: false,
+        }));
       },
       null,
       (error) => {
@@ -370,6 +376,10 @@ const DataView = () => {
       { siteIds: ids, clearTime: 0, startDate: dateString, endDate: dateString },
       (res) => {
         getSiteCustomerAttrData(res.data);
+        setIsLoadingData((prevData) => ({
+          ...prevData,
+          customerAttr: false,
+        }));
       },
       null,
       (error) => {
@@ -469,134 +479,27 @@ const DataView = () => {
       }
     );
 
-    Http.getHomeStat(
-      { siteId: siteId, timeType: 1 },
-      (res) => {
-        // 当前统计客流
-        const flowStats = res.data.flowStats;
-        const { curFlow, lastFlow } = flowStats;
-        const { inCount: dailyCount, inNum: dailyNum } = curFlow;
-        const { inCount: lastCount, inNum: lastNum } = lastFlow;
-        const dailyCountRate = lastCount === 0 ? 100 : StringUtils.toFixed(((dailyCount - lastCount) / lastCount) * 100, 2);
-        const dailyNumRate = lastNum === 0 ? 100 : StringUtils.toFixed(((dailyNum - lastNum) / lastNum) * 100, 2);
-        setDashboardData((prevData) => ({
-          ...prevData,
-          dailyCount,
-          dailyNum,
-          dailyCountRate,
-          dailyNumRate,
-        }));
+    // 获取近7天数据并区分工作日和周末
+    const last7DaysData = TimeUtils.getLast7DaysWithWeekday();
+    const weekdayRequests = last7DaysData.filter((d) => !d.isWeekend).map((d) => httpToPromise(Http.getFlowTrend, { siteIds: ids, clearTime: 0, startDate: d.date, endDate: d.date }));
+    const weekendRequests = last7DaysData.filter((d) => d.isWeekend).map((d) => httpToPromise(Http.getFlowTrend, { siteIds: ids, clearTime: 0, startDate: d.date, endDate: d.date }));
 
-        getSiteFloorTransformData("inCount", res.data.floorTransform); // 楼层转化
-        getSiteDoorRankingData(res.data.doorsRanking); // 出入口客流情况
-        // getSiteCustomerAttrData(res.data.faceData); // 客户画像分析
-
-        setIsLoadingData((prevData) => ({
-          ...prevData,
-          floorTransformData: false,
-          trendData: false,
-          doorRankingData: false,
-          customerAttr: false,
-        }));
-      },
-      null,
-      (error) => {
-        console.error("请求数据失败:", error);
-      }
-    );
-
-    // 请求前7日
-    Http.getDailyStats(
-      {
-        siteId: siteId,
-        timeType: 0,
-        startDate: startDateLast7Days,
-        endDate: endDateLast7Days,
-      },
-      (res) => {
-        let chartData = DataConverter.getVisitingPeakConvertData(1, res.data.visitingPeak);
-        setRecentSevenDaysData(chartData);
+    Promise.all([...weekdayRequests, ...weekendRequests])
+      .then((results) => {
+        const weekdayCount = weekdayRequests.length;
+        const weekdayData = results.slice(0, weekdayCount).map((res) => res.data.inCount || 0);
+        const weekendData = results.slice(weekdayCount).map((res) => res.data.inCount || 0);
+        console.log("近7日工作日数据:", weekdayData);
+        console.log("近7日周末数据:", weekendData);
+        let chartData = DataConverter.getNewVisitingPeakConvertData(1, { data: { weekdayData, weekendData } });
         setIsLoadingData((prevData) => ({
           ...prevData,
           recentSevenDaysData: false,
         }));
-      },
-      null,
-      (error) => {
-        console.error("请求数据失败:", error);
-      }
-    );
-
-    Http.getWeeklyStats(
-      {
-        siteId: siteId,
-        startDate: dateString,
-      },
-      (res) => {
-        const flowStats = res.data.flowStats;
-        const { curFlow, lastFlow } = flowStats;
-        const { inCount: weeklyCount, inNum: weeklyNum } = curFlow;
-        const { inCount: lastCount, inNum: lastNum } = lastFlow;
-
-        const weeklyCountRate = lastCount === 0 ? 100 : StringUtils.toFixed(((weeklyCount - lastCount) / lastCount) * 100, 2);
-        const weeklyNumRate = lastNum === 0 ? 100 : StringUtils.toFixed(((weeklyNum - lastNum) / lastNum) * 100, 2);
-        setDashboardData((prevData) => ({
-          ...prevData,
-          weeklyCount,
-          weeklyNum,
-          weeklyCountRate,
-          weeklyNumRate,
-        }));
-      },
-      null,
-      (error) => {
-        console.error("请求数据失败:", error);
-      }
-    );
-
-    Http.getMonthlyStats(
-      {
-        siteId: siteId,
-        startDate: dateString,
-      },
-      (res) => {
-        const flowStats = res.data.flowStats;
-        const { curFlow, lastFlow } = flowStats;
-        const { inCount: monthlyCount, inNum: monthlyNum } = curFlow;
-        const { inCount: lastCount, inNum: lastNum } = lastFlow;
-        const monthlyCountRate = lastCount === 0 ? 100 : StringUtils.toFixed(((monthlyCount - lastCount) / lastCount) * 100, 2);
-        const monthlyNumRate = lastNum === 0 ? 100 : StringUtils.toFixed(((monthlyNum - lastNum) / lastNum) * 100, 2);
-        setDashboardData((prevData) => ({
-          ...prevData,
-          monthlyCount,
-          monthlyNum,
-          monthlyCountRate,
-          monthlyNumRate,
-        }));
-      },
-      null,
-      (error) => {
-        console.error("请求数据失败:", error);
-      }
-    );
-
-    // Http.getGroupAnalysisMember(
-    //   {
-    //     siteId: siteId,
-    //   },
-    //   (res) => {
-    //     if (res.result == 1) {
-    //       const data = Array.isArray(res?.data) ? res?.data.sort((a, b) => (b.result || 0) - (a.result || 0)) : null;
-    //       setGroupAnalysisMemberData(data);
-    //       setIsLoadingData((prevData) => ({
-    //         ...prevData,
-    //         groupAnalysisMemberDataLoading: false,
-    //       }));
-    //     }
-    //   },
-    //   null,
-    //   (error) => {}
-    // );
+      })
+      .catch((error) => {
+        console.error("请求近7日数据失败:", error);
+      });
   };
 
   // 客流趋势
@@ -618,98 +521,6 @@ const DataView = () => {
       const rawData = data[i] || [];
       series[i] = rawData.length < xAxisLength ? [...rawData, ...Array(xAxisLength - rawData.length).fill(0)] : rawData.slice(0, xAxisLength);
     }
-
-    // const rangeFuncMap = {
-    //   [Constant.TIME_TYPE.TODAY]: TimeUtils.getTsHourRangeByTs,
-    //   [Constant.TIME_TYPE.WEEK]: TimeUtils.getTsDayRangeByTs,
-    //   [Constant.TIME_TYPE.MONTH]: TimeUtils.getTsDayRangeByTs,
-    //   [Constant.TIME_TYPE.YEAR]: TimeUtils.getTsMonthRangeByTs,
-    // };
-    // const dateFormatMap = {
-    //   [Constant.TIME_TYPE.TODAY]: "HH:00",
-    //   [Constant.TIME_TYPE.WEEK]: "MM-dd",
-    //   [Constant.TIME_TYPE.MONTH]: "MM-dd",
-    //   [Constant.TIME_TYPE.YEAR]: "yyyy-MM",
-    // };
-    // const todayData = data?.todayData || null;
-    // const list = data.list;
-    // const legend = legendMap[timeType];
-    // const xAxis = [];
-    // const series = [];
-    // if (timeType != Constant.TIME_TYPE.DATE) {
-    //   const seriesArr = [];
-    //   for (let i = 0; i < list.length; i++) {
-    //     let item = list[i];
-    //     let data = item.data;
-    //     let startTime = Number(item.startTime);
-    //     let endTime = Number(item.endTime);
-    //     let rangeFunc = rangeFuncMap[timeType];
-    //     let range = rangeFunc(startTime, endTime);
-    //     let dataMap = {};
-    //     let dataArr = [];
-    //     if (i == 0 && todayData) {
-    //       dataMap[todayData.dataTime] = Number(todayData[flowType]);
-    //     }
-    //     for (let j = 0; j < data.length; j++) {
-    //       let dataItem = data[j];
-    //       let dataTime = dataItem.dataTime;
-    //       if (dataMap[dataTime] == null) {
-    //         dataMap[dataTime] = 0;
-    //       }
-    //       dataMap[dataTime] += Number(dataItem[flowType]);
-    //     }
-    //     for (let j = 0; j < range.length; j++) {
-    //       let dataTime = range[j];
-    //       if (i == 0) {
-    //         xAxis.push(TimeUtils.ts2Date(dataTime, dateFormatMap[timeType]));
-    //       }
-    //       if (dataMap[dataTime] && dataMap[dataTime] > 0) {
-    //         dataArr.push(dataMap[dataTime]);
-    //       } else {
-    //         dataArr.push(0);
-    //       }
-    //     }
-    //     seriesArr.push(dataArr);
-    //     series.push([]);
-    //   }
-    //   for (let i = 0; i < xAxis.length; i++) {
-    //     for (let j = 0; j < seriesArr.length; j++) {
-    //       if (seriesArr[j].length > i) {
-    //         series[j].push(seriesArr[j][i]);
-    //       } else {
-    //         series[j].push(0);
-    //       }
-    //     }
-    //   }
-    // } else {
-    // let startTime = Number(list[0].startTime);
-    // let endTime = Number(list[0].endTime);
-    // let isHour = endTime - startTime < 86400;
-    // let range = isHour ? TimeUtils.getTsHourRangeByTs(startTime, endTime) : TimeUtils.getTsDayRangeByTs(startTime, endTime);
-    // let dataMap = {};
-    // let data = list[0].data;
-    // series.push([]);
-    // if (todayData) {
-    //   dataMap[todayData.dataTime] = Number(todayData[flowType]);
-    // }
-    // for (let i = 0; i < data.length; i++) {
-    //   let dataTime = data[i].dataTime;
-    //   dataMap[dataTime] = Number(data[i][flowType]);
-    // }
-    // for (let i = 0; i < range.length; i++) {
-    //   let dataTime = range[i];
-    //   if (isHour) {
-    //     xAxis.push(TimeUtils.ts2Date(dataTime, "HH:00"));
-    //   } else {
-    //     xAxis.push(TimeUtils.ts2Date(dataTime, "MM-dd"));
-    //   }
-    //   if (dataMap[dataTime]) {
-    //     series[0].push(dataMap[dataTime]);
-    //   } else {
-    //     series[0].push(0);
-    //   }
-    // }
-    // }
 
     let chartData = {
       xAxis,
@@ -751,73 +562,6 @@ const DataView = () => {
       offlineRate,
     };
     setDeviceData(deviceData);
-  };
-
-  // 楼层转化（copy by homePage)
-  const getSiteFloorTransformData = (flowType = "inCount", data) => {
-    const FlowTypePropMap = {
-      [Constant.FLOW_TYPE.IN_COUNT]: "ic",
-      [Constant.FLOW_TYPE.IN_NUM]: "in",
-      [Constant.FLOW_TYPE.BATCH_COUNT]: "bc",
-    };
-    let key = FlowTypePropMap[flowType];
-    let floors = data.floors;
-    let doorsSum = data.doorsSum;
-    let doorsSumMap = {};
-    let inCount = Number(data.curFlow.inCount);
-    let inNum = Number(data.curFlow.inNum);
-    let total = flowType == Constant.FLOW_TYPE.IN_COUNT ? inCount : inNum;
-    for (let i = 0; i < doorsSum.length; i++) {
-      doorsSumMap[doorsSum[i].doorId] = doorsSum[i];
-    }
-
-    let converData = [];
-    let arriveData = {
-      yAxis: [],
-      data: [],
-      rateData: [],
-    };
-    for (let i = 0; i < floors.length; i++) {
-      let floor = floors[i];
-      let doors = floor.doors;
-      let value = 0;
-      if (doors.length > 0) {
-        for (let j = 0; j < doors.length; j++) {
-          let doorId = doors[j];
-          if (doorsSumMap[doorId]) {
-            value += Number(doorsSumMap[doorId][key]);
-          }
-        }
-      }
-      let cvData = {
-        name: floor.floorName,
-        value: value,
-      };
-      let rate = 0;
-      if (rate > 0 && total == 0) {
-        rate = 100;
-      } else if (total > 0) {
-        rate = Number((value / total) * 100);
-        if (rate % 1 !== 0) {
-          rate = Number(rate.toFixed(2));
-        }
-      }
-      arriveData.yAxis.push(floor.floorName);
-      arriveData.data.push(value);
-      arriveData.rateData.push(rate);
-      converData.push(cvData);
-    }
-    let chartData = {
-      converData,
-      arriveData,
-    };
-    setFloorTransformData(chartData);
-  };
-
-  // 出入口客流情况（copy by homePage)
-  const getSiteDoorRankingData = (data) => {
-    let rankingData = DataConverter.getDooorRankingConvertData(data);
-    setDoorRankingData(rankingData);
   };
 
   // 节日客流情况
@@ -870,6 +614,7 @@ const DataView = () => {
     setFestivalData({ list: list, maxValue: maxNumber });
   };
 
+  // 客户画像分析
   const getSiteCustomerAttrData = (data) => {
     let chartData = DataConverter.getNewCustomerAttrConvertData(data);
 
@@ -1010,36 +755,11 @@ const DataView = () => {
           {/* 中间区域 */}
           <div className="TZdata-view-center-area">
             <div style={{ flex: 4 }}>
-              {/* <div className="component-title">
-                <div className="component-title-icon"></div>
-                <div className="component-title-text">当前统计客流数据</div>
-              </div>
-              <DashboardPanel dashboardData={dashboardData} deduplication={config.deduplication} /> */}
+              <TzMapDrawBoard />
             </div>
             <div className="TZdata-view-component-item" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-              {/* <div style={{ display: "flex", flex: 4, gap: "0.2rem" }}>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                  <div className="component-title">
-                    <div className="component-title-icon"></div>
-                    <div className="component-title-text">今日客流趋势</div>
-                  </div>
-                  <div className="component-content">
-                    <TrendChart chartData={trendData.chartData} isFullscreen={isFullscreen} isLoading={isLoadingData.trendData} />
-                  </div>
-                </div>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                  <div className="component-title" style={{ marginBottom: "0" }}>
-                    <div className="component-title-icon"></div>
-                    <div className="component-title-text">近7日工作日、周末分析</div>
-                  </div>
-                  <div className="component-content" style={{ flex: 1 }}>
-                    <RecentSevenDaysChart chartData={recentSevenDaysData} isLoading={isLoadingData.recentSevenDaysData} />
-                  </div>
-                </div>
-              </div> */}
               <div style={{ flex: 3, display: "flex", flexDirection: "column" }}>
                 <div className="component-title">
-                  {/* <div className="component-title-icon"></div> */}
                   <div className="component-title-text">12个月服务人次趋势图</div>
                 </div>
                 <div className="component-content" style={{ flex: 1 }}>
