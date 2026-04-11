@@ -164,9 +164,6 @@ export default class DataConverter {
       text(Language.PARAM_WANSHANG, { value: "(19:00-24:00)" }),
     ];
 
-    // 每个时段的小时数：[6, 5, 3, 3, 2, 5]
-    const hoursPerPeriod = [6, 5, 3, 3, 2, 5];
-
     // 时段边界：每小时属于哪个时段 (0-5 -> 0, 6-10 -> 1, 11-13 -> 2, 14-16 -> 3, 17-18 -> 4, 19-23 -> 5)
     const zone = [5, 10, 13, 16, 18, 23];
 

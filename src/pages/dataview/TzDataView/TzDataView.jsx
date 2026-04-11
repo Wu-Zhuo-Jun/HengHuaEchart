@@ -491,7 +491,8 @@ const DataView = () => {
         const weekendData = results.slice(weekdayCount).map((res) => res.data.inCount || 0);
         console.log("近7日工作日数据:", weekdayData);
         console.log("近7日周末数据:", weekendData);
-        let chartData = DataConverter.getNewVisitingPeakConvertData(1, { data: { weekdayData, weekendData } });
+        let chartData = DataConverter.getNewVisitingPeakConvertData(1, { data: {} });
+
         setIsLoadingData((prevData) => ({
           ...prevData,
           recentSevenDaysData: false,
