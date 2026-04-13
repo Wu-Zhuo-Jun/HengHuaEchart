@@ -290,7 +290,7 @@ const DataView = () => {
             setSiteList(res2.data || []);
           },
           null,
-          (error) => console.error("getAssocSites 失败:", error)
+          (error) => console.error("getAssocSites 失败:", error),
         );
       },
       null,
@@ -298,7 +298,7 @@ const DataView = () => {
         console.error("getTagList 失败:", error);
         setSiteList([...mockSiteList]);
         setSelectSiteList([...mockSiteList]);
-      }
+      },
     );
   };
 
@@ -320,7 +320,7 @@ const DataView = () => {
         params,
         (res) => resolve(res),
         null,
-        (error) => reject(error)
+        (error) => reject(error),
       );
     });
   };
@@ -353,7 +353,7 @@ const DataView = () => {
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      }
+      },
     );
 
     Http.getFlowTrend(
@@ -369,7 +369,7 @@ const DataView = () => {
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      }
+      },
     );
 
     Http.getFaceTotal(
@@ -384,7 +384,7 @@ const DataView = () => {
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      }
+      },
     );
 
     // 请求近12个月以及本年度客流
@@ -396,8 +396,8 @@ const DataView = () => {
           clearTime: 0,
           startDate: start,
           endDate: end,
-        })
-      )
+        }),
+      ),
     )
       .then((results) => {
         const Last12MonthsArray = [];
@@ -476,7 +476,7 @@ const DataView = () => {
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      }
+      },
     );
 
     // 获取近7天数据并区分工作日和周末
@@ -491,7 +491,8 @@ const DataView = () => {
         const weekendData = results.slice(weekdayCount).map((res) => res.data.inCount || 0);
         console.log("近7日工作日数据:", weekdayData);
         console.log("近7日周末数据:", weekendData);
-        let chartData = DataConverter.getNewVisitingPeakConvertData(1, { data: {} });
+        let chartData = DataConverter.getNewVisitingPeakConvertData(1, { data: { weekdayData, weekendData } });
+        setRecentSevenDaysData(chartData);
 
         setIsLoadingData((prevData) => ({
           ...prevData,
@@ -725,7 +726,8 @@ const DataView = () => {
           isMobile
             ? { width: `${containerSize.width}px`, height: `${containerSize.height}px` }
             : { width: "100vw", height: "100vh", minWidth: `${minContainerSize.width}px`, minHeight: `${minContainerSize.height}px` }
-        }>
+        }
+      >
         {/* 标题行 */}
         <div className="TZdata-view-header-row">
           {/* <div className="TZdata-view-site-name">{config.showSiteName === 1 ? <div>{config?.siteName || ""}</div> : <div></div>}</div> */}

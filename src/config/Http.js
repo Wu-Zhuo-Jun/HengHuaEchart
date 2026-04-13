@@ -85,8 +85,8 @@ export class Cmd {
   static CMD_SET_DEFAULT_SITE = Config.API_URL + "/sitemanagement/setDefaultSite";
 
   // tagManagement
-  static CMD_GET_TAG_LIST = Config.API_URL + "/tagManagement/getTagList";
-  static CMD_GET_ASSOC_SITES = Config.API_URL + "/tagManagement/getAssocSites";
+  static CMD_GET_TAG_LIST = Config.API_URL + "/tagmanagement//getTagList";
+  static CMD_GET_ASSOC_SITES = Config.API_URL + "/tagmanagement//getAssocSites";
 
   // siteAnalysis
   static CMD_GET_DEVICE_ONLINE_INFO = Config.API_URL + "/siteAnalysis/getDeviceOnlineInfo";
@@ -145,7 +145,7 @@ class Http {
         success(res);
       },
       null,
-      error
+      error,
     );
   }
 
@@ -163,7 +163,7 @@ class Http {
       (res) => {
         success(res);
       },
-      error
+      error,
     );
   }
 

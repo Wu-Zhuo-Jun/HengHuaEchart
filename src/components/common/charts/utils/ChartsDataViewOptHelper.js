@@ -148,7 +148,7 @@ class ChartsDataViewOptHelper {
     return option;
   }
 
-  /**近7日工作日、周末分析雷达图 */
+  /**近7日工作日、周末分析雷达图 data1:工作日数据, data2:周末数据, data3:总数据 */
   static createDVSevenDaysAnalysisChartOpt({ data1, data2, data3 }) {
     if (!data1 || !data2 || !data3) {
       return null;
