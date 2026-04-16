@@ -377,7 +377,7 @@ response{
 	}
 }
 
-siteAnalysis/getSiteRanking //获取场地排行
+siteAnalysis/getRanking //获取场地排行
 request{
 	siteIds:场地id(缺省时查询所有场地，["1","2"]逗号分隔为查多个场地)
 	clearTime:清0时间 (0-23)
@@ -390,7 +390,6 @@ response{
 	msg:错误信息，
 	data:{
 		siteId:["1"],//场地id
-		siteName:["name"],//场地名称
 		inNum: [0], //进人数
 		outNum: [0],//出人数
 		inCount: [0],//进人次
@@ -406,6 +405,7 @@ request{
 	clearTime:清0时间 (0-23)
 	startDate:开始日期
 	endDate:结束日期
+	realTime:1 1=单日时结束时间为指定日期年月日+当前的时分秒
 }
 
 response{
@@ -420,6 +420,7 @@ response{
 		batchCount: [0], //客流批次
 	}
 }
+
 
 
 siteAnalysis/getFestivalTotal //获取指定日期节假日人次
@@ -436,4 +437,46 @@ response{
 		festival: ["yuandan","chunjie"], //所属节假日(已排好序)
 		inCount: [0,0],//进人次
 	}
+}
+
+/dashboard/getSiteCfg 获取场地大屏配置
+request{
+	siteId:场地id
+}
+
+response 
+{
+	result:错误码,
+	msg:错误信息，
+	data:场地大屏配置(json编码后的字符串)
+}
+
+/dashboard/setSiteCfg 设置场地大屏配置
+request{
+	siteId:场地id,
+	cfg:{			 //场地大屏配置(json编码后的字符串)
+		title:标题,
+		showSiteName:0,
+		deduplication:0,
+		leftComponents:[1,2,3],
+		rightComponents:[1,2,3],
+	} 
+}
+
+response 
+{
+	result:错误码,
+	msg:错误信息，
+}
+
+/dashboard/getList 获取大屏模板列表
+request{
+	
+}
+
+response 
+{
+	data:["abc"], //模板名称
+	result:错误码,
+	msg:错误信息，
 }

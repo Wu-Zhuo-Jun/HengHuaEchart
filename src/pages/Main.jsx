@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Flex, Layout, Menu, Dropdown, message, Popover, Avatar, Tag } from "antd";
+import Http from "@/config/Http";
 import other_icon from "@/assets/images/other_icon.png";
 import male_icon from "@/assets/images/male_icon.png";
 import female_icon from "@/assets/images/female_icon.png";
@@ -20,23 +21,9 @@ import TimeUtils from "../utils/TimeUtils";
 import Constant from "@/common/Constant";
 import DataViewEditModal from "./homepage/components/DataViewEditModal";
 import UserInfoModal from "../components/systemComponent/UserInfoModal";
+import UserDataViewList from "../components/systemComponent/UserDataViewList";
 import useDeviceDetect from "@/hooks/useDeviceDetect";
 import "./Main.less";
-
-// const leftMenus = [
-//   {
-//     label: Language.SHOUYE,
-//     path: "homepage",
-//   },
-//   {
-//     label: Language.LIULIANG,
-//     path: "flow",
-//   },
-//   {
-//     label: Language.GONGZUOTAI,
-//     path: "console",
-//   },
-// ];
 
 const AvatarIconMap = {
   0: other_icon,
@@ -106,8 +93,10 @@ const MainContent = () => {
   const [defaultSiteId, setDefaultSiteId] = useState(null);
   const [dataViewModalOpen, setDataViewModalOpen] = useState(false);
   const [userInfoModalOpen, setUserInfoModalOpen] = useState(false);
+  const [userDataListModalOpen, setUserDataListModalOpen] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const { isMobile } = useDeviceDetect();
+  const [dashboardList, setDashboardList] = useState(["common"]);
   useEffect(() => {
     const options = User.getSiteOptions();
     const selectedSiteId = User.selectedSiteId;
@@ -117,6 +106,12 @@ const MainContent = () => {
     setDefaultSiteId(defaultSiteId);
     setBusinessHours(User.businessHours || [0, 24]);
     setBusinessHoursBy5Minutes(User.businessHoursBy5Minutes || [0, 288]);
+  }, []);
+
+  useEffect(() => {
+    Http.getDashboardList({}, (res) => {
+      setDashboardList([...dashboardList, ...res.data]);
+    });
   }, []);
 
   const location = useLocation();
@@ -167,9 +162,6 @@ const MainContent = () => {
     <Layout className="main-layout" ref={layoutRef}>
       <Header className={`main-header ${hasShadow ? "main-header-shadow" : ""}`}>
         <div className="main-header-logo">
-          <Link to="/tzdataview" style={{ color: "#fff", fontSize: "14px", marginLeft: "10px" }}>
-            [TZ数据大屏]
-          </Link>
           {!isNeutralDomain ? (
             <img
               src={User.logo ? User.logo : hhCompanyLogo}
@@ -206,8 +198,12 @@ const MainContent = () => {
                     return;
                   }
                   if (siteId) {
-                    dataViewEditModalRef.current.setSiteId(siteId);
-                    setDataViewModalOpen(true);
+                    if (dashboardList.includes("TzDataView")) {
+                      setUserDataListModalOpen(true);
+                    } else {
+                      dataViewEditModalRef.current.setSiteId(siteId);
+                      setDataViewModalOpen(true);
+                    }
                   } else {
                     message.warning({ content: "请先添加场地" });
                   }
@@ -299,6 +295,21 @@ const MainContent = () => {
           message.success("账号设置已保存");
         }}
         avatarIconMap={AvatarIconMap}
+      />
+      {/* 大屏类型选择 */}
+      <UserDataViewList
+        open={userDataListModalOpen}
+        onCancel={() => setUserDataListModalOpen(false)}
+        onConfirm={(value) => {
+          if (value === "common") {
+            dataViewEditModalRef.current?.setSiteId(siteId);
+            setDataViewModalOpen(true);
+          }
+          if (value === "TzDataView") {
+            navigate("/tzdataview");
+          }
+        }}
+        dashboardList={dashboardList}
       />
     </Layout>
   );

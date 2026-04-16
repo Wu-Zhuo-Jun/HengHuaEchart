@@ -545,7 +545,8 @@ const DataView = () => {
       },
       (res) => {
         if (res.result == 1) {
-          const data = Array.isArray(res?.data) ? res?.data.sort((a, b) => (b.result || 0) - (a.result || 0)) : null;
+          const data = Array.isArray(res?.data) ? res?.data.sort((a, b) => (b.inCount || 0) - (a.inCount || 0)) : null;
+          console.log(549, data);
           setGroupAnalysisMemberData(data);
           setIsLoadingData((prevData) => ({
             ...prevData,

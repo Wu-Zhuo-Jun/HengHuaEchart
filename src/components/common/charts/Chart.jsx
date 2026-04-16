@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import echarts from "@/utils/echarts";
 import ChartsOptHelper from "./utils/ChartsOptHelper";
 import ChartsFlowOptHelper from "./utils/ChartsFlowOptHelper";
-import ChartsDataViewOptHelper from "./utils/ChartsDataViewOptHelper";
+import ChartsDataViewOptHelper from "./utils/ChartsDataViewOptHelper.jsx";
 // import { graphic } from "echarts/components";
 import { Language } from "@/language/LocaleContext";
 import "./styles/Charts.css";
@@ -545,10 +545,23 @@ export class DVSevenDaysAnalysisChart extends Chart {
   };
 }
 
+/**数据视图-近7日工作日、周末分析通州 */
+export class DVSevenDaysAnalysisChartByTz extends Chart {
+  getOption = (data) => {
+    return ChartsDataViewOptHelper.createDVSevenDaysAnalysisChartOptByTZ(data);
+  };
+}
+
 /**数据视图-近12个月客流趋势柱状图 */
 export class DV12MonthsFlowTrendChart extends Chart {
   getOption = (data) => {
     return ChartsDataViewOptHelper.createDV12MonthsFlowTrendChartOpt(data);
+  };
+}
+/**数据视图-近12个月客流趋势柱状图 */
+export class DV12MonthsFlowTrendChartByTz extends Chart {
+  getOption = (data) => {
+    return ChartsDataViewOptHelper.createDV12MonthsFlowTrendChartOptByTz(data);
   };
 }
 

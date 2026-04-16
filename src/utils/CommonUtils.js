@@ -322,9 +322,9 @@ class CommonUtils {
     // 小于10000，返回原数值
     const formattedValue = num.toLocaleString("en-US");
     return {
-      value: formattedValue,
+      value: formattedValue || 0,
       unit: "",
-      fullText: formattedValue,
+      fullText: formattedValue || "0",
     };
   };
 

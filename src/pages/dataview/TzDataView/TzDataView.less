@@ -16,7 +16,7 @@
   background-image: url("@/assets/dataviewImages/TzBg.webp");
   background-size: cover;
   // padding: 0 1.25rem 1.25rem 1.25rem;
-  padding-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -648,13 +648,14 @@
       flex: 1;
       height: 100%;
       overflow: hidden;
+      margin-bottom: 0.4rem;
       .group-statistics-panel-header-item {
         flex: 1;
         text-align: center;
         font-weight: bold;
         padding: 0.08rem;
         // border: 1px solid #fff;
-        background: url("@/assets/dataviewImages/dashBoradBg.png") no-repeat center center;
+        background: url("@/assets/dataviewImages/TzRanking.png") no-repeat center center;
         background-size: cover;
         display: flex;
         height: 100%;
@@ -662,7 +663,8 @@
         .icon {
           display: block;
           height: auto;
-          width: 5.4rem;
+          width: 2rem;
+          margin-left: 1.5rem;
           object-fit: contain;
         }
         .total-value-container {
@@ -838,6 +840,7 @@
     }
     .percentage {
       position: absolute;
+      width: 100%;
       top: 65%;
       left: 50%;
       transform: translate(-50%, -50%);

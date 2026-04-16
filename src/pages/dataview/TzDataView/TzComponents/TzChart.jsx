@@ -4,7 +4,14 @@ import { UIPanel, UISelect } from "@/components/ui/UIComponent";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import { DVFlowTrendChart, DVSevenDaysAnalysisChart, DV12MonthsFlowTrendChart, DVFloorConverPieChart, DVFloorConverPieChartRose, DVcustomerBottomChart } from "@/components/common/charts/Chart";
+import {
+  DVFlowTrendChart,
+  DVSevenDaysAnalysisChartByTz,
+  DV12MonthsFlowTrendChartByTz,
+  DVFloorConverPieChart,
+  DVFloorConverPieChartRose,
+  DVcustomerBottomChart,
+} from "@/components/common/charts/Chart";
 import { Skeleton } from "antd";
 import { Language, text } from "@/language/LocaleContext";
 import StringUtils from "@/utils/StringUtils";
@@ -72,7 +79,7 @@ export const RecentSevenDaysChart = React.memo(({ chartData, isLoading }) => {
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "row", gap: "0.2rem" }}>
       {/* 左侧雷达图 */}
-      <div style={{ flex: 1, minWidth: 0 }}>{isLoading ? <Skeleton active style={{ width: "100%", height: "100%" }} /> : <DVSevenDaysAnalysisChart data={{ data1, data2, data3 }} />}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>{isLoading ? <Skeleton active style={{ width: "100%", height: "100%" }} /> : <DVSevenDaysAnalysisChartByTz data={{ data1, data2, data3 }} />}</div>
 
       {/* 右侧数据表格 */}
       <div style={{ flex: 1, minWidth: 0, height: "100%", overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0 }}>
@@ -95,7 +102,7 @@ export const RecentSevenDaysChart = React.memo(({ chartData, isLoading }) => {
                 <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem", width: "30%" }}>时段</th>
                 <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem" }}>{Language.GONGZUORI}</th>
                 <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem" }}>{Language.ZHOUMO}</th>
-                <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem" }}>{Language.ZHENGTI}</th>
+                <th style={{ textAlign: "center", wordBreak: "break-all", padding: "0.08rem" }}>平均</th>
               </tr>
             </thead>
 
@@ -129,7 +136,7 @@ export const Last12MonthsFlowTrendChart = React.memo(({ chartData, isLoading }) 
   const { xAxis, data, xAxisTooltips } = chartData || {};
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      {isLoading ? <Skeleton active style={{ width: "100%", height: "100%" }} /> : <DV12MonthsFlowTrendChart data={{ xAxis, data, xAxisTooltips }} />}
+      {isLoading ? <Skeleton active style={{ width: "100%", height: "100%" }} /> : <DV12MonthsFlowTrendChartByTz data={{ xAxis, data, xAxisTooltips }} />}
     </div>
   );
 });

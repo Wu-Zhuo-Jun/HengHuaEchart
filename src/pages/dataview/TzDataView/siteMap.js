@@ -68,7 +68,7 @@
 // 227	1000	77	北京城市副中心党群服务中心
 // 233	1007	77	永乐店镇西槐庄科技小院党群服务中心
 
-export const siteMap = {
+export const siteAllMap = {
   179: { siteId: 179, typeIds: "1001", siteName: "新华街道党群服务中心", siteCoord: { x: 4050, y: 2550 } },
   180: { siteId: 180, typeIds: "1001,1003", siteName: "北苑街道万达党群服务中心", siteCoord: { x: 3600, y: 2820 } },
   181: { siteId: 181, typeIds: "1001", siteName: "北苑街道官园党群服务中心", siteCoord: { x: 3680, y: 2940 } },
@@ -98,9 +98,9 @@ export const siteMap = {
   205: { siteId: 205, typeIds: "1004", siteName: "宋庄镇含章园二社区党群服务中心", siteCoord: { x: 4600, y: 2120 } },
   206: { siteId: 206, typeIds: "1002,1007", siteName: "潞城镇党群服务中心", siteCoord: { x: 5700, y: 4220 } },
   207: { siteId: 207, typeIds: "1007", siteName: "潞城镇前疃村党群服务中心", siteCoord: { x: 6060, y: 3620 } },
-  208: { siteId: 208, typeIds: "1002", siteName: "西集镇党群服务中心", siteCoord: null },
-  209: { siteId: 209, typeIds: "1007", siteName: "西集镇田间学校党群服务中心", siteCoord: null },
-  210: { siteId: 210, typeIds: "1007", siteName: "西集镇红樱党群服务中心", siteCoord: null },
+  208: { siteId: 208, typeIds: "1002", siteName: "西集镇党群服务中心", siteCoord: { x: 6480, y: 4820 } },
+  209: { siteId: 209, typeIds: "1007", siteName: "西集镇田间学校党群服务中心", siteCoord: { x: 7280, y: 5100 } },
+  210: { siteId: 210, typeIds: "1007", siteName: "西集镇红樱党群服务中心", siteCoord: { x: 6740, y: 5520 } },
   211: { siteId: 211, typeIds: "1003,1006", siteName: "漷县镇医药健康产业园党群服务中心", siteCoord: { x: 5600, y: 6360 } },
   212: { siteId: 212, typeIds: "1002", siteName: "漷县镇党群服务中心", siteCoord: { x: 5600, y: 5760 } },
   213: { siteId: 213, typeIds: "1007", siteName: "漷县镇马头村党群服务中心", siteCoord: { x: 7020, y: 6260 } },
@@ -108,14 +108,26 @@ export const siteMap = {
   215: { siteId: 215, typeIds: "1007", siteName: "张家湾镇苍上村党群服务中心", siteCoord: { x: 4900, y: 5600 } },
   216: { siteId: 216, typeIds: "1002", siteName: "台湖镇党群服务中心", siteCoord: { x: 2820, y: 5320 } },
   217: { siteId: 217, typeIds: "1002,1005", siteName: "台湖镇环影宿游党群服务中心", siteCoord: { x: 3460, y: 5400 } },
-  218: { siteId: 218, typeIds: "1002,1004", siteName: "马驹桥镇党群服务中心", siteCoord: null },
-  219: { siteId: 219, typeIds: "1004", siteName: "马驹桥镇南五村党群服务中心", siteCoord: null },
-  220: { siteId: 220, typeIds: "1002,1007", siteName: "永乐店镇党群服务中心", siteCoord: null },
-  221: { siteId: 221, typeIds: "1007", siteName: "永乐店镇西槐庄村党群服务中心", siteCoord: null },
-  222: { siteId: 222, typeIds: "1002", siteName: "于家务回族乡党群服务中心", siteCoord: null },
-  223: { siteId: 223, typeIds: "1007", siteName: "于家务回族乡仇庄村党群服务中心", siteCoord: null },
-  224: { siteId: 224, typeIds: "1007", siteName: "于家务回族乡南三间房村党群服务中心", siteCoord: null },
+  218: { siteId: 218, typeIds: "1002,1004", siteName: "马驹桥镇党群服务中心", siteCoord: { x: 2520, y: 6360 } },
+  219: { siteId: 219, typeIds: "1004", siteName: "马驹桥镇南五村党群服务中心", siteCoord: { x: 2260, y: 6560 } },
+  220: { siteId: 220, typeIds: "1002,1007", siteName: "永乐店镇党群服务中心", siteCoord: { x: 5780, y: 7360 } },
+  221: { siteId: 221, typeIds: "1007", siteName: "永乐店镇西槐庄村党群服务中心", siteCoord: { x: 6460, y: 7560 } },
+  222: { siteId: 222, typeIds: "1002", siteName: "于家务回族乡党群服务中心", siteCoord: { x: 4500, y: 7040 } },
+  223: { siteId: 223, typeIds: "1007", siteName: "于家务回族乡仇庄村党群服务中心", siteCoord: { x: 4660, y: 8400 } },
+  224: { siteId: 224, typeIds: "1007", siteName: "于家务回族乡南三间房村党群服务中心", siteCoord: { x: 5060, y: 7580 } },
   225: { siteId: 225, typeIds: "1003,1006", siteName: "中关村通州园党群服务中心", siteCoord: { x: 4640, y: 3660 } },
   226: { siteId: 226, typeIds: "1003,1006", siteName: "运河商务区党群服务中心", siteCoord: { x: 3975, y: 2690 } },
   227: { siteId: 227, typeIds: "1000", siteName: "北京城市副中心党群服务中心", siteCoord: { x: 3900, y: 2550 } },
+};
+
+export const siteTzTagTypeMap = {
+  1000: { tagId: "1000", tagName: "区级" },
+  1001: { tagId: "1001", tagName: "街道级" },
+  1002: { tagId: "1002", tagName: "乡镇级" },
+  1003: { tagId: "1003", tagName: "园区级" },
+  1004: { tagId: "1004", tagName: "民生服务型" },
+  1005: { tagId: "1005", tagName: "文旅辐射型" },
+  1006: { tagId: "1006", tagName: "园区助企型" },
+  1007: { tagId: "1007", tagName: "乡村振兴型" },
+  1008: { tagId: "1008", tagName: "治理融合型" },
 };

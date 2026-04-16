@@ -66,11 +66,11 @@ const items = [
         label: Language.CHURUKOUGUANLI,
         icon: <ClusterOutlined />,
       },
-      {
-        key: "districtManagement",
-        label: Language.QUYUGUANLI,
-        icon: <ClusterOutlined />,
-      },
+      // {
+      //   key: "districtManagement",
+      //   label: Language.QUYUGUANLI,
+      //   icon: <ClusterOutlined />,
+      // },
     ],
   },
   // {

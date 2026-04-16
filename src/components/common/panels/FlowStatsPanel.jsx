@@ -115,7 +115,6 @@ const HomeStatsCard = React.memo(({ val, preVal, rate, type }) => {
   let url = HomeStatsType[type].url;
   let tooltipSize = HomeStatsType[type].tooltipSize;
   let placement = HomeStatsType[type].placement || "top";
-  console.log(placement, 118);
   return (
     <div className="home-stats-card">
       <div className="home-stats-head">

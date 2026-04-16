@@ -142,12 +142,68 @@ export default class DataConverter {
     if (data == null) {
       return;
     }
-    const weekdayData = data.weekdayData || [];
-    const weekendData = data.weekendData || [];
-    const weekdayDays = Number(data.weekdayDays) || 5;
-    const weekendDays = Number(data.weekendDays) || 2;
-    const totalDays = weekdayDays + weekendDays;
+    // 兼容 { weekdayData, weekendData } 或 { data: { weekdayData, weekendData } } 两种格式
+    const sourceData = data.data || data;
+    const weekdayData = sourceData.weekdayData || [];
+    const weekendData = sourceData.weekendData || [];
 
+    /**
+     * 将API返回的数据格式 { data: { inCount: [...], dataTime: [...] } }
+     * 转换为固定长度为24的数组，根据时间戳判断缺失的小时并补0
+     */
+    const normalizeHourData = (item) => {
+      // 初始化24小时数组，全部为0
+      const hourData = new Array(24).fill(0);
+
+      if (!item || !item.data) {
+        return hourData;
+      }
+
+      const { inCount = [], dataTime = [] } = item.data;
+
+      // 遍历时间戳，提取小时数，将数据填入对应位置
+      dataTime.forEach((timestamp, index) => {
+        // 使用 luxon DateTime 解析时间戳获取小时
+        const dateTime = TimeUtils.getDateTimeFromTs(timestamp);
+        const hour = dateTime.hour;
+        if (hour >= 0 && hour < 24 && inCount[index] !== undefined) {
+          hourData[hour] = Number(inCount[index]) || 0;
+        }
+      });
+
+      return hourData;
+    };
+
+    // 处理weekdayData和weekendData，将每个元素转换为24小时数组
+    const processedWeekdayData = weekdayData.map((item) => normalizeHourData(item));
+    const processedWeekendData = weekendData.map((item) => normalizeHourData(item));
+
+    console.log(processedWeekdayData, processedWeekendData, 181);
+    const weekdayDays = Number(sourceData.weekdayDays) || 5;
+    const weekendDays = Number(sourceData.weekendDays) || 2;
+
+    let resWeekdayData = new Array(24).fill(0);
+    let resWeekendData = new Array(24).fill(0);
+    processedWeekdayData.forEach((item) => {
+      item.forEach((value, i) => {
+        resWeekdayData[i] = Number(value) + resWeekdayData[i];
+      });
+    });
+    processedWeekendData.forEach((item) => {
+      item.forEach((value, i) => {
+        resWeekendData[i] = Number(value) + resWeekendData[i];
+      });
+    });
+    const AvgWeekdayData = resWeekdayData.map((item) => {
+      return Math.ceil(item / weekdayDays);
+    });
+    const AvgWeekendData = resWeekendData.map((item) => {
+      return Math.ceil(item / weekendDays);
+    });
+
+    const AvgEveryDayData = resWeekdayData.map((item, index) => {
+      return Math.ceil((resWeekendData[index] + resWeekdayData[index]) / 7);
+    });
     // 时段定义：凌晨、早上、中午、下午、傍晚、晚上
     // 凌晨 0:00-6:00 (小时 0-5)
     // 早上 6:00-11:00 (小时 6-10)
@@ -174,9 +230,9 @@ export default class DataConverter {
 
     // 遍历24小时数据，累加到对应时段
     for (let i = 0; i < 24; i++) {
-      const weekdayValue = Number(weekdayData[i]) || 0;
-      const weekendValue = Number(weekendData[i]) || 0;
-      const totalValue = weekdayValue + weekendValue;
+      const weekdayValue = Number(AvgWeekdayData[i]) || 0;
+      const weekendValue = Number(AvgWeekendData[i]) || 0;
+      const totalValue = Number(AvgEveryDayData[i]) || 0;
 
       // 找到该小时属于哪个时段
       for (let j = 0; j < zone.length; j++) {
@@ -188,37 +244,36 @@ export default class DataConverter {
         }
       }
     }
+    // const weekdayAvgData = weekdayPeriodTotal.map((v) => (weekdayDays > 0 ? Math.ceil(v / weekdayDays) : 0));
+    // const weekendAvgData = weekendPeriodTotal.map((v) => (weekendDays > 0 ? Math.ceil(v / weekendDays) : 0));
+    // const totalAvgData = totalPeriodTotal.map((v) => (totalDays > 0 ? Math.ceil(v / totalDays) : 0));
 
-    // 计算各时段平均值
-    const weekdayAvgData = weekdayPeriodTotal.map((v) => (weekdayDays > 0 ? Math.ceil(v / weekdayDays) : 0));
-    const weekendAvgData = weekendPeriodTotal.map((v) => (weekendDays > 0 ? Math.ceil(v / weekendDays) : 0));
-    const totalAvgData = totalPeriodTotal.map((v) => (totalDays > 0 ? Math.ceil(v / totalDays) : 0));
-
-    // 处理负值
-    for (let i = 0; i < 6; i++) {
-      weekdayAvgData[i] = weekdayAvgData[i] < 0 ? 0 : weekdayAvgData[i];
-      weekendAvgData[i] = weekendAvgData[i] < 0 ? 0 : weekendAvgData[i];
-      totalAvgData[i] = totalAvgData[i] < 0 ? 0 : totalAvgData[i];
-    }
+    // // 处理负值
+    // for (let i = 0; i < 6; i++) {
+    //   weekdayAvgData[i] = weekdayAvgData[i] < 0 ? 0 : weekdayAvgData[i];
+    //   weekendAvgData[i] = weekendAvgData[i] < 0 ? 0 : weekendAvgData[i];
+    //   totalAvgData[i] = totalAvgData[i] < 0 ? 0 : totalAvgData[i];
+    // }
 
     let convertData = {};
 
     if (type == 1) {
       // 返回饼图格式数据
       convertData = {
-        data1: weekdayAvgData,
-        data2: weekendAvgData,
-        data3: totalAvgData,
-      };
-    } else {
-      // 返回折线图格式数据
-      const legend = [Language.GONGZUORIPINGJUNKELIU, Language.ZHOUMOPINGJUNKELIU, Language.ZHENGTIPINGJUNKELIU];
-      convertData = {
-        legend,
-        xAxis: peakTimeArr,
-        series: [weekdayAvgData, weekendAvgData, totalAvgData],
+        data1: weekdayPeriodTotal,
+        data2: weekendPeriodTotal,
+        data3: totalPeriodTotal,
       };
     }
+    //  else {
+    //   // 返回折线图格式数据
+    //   const legend = [Language.GONGZUORIPINGJUNKELIU, Language.ZHOUMOPINGJUNKELIU, Language.ZHENGTIPINGJUNKELIU];
+    //   convertData = {
+    //     legend,
+    //     xAxis: peakTimeArr,
+    //     series: [weekdayAvgData, weekendAvgData, totalAvgData],
+    //   };
+    // }
 
     return convertData;
   };
@@ -428,7 +483,6 @@ export default class DataConverter {
       maleMaxDescForDv,
       femaleMaxDescForDv,
     };
-    console.log(convertData, 338);
 
     return convertData;
   };

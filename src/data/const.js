@@ -99,14 +99,3 @@ export const festivalNameMap = {
   hanjia: Language.HANJIA,
 };
 
-export const siteTzTagTypeMap = {
-  1000: { tagId: "1000", tagName: "区级" },
-  1001: { tagId: "1001", tagName: "街道级" },
-  1002: { tagId: "1002", tagName: "乡镇级" },
-  1003: { tagId: "1003", tagName: "园区级" },
-  1004: { tagId: "1004", tagName: "民生服务型" },
-  1005: { tagId: "1005", tagName: "文旅辐射型" },
-  1006: { tagId: "1006", tagName: "园区助企型" },
-  1007: { tagId: "1007", tagName: "乡村振兴型" },
-  1008: { tagId: "1008", tagName: "治理融合型" },
-};

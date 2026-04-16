@@ -79,6 +79,7 @@ export class Cmd {
 
   static CMD_GET_DASHBOARD_SITE_CFG = Config.API_URL + "/dashboard/getSiteCfg";
   static CMD_SET_DASHBOARD_SITE_CFG = Config.API_URL + "/dashboard/setSiteCfg";
+  static CMD_GET_DASHBOARD_LIST = Config.API_URL + "/dashboard/getTemplateList";
 
   static CMD_GET_GROUPANALYSIS_MEMBER = Config.API_URL + "/groupanalysis/getMemberRealTime";
 
@@ -92,7 +93,7 @@ export class Cmd {
   static CMD_GET_DEVICE_ONLINE_INFO = Config.API_URL + "/siteAnalysis/getDeviceOnlineInfo";
   static CMD_GET_FLOW_TREND = Config.API_URL + "/siteAnalysis/getFlowTrend";
   static CMD_GET_FACE_TOTAL = Config.API_URL + "/siteAnalysis/getFaceTotal";
-  static CMD_GET_SITE_RANKING = Config.API_URL + "/siteAnalysis/getSiteRanking";
+  static CMD_GET_SITE_RANKING = Config.API_URL + "/siteAnalysis/getRanking";
   static CMD_GET_FLOW_TOTAL = Config.API_URL + "/siteAnalysis/getFlowTotal";
   static CMD_GET_FESTIVAL_TOTAL = Config.API_URL + "/siteAnalysis/getFestivalTotal";
 }
@@ -145,7 +146,7 @@ class Http {
         success(res);
       },
       null,
-      error,
+      error
     );
   }
 
@@ -163,7 +164,7 @@ class Http {
       (res) => {
         success(res);
       },
-      error,
+      error
     );
   }
 
@@ -514,6 +515,11 @@ class Http {
   /** 场地分析-获取指定日期节假日人次-通州 */
   static getFestivalTotal(params, success, token, error) {
     Http.post(Cmd.CMD_GET_FESTIVAL_TOTAL, params, success, token, error);
+  }
+
+  /** 大屏预览-获取大屏模板列表  */
+  static getDashboardList(params, success, token, error) {
+    Http.post(Cmd.CMD_GET_DASHBOARD_LIST, params, success, token, error);
   }
 }
 export default Http;

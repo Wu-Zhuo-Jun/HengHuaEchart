@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { TzDataViewMap, festivalNameMap } from "@/data/const";
-import { siteMap } from "./siteMap";
+import { siteAllMap } from "./siteMap";
 import Http from "@/config/Http";
 import {
   TodayTrendPanel,
@@ -24,7 +24,7 @@ import { Language } from "@/language/LocaleContext";
 import dayjs from "dayjs";
 import User from "@/data/UserData";
 import "./TzDataView.less";
-import { siteList as mockSiteList } from "./mockData";
+// import { siteList as mockSiteList } from "./mockData";
 
 // 通州默认大屏配置
 const DEFAULT_CONFIG = {
@@ -47,6 +47,7 @@ const DEFAULT_CONFIG = {
 
 const DataView = () => {
   const [config] = useState(DEFAULT_CONFIG);
+  const [title, setTitle] = useState("北京市通州区党群服务阵地体系一屏通览");
   const [currentTime, setCurrentTime] = useState(new Date());
   const siteIdRef = useRef(null);
   // 宽高比16:9，根据宽度计算高度
@@ -55,39 +56,22 @@ const DataView = () => {
   };
   const [containerSize, setContainerSize] = useState({ width: 1420, height: calculateHeight(1420) });
   const [minContainerSize, setMinContainerSize] = useState({ width: 1420, height: 780 });
-  const [dashboardData, setDashboardData] = useState({
-    dailyCount: 0,
-    dailyNum: 0,
-    dailyCountRate: 0,
-    dailyNumRate: 0,
-    weeklyCount: 0,
-    weeklyNum: 0,
-    weeklyCountRate: 0,
-    weeklyNumRate: 0,
-    monthlyCount: 0,
-    monthlyNum: 0,
-    monthlyCountRate: 0,
-    monthlyNumRate: 0,
-    annualCount: 0,
-    annualNum: 0,
-    annualCountRate: 0,
-    annualNumRate: 0,
-  });
   const [trendData, setTrendData] = useState({
     flowType: "inCount",
     data: null,
   });
   const [recentSevenDaysData, setRecentSevenDaysData] = useState(null);
   const [last12MonthsFlowTrendData, setLast12MonthsFlowTrendData] = useState(null);
-  const [floorTransformData, setFloorTransformData] = useState(null);
   const [deviceData, setDeviceData] = useState(null);
-  const [doorRankingData, setDoorRankingData] = useState(null);
   const [festivalData, setFestivalData] = useState(null);
   const [customerAttr, setCustomerAttr] = useState(null);
+  const [groupAnalysisMemberData, setGroupAnalysisMemberData] = useState(null);
+
   const fullscreenHandlerRef = useRef(null);
   const resizeTimerRef = useRef(null);
+  const mapPanelTimerRef = useRef(null); // panel的定时请求
+  const dataViewConfigTimerRef = useRef(null); // 大屏的定时请求
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [groupAnalysisMemberData, setGroupAnalysisMemberData] = useState(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isLoadingData, setIsLoadingData] = useState({
     trendData: false,
@@ -98,11 +82,39 @@ const DataView = () => {
     customerAttr: false,
     groupAnalysisMemberDataLoading: false,
   });
-  const isNeutralDomain = window.localStorage.getItem("isNeutralDomain") === "true";
+  // const isNeutralDomain = window.localStorage.getItem("isNeutralDomain") === "true";
   const [isMobile, setIsMobile] = useState(false);
   const [tagList, setTagList] = useState([]);
   const [siteList, setSiteList] = useState([]);
   const [selectSiteList, setSelectSiteList] = useState([]);
+  const [infoSelectSiteLIst, setInfoSelectSiteLIst] = useState([]);
+
+  const [mapTotalInfo, setMapTotalInfo] = useState({
+    todayCount: 0,
+    todayNum: 0,
+    todayCountRate: 0,
+    todayNumRate: 0,
+    thisMonthCount: 0,
+    thisMonthNum: 0,
+    thisMonthCountRate: 0,
+    thisMonthNumRate: 0,
+    thisYearCount: 0,
+    thisYearNum: 0,
+    thisYearCountRate: 0,
+    thisYearNumRate: 0,
+  });
+
+  const userSiteIds = useMemo(() => new Set((User.sites || []).map((s) => Number(s.siteId))), [User.sites]);
+  const siteMap = useMemo(() => {
+    const filtered = {};
+    Object.entries(siteAllMap).forEach(([id, site]) => {
+      if (userSiteIds.has(site.siteId)) {
+        filtered[id] = site;
+      }
+    });
+    return filtered;
+  }, [siteAllMap, userSiteIds]);
+
   // 移动端viewport处理：保持PC端比例，允许缩放查看
   useEffect(() => {
     // 检测是否是移动设备
@@ -173,9 +185,6 @@ const DataView = () => {
       const isFullscreenMode = hasFullscreenElement || isWindowFullscreen;
 
       setIsFullscreen((prev) => {
-        // if (prev !== isFullscreenMode) {
-        //   console.log("全屏状态变化:", prev, "->", isFullscreenMode);
-        // }
         return isFullscreenMode;
       });
     };
@@ -268,50 +277,37 @@ const DataView = () => {
   }, [isMobile]);
 
   useEffect(() => {
-    const defaultSiteId = User.selectedSiteId || User.defaultSiteId;
-    siteIdRef.current = defaultSiteId;
-    if (defaultSiteId) {
-      requestDataViewConfig(defaultSiteId);
-    }
-  }, []);
-
-  useEffect(() => {
+    let arr = [];
+    Object.values(siteMap).forEach((site) => {
+      arr.push(site);
+    });
+    setSiteList([...arr]);
+    setSelectSiteList([...arr]);
+    setInfoSelectSiteLIst([...arr]);
     initTagAndSiteData();
-  }, []);
+  }, [siteMap]);
 
   const initTagAndSiteData = () => {
     Http.getTagManagementGetTagList(
       {},
       (res) => {
         setTagList(res.data || []);
-        Http.getTagManagementGetAssocSites(
-          { tagIds: null },
-          (res2) => {
-            setSiteList(res2.data || []);
-          },
-          null,
-          (error) => console.error("getAssocSites 失败:", error),
-        );
+        // Http.getTagManagementGetAssocSites(
+        //   { tagIds: null },
+        //   (res2) => {
+        //     setSiteList(res2.data || []);
+        //     setSelectSiteList(res2.data || []);
+        //   },
+        //   null,
+        //   (error) => console.error("getAssocSites 失败:", error)
+        // );
       },
       null,
       (error) => {
         console.error("getTagList 失败:", error);
-        setSiteList([...mockSiteList]);
-        setSelectSiteList([...mockSiteList]);
-      },
+      }
     );
   };
-
-  // 每分钟请求一次数据
-  useEffect(() => {
-    if (!siteIdRef.current) return;
-
-    const interval = setInterval(() => {
-      requestDataViewConfig(siteIdRef.current);
-    }, 60000); // 60000毫秒 = 1分钟
-
-    return () => clearInterval(interval);
-  }, [isFirstLoad]);
 
   // 将回调式 HTTP 方法转换为 Promise 的辅助函数
   const httpToPromise = (httpMethod, params) => {
@@ -320,16 +316,240 @@ const DataView = () => {
         params,
         (res) => resolve(res),
         null,
-        (error) => reject(error),
+        (error) => reject(error)
       );
+    });
+  };
+
+  // 地图面板信息定时请求（每分钟，列表变化时重置）
+  useEffect(() => {
+    const resetAndStartTimer = () => {
+      // 立即发起一次请求
+      reuqestMapPanelInfo();
+      // 清除已有定时器
+      if (mapPanelTimerRef.current) {
+        clearInterval(mapPanelTimerRef.current);
+      }
+      // 设置新的定时器，一分钟后再次请求
+      mapPanelTimerRef.current = setInterval(() => {
+        reuqestMapPanelInfo();
+      }, 60000);
+    };
+
+    resetAndStartTimer();
+
+    return () => {
+      if (mapPanelTimerRef.current) {
+        clearInterval(mapPanelTimerRef.current);
+        mapPanelTimerRef.current = null;
+      }
+    };
+  }, [infoSelectSiteLIst]);
+
+  // 数据视图配置定时请求（每分钟，列表变化时重置）
+  useEffect(() => {
+    const resetAndStartTimer = () => {
+      // 立即发起一次请求
+      requestDataViewConfig();
+      // 清除已有定时器
+      if (dataViewConfigTimerRef.current) {
+        clearInterval(dataViewConfigTimerRef.current);
+      }
+      // 设置新的定时器，一分钟后再次请求
+      dataViewConfigTimerRef.current = setInterval(() => {
+        requestDataViewConfig();
+      }, 60000);
+    };
+
+    resetAndStartTimer();
+
+    return () => {
+      if (dataViewConfigTimerRef.current) {
+        clearInterval(dataViewConfigTimerRef.current);
+        dataViewConfigTimerRef.current = null;
+      }
+    };
+  }, [selectSiteList]);
+
+  // 处理地图站点点击（单击/双击）
+  const handleSiteClick = useCallback((site, clickType) => {
+    if (clickType === "single") {
+      // 单击：保存到 infoSelectSiteLIst
+      setInfoSelectSiteLIst([site]);
+    } else if (clickType === "double") {
+      // 双击：保存到 infoSelectSiteLIst 和 selectSiteList，并更新标题
+      setInfoSelectSiteLIst([site]);
+      setSelectSiteList([site]);
+      setTitle(site.siteName);
+    } else if (clickType === "clear") {
+      setTitle("北京市通州区党群服务阵地体系一屏通览");
+    }
+  }, []);
+
+  const handleSiteSelectChange = useCallback(
+    (filteredSites) => {
+      setSelectSiteList(filteredSites);
+    },
+    [handleSiteClick]
+  );
+
+  const handleInfoSelectSiteLIstChange = useCallback(
+    (filteredSites) => {
+      setInfoSelectSiteLIst(filteredSites);
+    },
+    [handleSiteClick]
+  );
+
+  const reuqestMapPanelInfo = async () => {
+    const dateString = new Date().toISOString().split("T")[0];
+    const now = dayjs(dateString);
+    const currentYear = now.year();
+    const lastYear = currentYear - 1;
+    const thisMonthStart = now.startOf("month").format("YYYY-MM-DD");
+    const thisMonthEnd = now.endOf("month").format("YYYY-MM-DD");
+    const today = now.format("YYYY-MM-DD");
+    const lastYearStart = `${lastYear}-01-01`;
+    const lastYearEnd = `${lastYear}-12-31`;
+    const thisYearStart = `${currentYear}-01-01`;
+    const lastMonth = now.subtract(1, "month");
+    const lastMonthStart = lastMonth.startOf("month").format("YYYY-MM-DD");
+    const lastMonthEnd = lastMonth.endOf("month").format("YYYY-MM-DD");
+    const lastDay = now.subtract(1, "day").format("YYYY-MM-DD");
+    const ids = infoSelectSiteLIst?.map((item) => item.siteId)?.join(",") || "";
+    if (infoSelectSiteLIst.length == 0) {
+      // return;
+      setMapTotalInfo({
+        todayCount: 0,
+        todayNum: 0,
+        todayCountRate: 0,
+        todayNumRate: 0,
+        thisMonthCount: 0,
+        thisMonthNum: 0,
+        thisMonthCountRate: 0,
+        thisMonthNumRate: 0,
+        thisYearCount: 0,
+        thisYearNum: 0,
+        thisYearCountRate: 0,
+        thisYearNumRate: 0,
+      });
+      return;
+    }
+    // 并行请求本年全年、本月、今天、去年全年、上个月、昨天数据
+    Promise.all([
+      httpToPromise(Http.getFlowTotal, {
+        siteIds: ids,
+        clearTime: 0,
+        startDate: thisYearStart,
+        endDate: dateString,
+      }),
+      httpToPromise(Http.getFlowTotal, {
+        siteIds: ids,
+        clearTime: 0,
+        startDate: lastYearStart,
+        endDate: lastYearEnd,
+      }),
+      httpToPromise(Http.getFlowTotal, {
+        siteIds: ids,
+        clearTime: 0,
+        startDate: thisMonthStart,
+        endDate: thisMonthEnd,
+      }),
+      httpToPromise(Http.getFlowTotal, {
+        siteIds: ids,
+        clearTime: 0,
+        startDate: lastMonthStart,
+        endDate: lastMonthEnd,
+      }),
+      httpToPromise(Http.getFlowTotal, {
+        siteIds: ids,
+        clearTime: 0,
+        startDate: today,
+        endDate: today,
+        realTime: 1,
+      }),
+      httpToPromise(Http.getFlowTotal, {
+        siteIds: ids,
+        clearTime: 0,
+        startDate: lastDay,
+        endDate: lastDay,
+        realTime: 1,
+      }),
+    ]).then((results) => {
+      const [thisYearResult, lastYearResult, thisMonthResult, lastMonthResult, todayResult, yesterdayResult] = results;
+
+      // 提取数据，接口返回 result=1 时有有效数据
+      const getData = (result) => (result?.result === 1 ? result?.data : null);
+
+      const thisYearData = getData(thisYearResult);
+      const lastYearData = getData(lastYearResult);
+      const thisMonthData = getData(thisMonthResult);
+      const lastMonthData = getData(lastMonthResult);
+      const todayData = getData(todayResult);
+      const yesterdayData = getData(yesterdayResult);
+
+      // 计算同比/环比增长率
+      const calcRate = (current, previous) => {
+        if (!previous || previous === 0) return 0;
+        return (((current - previous) / previous) * 100).toFixed(1);
+      };
+
+      // 本年数据
+      const thisYearCount = thisYearData?.inCount || 0; // 进人数
+      const thisYearNum = thisYearData?.inNum || 0;
+      const lastYearCount = lastYearData?.inCount || 0;
+      const lastYearNum = lastYearData?.inNum || 0;
+
+      // 本月数据
+      const thisMonthCount = thisMonthData?.inCount || 0;
+      const thisMonthNum = thisMonthData?.inNum || 0;
+      const lastMonthCount = lastMonthData?.inCount || 0;
+      const lastMonthNum = lastMonthData?.inNum || 0;
+
+      // 今天数据
+      const todayCount = todayData?.inCount || 0;
+      const todayNum = todayData?.inNum || 0;
+      const yesterdayCount = yesterdayData?.inCount || 0;
+      const yesterdayNum = yesterdayData?.inNum || 0;
+
+      setMapTotalInfo({
+        todayCount,
+        todayNum,
+        todayCountRate: calcRate(todayCount, yesterdayCount),
+        todayNumRate: calcRate(todayNum, yesterdayNum),
+        thisMonthCount,
+        thisMonthNum,
+        thisMonthCountRate: calcRate(thisMonthCount, lastMonthCount),
+        thisMonthNumRate: calcRate(thisMonthNum, lastMonthNum),
+        thisYearCount,
+        thisYearNum,
+        thisYearCountRate: calcRate(thisYearCount, lastYearCount),
+        thisYearNumRate: calcRate(thisYearNum, lastYearNum),
+      });
     });
   };
 
   const requestDataViewConfig = async (siteId) => {
     const dateString = new Date().toISOString().split("T")[0];
-    const [endDateLast7Days, startDateLast7Days] = TimeUtils.getLast7DaysRange();
     const [endDateLast12Months, startDateLast12Months] = TimeUtils.getLast12MonthsRange();
-    const ids = selectSiteList.length === siteList.length ? null : selectSiteList.map((item) => item.siteId); // 请求场地id 全部请求就缺省null 否则 [1,2,3..]
+    const ids = selectSiteList.map((item) => item.siteId)?.join(",");
+    const allIds = Object.values(siteMap)
+      .map((site) => site.siteId)
+      ?.join(",");
+
+    if (selectSiteList.length == 0) {
+      setTrendData({
+        flowType: "inCount",
+        data: null,
+      });
+      setRecentSevenDaysData(null);
+      setLast12MonthsFlowTrendData(null);
+      setDeviceData(null);
+      setFestivalData(null);
+      setCustomerAttr(null);
+      setGroupAnalysisMemberData(null);
+
+      return;
+    }
     const year = dayjs(dateString).year();
 
     if (isFirstLoad) {
@@ -353,7 +573,7 @@ const DataView = () => {
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      },
+      }
     );
 
     Http.getFlowTrend(
@@ -369,7 +589,7 @@ const DataView = () => {
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      },
+      }
     );
 
     Http.getFaceTotal(
@@ -384,7 +604,7 @@ const DataView = () => {
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      },
+      }
     );
 
     // 请求近12个月以及本年度客流
@@ -396,8 +616,8 @@ const DataView = () => {
           clearTime: 0,
           startDate: start,
           endDate: end,
-        }),
-      ),
+        })
+      )
     )
       .then((results) => {
         const Last12MonthsArray = [];
@@ -441,10 +661,6 @@ const DataView = () => {
       httpToPromise(Http.getFlowTotal, { siteIds: ids, clearTime: 0, startDate: TimeUtils.getJanuaryToFebruaryRange(lastYear).start, endDate: TimeUtils.getJanuaryToFebruaryRange(lastYear).end }),
     ])
       .then((results) => {
-        console.log("节假日客流数据:", results[0], results[1]);
-        console.log("暑期(7-9月)客流数据:", results[2], results[3]);
-        console.log("寒假(1-2月)客流数据:", results[4], results[5]);
-
         const summerHolidayThisYear = results[2].data.inCount;
         const summerHolidayLastYear = results[3].data.inCount;
         const winterHolidayThisYear = results[4].data.inCount;
@@ -469,14 +685,18 @@ const DataView = () => {
       });
 
     Http.getSiteRanking(
-      { siteIds: ids, clearTime: 0, startDate: dateString, endDate: dateString },
+      { siteIds: allIds, clearTime: 0, startDate: dateString, endDate: dateString },
       (res) => {
-        console.log(res);
+        setGroupAnalysisMemberData(getSiteRankingData(res.data));
+        setIsLoadingData((prevData) => ({
+          ...prevData,
+          groupAnalysisMemberDataLoading: false,
+        }));
       },
       null,
       (error) => {
         console.error("请求数据失败:", error);
-      },
+      }
     );
 
     // 获取近7天数据并区分工作日和周末
@@ -487,10 +707,10 @@ const DataView = () => {
     Promise.all([...weekdayRequests, ...weekendRequests])
       .then((results) => {
         const weekdayCount = weekdayRequests.length;
-        const weekdayData = results.slice(0, weekdayCount).map((res) => res.data.inCount || 0);
-        const weekendData = results.slice(weekdayCount).map((res) => res.data.inCount || 0);
-        console.log("近7日工作日数据:", weekdayData);
-        console.log("近7日周末数据:", weekendData);
+
+        const weekdayData = results.slice(0, weekdayCount);
+        const weekendData = results.slice(weekdayCount);
+
         let chartData = DataConverter.getNewVisitingPeakConvertData(1, { data: { weekdayData, weekendData } });
         setRecentSevenDaysData(chartData);
 
@@ -669,6 +889,26 @@ const DataView = () => {
     setCustomerAttr(convertData);
   };
 
+  // 集团分析和场地排行
+  const getSiteRankingData = (data) => {
+    if (!data) return [];
+
+    const { siteId = [], inCount = [], inNum = [] } = data;
+    const result = siteId
+      .map((id, index) => {
+        const siteInfo = siteAllMap[Number(id)] || {};
+        return {
+          siteId: id,
+          siteName: siteInfo.siteName || "",
+          inCount: inCount[index] || 0,
+          inNum: inNum[index] || 0,
+        };
+      })
+      .sort((a, b) => b.inCount - a.inCount);
+
+    return result;
+  };
+
   // 更新时间
   useEffect(() => {
     const timer = setInterval(() => {
@@ -708,7 +948,7 @@ const DataView = () => {
       case "holidayFlow":
         return <FestivalFlowPanel data={festivalData?.list || []} maxNumber={festivalData?.maxValue || 0} />;
       case "groupStatistics":
-        return <GroupStatisticsPanel data={groupAnalysisMemberData} deduplication={config.deduplication} isLoading={isLoadingData.groupAnalysisMemberDataLoading} />;
+        return <GroupStatisticsPanel data={groupAnalysisMemberData} deduplication={1} isLoading={isLoadingData.groupAnalysisMemberDataLoading} />;
       case "todayTrend":
         return <TodayTrendPanel chartData={trendData.chartData} isFullscreen={isFullscreen} isLoading={isLoadingData.trendData} />;
       case "recentSevenDays":
@@ -726,12 +966,11 @@ const DataView = () => {
           isMobile
             ? { width: `${containerSize.width}px`, height: `${containerSize.height}px` }
             : { width: "100vw", height: "100vh", minWidth: `${minContainerSize.width}px`, minHeight: `${minContainerSize.height}px` }
-        }
-      >
+        }>
         {/* 标题行 */}
         <div className="TZdata-view-header-row">
           {/* <div className="TZdata-view-site-name">{config.showSiteName === 1 ? <div>{config?.siteName || ""}</div> : <div></div>}</div> */}
-          <div className="TZdata-view-title">{config.title || "北京市通州区党群服务阵地体系一屏通览"}</div>
+          <div className="TZdata-view-title">{title || "北京市通州区党群服务阵地体系一屏通览"}</div>
           <div className="TZdata-view-time">{formatTime(currentTime)}</div>
         </div>
 
@@ -758,7 +997,7 @@ const DataView = () => {
           {/* 中间区域 */}
           <div className="TZdata-view-center-area">
             <div style={{ flex: 4 }}>
-              <TzMapDrawBoard />
+              <TzMapDrawBoard onSiteSelect={handleSiteSelectChange} onSiteInfoSelect={handleInfoSelectSiteLIstChange} onSiteClick={handleSiteClick} mapTotalInfo={mapTotalInfo} />
             </div>
             <div className="TZdata-view-component-item" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.2rem" }}>
               <div style={{ flex: 3, display: "flex", flexDirection: "column" }}>

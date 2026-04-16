@@ -167,6 +167,7 @@ class ChartsDataViewOptHelper {
 
     // 时段名称数组
     const indicatorNames = [Language.LINGCHEN, Language.ZAOSHANG, Language.ZHONGWU, Language.XIAWU, Language.BANGWAN, Language.WANSHANG];
+    const timeNames = ["(00:00-06:00)", "(06:00-11:00)", "(11:00-14:00)", "(14:00-17:00)", "(17:00-19:00)", "(19:00-24:00)"];
 
     const option = {
       tooltip: {
@@ -184,7 +185,7 @@ class ChartsDataViewOptHelper {
           let marker = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${params.color}; margin-right: 6px;"></span>`;
           for (let i = 0; i < valueArr.length; i++) {
             const value = valueArr[i];
-            str += `${marker}${indicatorNames[i]}: ${value}<br>`;
+            str += `${marker}${indicatorNames[i]}${timeNames[i]}: ${value}<br>`;
           }
           return str;
         },
@@ -294,6 +295,77 @@ class ChartsDataViewOptHelper {
         },
       ],
     };
+    return option;
+  }
+
+  // 通州-7日工作日、周末分析雷达图 data1:工作日数据, data2:周末数据, data3:总数据 */
+  static createDVSevenDaysAnalysisChartOptByTZ({ data1, data2, data3 }) {
+    let option = this.createDVSevenDaysAnalysisChartOpt({ data1, data2, data3 });
+    option.legend.data = ["工作日平均人次", "周末平均人次", "平均人次"];
+    option.series = [
+      {
+        name: Language.FENBUSHUJU,
+        type: "radar",
+        data: [
+          {
+            value: data1,
+            name: "工作日平均人次",
+            areaStyle: {
+              color: "#00FFFF", // 浅蓝色
+            },
+            lineStyle: {
+              color: "#00FFFF",
+              width: 2,
+            },
+            itemStyle: {
+              color: "#00FFFF",
+            },
+            symbol: "circle",
+            symbolSize: 4,
+          },
+          {
+            value: data2,
+            name: "周末平均人次",
+            areaStyle: {
+              color: "rgba(249,162,49, 0.4)", // 浅橙色
+            },
+            lineStyle: {
+              color: "#F9A231",
+              width: 2,
+            },
+            itemStyle: {
+              color: "#F9A231",
+            },
+            symbol: "circle",
+            symbolSize: 4,
+          },
+          {
+            value: data3,
+            name: "平均人次",
+            areaStyle: {
+              color: "rgba(103,214,56, 0.4)", // 浅绿色
+            },
+            lineStyle: {
+              color: "#67D638",
+              width: 2,
+            },
+            itemStyle: {
+              color: "#67D638",
+            },
+            symbol: "circle",
+            symbolSize: 4,
+          },
+        ],
+      },
+    ];
+
+    option.radar.axisName.fontSize = 12;
+    // 凌晨 0:00-6:00 (小时 0-5)
+    // 早上 6:00-11:00 (小时 6-10)
+    // 中午 11:00-14:00 (小时 11-13)
+    // 下午 14:00-17:00 (小时 14-16)
+    // 傍晚 17:00-19:00 (小时 17-18)
+    // 晚上 19:00-24:00 (小时 19-23)
     return option;
   }
 
@@ -420,6 +492,19 @@ class ChartsDataViewOptHelper {
       ],
     };
 
+    return option;
+  }
+
+  static createDV12MonthsFlowTrendChartOptByTz({ xAxis, data, xAxisTooltips }) {
+    let option = this.createDV12MonthsFlowTrendChartOpt({ xAxis, data, xAxisTooltips });
+
+    option?.tooltip?.formatter &&
+      (option.tooltip.formatter = (params) => {
+        if (!params || params.length === 0) return "";
+        const date = xAxisTooltips && xAxisTooltips[params[0].dataIndex] ? xAxisTooltips[params[0].dataIndex] : params[0].name;
+        const value = params[0].value || 0;
+        return `${date}<br>${params[0].marker}服务人次：${value}`;
+      });
     return option;
   }
 

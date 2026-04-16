@@ -185,6 +185,10 @@ export default class User {
     return UserData.selectedSiteId;
   }
 
+  static get sites() {
+    return UserData.sites;
+  }
+
   static getSiteClearTime(siteId) {
     let site = User.getSite(siteId);
     if (!site) {

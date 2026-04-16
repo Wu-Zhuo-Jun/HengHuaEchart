@@ -6,8 +6,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import { Language } from "@/language/LocaleContext";
-import groupCountIcon from "@/assets/dataviewImages/groupCountIcon.webp";
-import groupNumIcon from "@/assets/dataviewImages/groupNumIcon.webp";
+import TzRankOne from "@/assets/dataviewImages/TzRankOne.png";
+import TzRanKTwo from "@/assets/dataviewImages/TzRanKTwo.png";
 import fieldBlock from "@/assets/dataviewImages/fieldBlock.png";
 import fieldBeam from "@/assets/dataviewImages/field.png";
 import TzFieldOne from "@/assets/dataviewImages/TzFieldOne.png";
@@ -496,30 +496,30 @@ export const GroupStatisticsPanel = React.memo(({ data, deduplication, isLoading
     <div className="group-statistics-panel" style={{ width: "100%", height: "100%", minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column", color: "#fff" }}>
       <div className="group-statistics-panel-header">
         <div className="group-statistics-panel-header-item">
-          <img className="icon" src={groupCountIcon} alt="groupCountIcon" />
+          <img className="icon" src={TzRankOne} alt="TzRankOne" />
           <div className="total-value-container">
-            <div className="total-value-unit">{Language.ZONGKELIURENCI}</div>
+            <div className="total-value-unit">总服务人次</div>
             <div className="total-value">{inCountTotal}</div>
           </div>
         </div>
         {deduplication === 1 ? (
           <div className="group-statistics-panel-header-item">
-            <img className="icon" src={groupNumIcon} alt="groupNumIcon" />
+            <img className="icon" src={TzRanKTwo} alt="TzRanKTwo" />
             <div className="total-value-container">
-              <div className="total-value-unit">{Language.ZONGKELIURENSHU}</div>
+              <div className="total-value-unit"> 总服务人数</div>
               <div className="total-value">{inNumTotal}</div>
             </div>
           </div>
         ) : null}
       </div>
       {/* 表格部分 */}
-      <div style={{ flex: 4.4, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column", fontSize: "1rem" }}>
+      <div style={{ flex: 4.4, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column", fontSize: "0.9rem" }}>
         {/* 表头 */}
-        <div style={{ display: "flex", flexDirection: "row", color: "#00FFFF", flexShrink: 0 }}>
-          <div style={{ flex: "0 0 2.2rem", textAlign: "left", fontWeight: "bold", padding: "0.08rem" }}>{Language.PAIMING}</div>
-          <div style={{ flex: 2, textAlign: "center", fontWeight: "bold", padding: "0.08rem" }}>{Language.CHANGDIMINGMINGCHENG}</div>
-          <div style={{ flex: 1, textAlign: "center", fontWeight: "bold", padding: "0.08rem" }}>{Language.JINCHANGRENCI}</div>
-          {deduplication === 1 ? <div style={{ flex: 1, textAlign: "center", fontWeight: "bold", padding: "0.08rem" }}>{Language.JINCHANGRENSHU}</div> : null}
+        <div style={{ display: "flex", flexDirection: "row", flexShrink: 0 }}>
+          <div style={{ flex: "0 0 2.2rem", textAlign: "left", padding: "0.08rem" }}>{Language.PAIMING}</div>
+          <div style={{ flex: 2.8, textAlign: "center", padding: "0.08rem" }}>服务中心</div>
+          <div style={{ flex: 1, textAlign: "center", padding: "0.08rem" }}>服务人次</div>
+          {deduplication === 1 ? <div style={{ flex: 1, textAlign: "center", padding: "0.08rem" }}>服务人数</div> : null}
         </div>
         {/* 数据行 */}
         <div style={{ flex: 1, minHeight: 0, height: `calc(${rowHeight} * 8)` }}>
@@ -549,27 +549,37 @@ export const GroupStatisticsPanel = React.memo(({ data, deduplication, isLoading
                           flex: "0 0 2rem",
                           textAlign: "left",
                           padding: "0.08rem",
-                          lineHeight: "1.1",
+                          lineHeight: "1.05",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: "1.3rem",
-                          fontWeight: "bold",
+                          fontSize: "1.1rem",
                           color: getRankingColor(ranking),
                         }}>
                         {String(ranking).padStart(2, "0")}
                       </div>
                       {/* 场地名称 */}
-                      <div className="text-ellipsis" style={{ flex: 2, padding: "0.08rem", lineHeight: "1.1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem" }}>
+                      <div
+                        style={{
+                          flex: 2.8,
+                          padding: "0.08rem",
+                          lineHeight: "1.05",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "0.9rem",
+                          wordBreak: "break-all",
+                          textAlign: "center",
+                        }}>
                         {item.siteName || "-"}
                       </div>
                       {/* 进场人次 */}
-                      <div style={{ flex: 1, textAlign: "center", padding: "0.08rem", lineHeight: "1.1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ flex: 1, textAlign: "center", padding: "0.08rem", lineHeight: "1.05", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {CommonUtils.formatNumberToUnit(item.inCount || item.count || 0).fullText}
                       </div>
                       {/* 进场人数 */}
                       {deduplication === 1 ? (
-                        <div style={{ flex: 1, textAlign: "center", padding: "0.08rem", lineHeight: "1.1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ flex: 1, textAlign: "center", padding: "0.08rem", lineHeight: "1.05", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           {CommonUtils.formatNumberToUnit(item.inNum || item.num || 0).fullText}
                         </div>
                       ) : null}
