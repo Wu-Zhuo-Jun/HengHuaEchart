@@ -11,7 +11,7 @@ import TimeUtils from "@/utils/TimeUtils";
 const PAGE_SIZES = Constant.PAGE_SIZES;
 
 // 每个 Tab 独立 queryModel 默认值
-const QUERY_DEFAULT = { state: 0, dir: null, search: "", page: 1, limit: PAGE_SIZES[0], sort: null };
+const QUERY_DEFAULT = { state: 0, dir: 0, search: "", page: 1, limit: PAGE_SIZES[0], sort: null };
 
 // Tab type 映射：Tab key -> API type
 const TAB_TYPE_MAP = { 1: 1, 2: 2, 3: -1 };
@@ -25,7 +25,7 @@ const STATE_OPTIONS = [
 
 // 进出方向选项
 const DIR_OPTIONS = [
-  { value: null, label: "全部" },
+  { value: 0, label: "全部" },
   { value: 1, label: "正向" },
   { value: 2, label: "反向" },
 ];
@@ -66,8 +66,8 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
   const [dataList, setDataList] = useState([]);
   const [pager, setPager] = useState({ current: 1, pageSize: PAGE_SIZES[0], total: 0 });
 
-  // 三个 Tab 各自维护独立 queryModel
-  const tabModels = useRef({
+  // 三个 Tab 各自维护独立 queryModel（用 state 保证 React 感知更新）
+  const [queryModels, setQueryModels] = useState({
     1: { ...QUERY_DEFAULT },
     2: { ...QUERY_DEFAULT },
     3: { ...QUERY_DEFAULT },
@@ -83,7 +83,7 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
   const [deviceDrawerData, setDeviceDrawerData] = useState(null);
 
   // 当前 Tab 的 queryModel
-  const getCurrentModel = () => tabModels.current[activeTab];
+  const getCurrentModel = () => queryModels[activeTab];
 
   // 格式化列表
   const formatList = (list) => {
@@ -103,55 +103,69 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
   };
 
   // 请求数据
-  const requestData = useCallback(() => {
-    if (!open || !siteId || !areaId) return;
-    const model = getCurrentModel();
-    const type = TAB_TYPE_MAP[activeTab];
-    const params = {
-      type,
-      siteId,
-      areaId,
-      state: model.state,
-      dir: model.dir,
-      search: model.search || undefined,
-      page: model.page,
-      limit: model.limit,
-    };
-    if (model.sort != null) params.sort = model.sort;
+  const requestData =
+    // useCallback(
+    (tabKey) => {
+      if (!open || !siteId || !areaId) return;
+      const tab = tabKey ?? activeTab;
+      const model = queryModels[tab];
+      const type = TAB_TYPE_MAP[tab];
+      const params = {
+        type,
+        siteId,
+        areaId,
+        state: model.state,
+        dir: model.dir,
+        search: model.search || undefined,
+        page: model.page,
+        limit: model.limit,
 
-    setLoading(true);
-    Http.getAreaDoors(
-      params,
-      (res) => {
-        setLoading(false);
-        if (res.result === 1) {
-          const list = Array.isArray(res.data) ? res.data : res.data?.data ?? [];
-          setDataList(formatList(list));
-          const total = res.data?.pager?.count ?? (model.page - 1) * model.limit + list.length;
-          setPager((p) => ({ ...p, current: model.page, pageSize: model.limit, total }));
-        } else {
-          message.error(res.msg ?? "请求失败");
+        // type:类型, -1=可关联出入口 0=已关联出入口 1=已关联入区计数口 2=已关联外部计数口
+        // siteId:场地id,
+        // areaId:区域id,
+        // state:映射状态 0=全部 -1=未映射 1=已映射
+        // dir:进出方向 1=正向 2=反向
+        // search: 查找关键字,可缺省参数
+        // page:页码,
+        // limit:每页行数,
+        // sort:关联时间排序 -1=降序 1=升序(type=0,1,2时生效)
+      };
+      if (model.sort != null) params.sort = model.sort;
+
+      setLoading(true);
+      Http.getAreaDoors(
+        params,
+        (res) => {
+          setLoading(false);
+          if (res.result === 1) {
+            const list = Array.isArray(res.data) ? res.data : res.data?.data ?? [];
+            setDataList(formatList(list));
+            const total = res.data?.pager?.count ?? (model.page - 1) * model.limit + list.length;
+            setPager((p) => ({ ...p, current: model.page, pageSize: model.limit, total }));
+          } else {
+            message.error(res.msg ?? "请求失败");
+            setDataList([]);
+          }
+        },
+        null,
+        () => {
+          setLoading(false);
+          message.error("网络请求失败");
           setDataList([]);
         }
-      },
-      null,
-      () => {
-        setLoading(false);
-        message.error("网络请求失败");
-        setDataList([]);
-      }
-    );
-  }, [open, siteId, areaId, activeTab]);
+      );
+    };
+  // ,[open, siteId, areaId, activeTab]);
 
   // open 变化时自动请求 Tab1
   React.useEffect(() => {
     if (open) {
       setActiveTab("1");
-      tabModels.current = {
+      setQueryModels({
         1: { ...QUERY_DEFAULT },
         2: { ...QUERY_DEFAULT },
         3: { ...QUERY_DEFAULT },
-      };
+      });
       setSelectedRowKeys([]);
       requestData();
     }
@@ -160,51 +174,39 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
   // Tab 切换：重置该 Tab 的分页，重新请求
   const onTabChange = (key) => {
     setActiveTab(key);
-    tabModels.current[key].page = 1;
-    tabModels.current[key].sort = null;
+    setQueryModels((prev) => ({ ...prev, [key]: { ...prev[key], page: 1, sort: null } }));
     setSelectedRowKeys([]);
-    requestData();
+    Promise.resolve().then(() => requestData(key));
   };
 
   // 筛选条件变化
   const onChangeFilter = (key, value) => {
-    const model = getCurrentModel();
-    model[key] = value;
+    setQueryModels((prev) => ({ ...prev, [activeTab]: { ...prev[activeTab], [key]: value } }));
   };
 
   // 查询
   const onClickQuery = () => {
-    const model = getCurrentModel();
-    model.page = 1;
-    requestData();
+    setQueryModels((prev) => ({ ...prev, [activeTab]: { ...prev[activeTab], page: 1 } }));
+    Promise.resolve().then(() => requestData());
   };
 
   // 重置
   const onClickReset = () => {
-    const model = getCurrentModel();
-    model.state = 0;
-    model.dir = null;
-    model.search = "";
-    model.page = 1;
-    model.sort = null;
-    requestData();
+    setQueryModels((prev) => ({ ...prev, [activeTab]: { ...QUERY_DEFAULT } }));
+    Promise.resolve().then(() => requestData());
   };
 
   // 分页变化
   const onChangePage = (page, pageSize) => {
-    const model = getCurrentModel();
-    model.page = page;
-    model.limit = pageSize;
-    requestData();
+    setQueryModels((prev) => ({ ...prev, [activeTab]: { ...prev[activeTab], page, limit: pageSize } }));
+    Promise.resolve().then(() => requestData());
   };
 
   // 排序变化
   const onChangeTable = (pagination, filters, sorter) => {
-    const model = getCurrentModel();
-    if (sorter?.order === "ascend") model.sort = 1;
-    else if (sorter?.order === "descend") model.sort = -1;
-    else model.sort = null;
-    requestData();
+    const sortVal = sorter?.order === "ascend" ? 1 : sorter?.order === "descend" ? -1 : null;
+    setQueryModels((prev) => ({ ...prev, [activeTab]: { ...prev[activeTab], sort: sortVal } }));
+    Promise.resolve().then(() => requestData());
   };
 
   // 解除关联
@@ -215,7 +217,7 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
       onOk: (close) => {
         close({ okButtonProps: { loading: true } });
         Http.removeAssocDoor(
-          { siteId, areaId, doorId: record.doorId },
+          { siteId, areaId, doorIds: record.doorId },
           (res) => {
             if (res.result === 1) {
               message.success("解除关联成功");
@@ -244,16 +246,18 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
       onOk: (close) => {
         close({ okButtonProps: { loading: true } });
         Http.addAssocDoor(
-          { siteId, areaId, doorIds: record.doorId, assocType },
+          { siteId, areaId, doorIds: record.doorId, type: assocType },
           (res) => {
             if (res.result === 1) {
               message.success("关联成功");
               setSelectedRowKeys([]);
               if (activeTab === "3") {
                 setActiveTab("1");
-                tabModels.current["1"].page = 1;
+                setQueryModels((prev) => ({ ...prev, 1: { ...prev[1], page: 1 } }));
+                Promise.resolve().then(() => requestData("1"));
+              } else {
+                Promise.resolve().then(() => requestData());
               }
-              requestData();
             } else {
               message.error(res.msg ?? "关联失败");
             }
@@ -285,7 +289,7 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
       onOk: (close) => {
         close({ okButtonProps: { loading: true } });
         Http.addAssocDoor(
-          { siteId, areaId, doorIds: selectedRowKeys.join(","), assocType: batchType },
+          { siteId, areaId, doorIds: selectedRowKeys.join(","), type: batchType },
           (res) => {
             close({ okButtonProps: { loading: false } });
             if (res.result === 1) {
@@ -295,10 +299,11 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
               setBatchType(null);
               if (activeTab === "3") {
                 setActiveTab("1");
-                tabModels.current["1"].page = 1;
+                setQueryModels((prev) => ({ ...prev, 1: { ...prev[1], page: 1 } }));
+                Promise.resolve().then(() => requestData("1"));
+              } else {
+                requestData();
               }
-              close({ okButtonProps: { loading: false } });
-              requestData();
             } else {
               message.error(res.msg ?? "批量关联失败");
               close({ okButtonProps: { loading: false } });
@@ -322,6 +327,42 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
 
   // 当前筛选条件（用于 UI 显示）
   const currentModel = getCurrentModel();
+
+  // 筛选条：Tab3 隐藏 state 和 dir 筛选
+  const renderFilterBar = () => (
+    <UIContent style={{ backgroundColor: "#edf3ff", height: "48px", width: "100%", marginBottom: "12px" }}>
+      <Flex align="center" justify="space-between" style={{ height: "100%" }}>
+        <Flex gap={12} align="center">
+          <Input
+            prefix={<SearchOutlined />}
+            placeholder="请输入出入口名称"
+            style={{ width: "257px", height: "36px" }}
+            value={currentModel.search}
+            onChange={(e) => onChangeFilter("search", e.target.value)}
+            onPressEnter={onClickQuery}
+          />
+          {activeTab !== "3" && (
+            <div>
+              <span>映射状态：</span>
+              <Select options={STATE_OPTIONS} value={currentModel.state} style={{ width: "145px", height: "36px" }} onChange={(val) => onChangeFilter("state", val)} />
+            </div>
+          )}
+          <div>
+            <span>进出方向：</span>
+            <Select options={DIR_OPTIONS} value={currentModel.dir} style={{ width: "145px", height: "36px" }} onChange={(val) => onChangeFilter("dir", val)} />
+          </div>
+        </Flex>
+        <Flex gap={12}>
+          <Button type="primary" className="btn-primary" onClick={onClickQuery}>
+            {Language.CHAXUN}
+          </Button>
+          <Button type="primary" className="btn-primary-s1" onClick={onClickReset}>
+            {Language.CHONGZHI}
+          </Button>
+        </Flex>
+      </Flex>
+    </UIContent>
+  );
 
   // 入区计数口 / 外部计数口 Tab 内容（共用列）
   const renderDoorTab = () => (
@@ -463,30 +504,7 @@ export default function DoorAssociationDrawer({ open, siteId, areaId, areaName, 
     <>
       <Drawer width="80%" destroyOnHidden open={open} onClose={onClose} title={`出入口关联 | ${areaName}`} footer={null}>
         {/* 筛选条 */}
-        <UIContent style={{ backgroundColor: "#edf3ff", height: "48px", width: "100%", marginBottom: "12px" }}>
-          <Flex align="center" justify="space-between" style={{ height: "100%" }}>
-            <Flex gap={12} align="center">
-              <Input
-                prefix={<SearchOutlined />}
-                placeholder="请输入出入口名称"
-                style={{ width: "257px", height: "36px" }}
-                value={currentModel.search}
-                onChange={(e) => onChangeFilter("search", e.target.value)}
-                onPressEnter={onClickQuery}
-              />
-              <Select options={STATE_OPTIONS} value={currentModel.state} style={{ width: "145px", height: "36px" }} onChange={(val) => onChangeFilter("state", val)} />
-              <Select options={DIR_OPTIONS} value={currentModel.dir} style={{ width: "145px", height: "36px" }} onChange={(val) => onChangeFilter("dir", val)} />
-            </Flex>
-            <Flex gap={12}>
-              <Button type="primary" className="btn-primary" onClick={onClickQuery}>
-                {Language.CHAXUN}
-              </Button>
-              <Button type="primary" className="btn-primary-s1" onClick={onClickReset}>
-                {Language.CHONGZHI}
-              </Button>
-            </Flex>
-          </Flex>
-        </UIContent>
+        {renderFilterBar()}
 
         {/* Tabs */}
         <Tabs activeKey={activeTab} onChange={onTabChange} items={tabItems} />

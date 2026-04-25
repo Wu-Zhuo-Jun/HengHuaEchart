@@ -107,6 +107,7 @@
       // border-bottom: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
       display: flex;
+      justify-content: space-between;
       align-items: center;
       gap: 0.5rem;
       // .component-title-icon {
@@ -928,6 +929,150 @@
 
     &:not(:last-child) {
       margin-bottom: 0.1rem;
+    }
+  }
+
+  // RangePicker 日期选择器样式 - 适配深色背景
+  .ant-picker-range {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.3);
+    font-size: 0.75rem;
+    width: 13rem;
+
+    &:hover,
+    &:focus,
+    &.ant-picker-focused {
+      border-color: rgba(56, 135, 253, 0.6);
+    }
+
+    .ant-picker-input {
+      input {
+        color: #fff;
+        font-size: 0.75rem;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.5);
+        }
+      }
+    }
+
+    .ant-picker-separator {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .ant-picker-suffix,
+    .ant-picker-clear {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .ant-picker-active-bar {
+      background: rgba(56, 135, 253, 0.6);
+    }
+
+    &.ant-picker-small {
+      .ant-picker-input {
+        input {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+
+  // RangePicker 下拉面板样式
+  .ant-picker-dropdown {
+    .ant-picker-panel {
+      background: rgba(0, 24, 58, 0.95);
+      border-color: rgba(56, 135, 253, 0.3);
+
+      .ant-picker-header {
+        color: #fff;
+        border-bottom-color: rgba(56, 135, 253, 0.3);
+
+        .ant-picker-header-button,
+        .ant-picker-century-select,
+        .ant-picker-decade-select,
+        .ant-picker-year-select,
+        .ant-picker-month-select {
+          color: #fff;
+
+          &:hover {
+            color: rgba(56, 135, 253, 0.8);
+          }
+        }
+
+        .ant-picker-super-prev-icon,
+        .ant-picker-super-next-icon,
+        .ant-picker-prev-icon,
+        .ant-picker-next-icon,
+        .ant-picker-year-prev-icon,
+        .ant-picker-year-next-icon,
+        .ant-picker-month-prev-icon,
+        .ant-picker-month-next-icon {
+          border-color: #fff;
+        }
+      }
+
+      .ant-picker-content {
+        th {
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        td {
+          .ant-picker-cell {
+            color: #fff;
+
+            &-inner {
+              &:hover {
+                background: rgba(56, 135, 253, 0.2);
+              }
+            }
+          }
+
+          &.ant-picker-cell-selected,
+          &.ant-picker-cell-in-view.ant-picker-cell-range-start,
+          &.ant-picker-cell-in-view.ant-picker-cell-range-end {
+            .ant-picker-cell-inner {
+              background: rgba(56, 135, 253, 0.6);
+            }
+          }
+
+          &.ant-picker-cell-in-view.ant-picker-cell-in-range::before {
+            background: rgba(56, 135, 253, 0.15);
+          }
+
+          &.ant-picker-cell-today .ant-picker-cell-inner::before {
+            border-color: rgba(56, 135, 253, 0.6);
+          }
+
+          &.ant-picker-cell-disabled .ant-picker-cell-inner {
+            color: rgba(255, 255, 255, 0.25);
+          }
+        }
+      }
+    }
+
+    .ant-picker-footer {
+      border-top-color: rgba(56, 135, 253, 0.3);
+
+      .ant-picker-ranges {
+        .ant-picker-preset {
+          > .ant-tag {
+            background: rgba(56, 135, 253, 0.2);
+            border-color: rgba(56, 135, 253, 0.4);
+            color: #fff;
+          }
+        }
+
+        .ant-btn {
+          background: rgba(56, 135, 253, 0.3);
+          border-color: rgba(56, 135, 253, 0.5);
+          color: #fff;
+
+          &:hover {
+            background: rgba(56, 135, 253, 0.5);
+          }
+        }
+      }
     }
   }
 }

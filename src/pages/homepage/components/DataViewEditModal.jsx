@@ -52,6 +52,11 @@ const DataViewEditModal = forwardRef(({ open, onCancel, onConfirm, getContainer,
     }
   }, [open]);
 
+  const data = [
+    { points: [{ x: 0.6239259294075435, y: 0.26118340569297943 }], title: "映射1", outletId: 1, StatisticalType: 1 },
+    { points: [{ x: 0.6239259294075435, y: 0.26118340569297943 }], title: "映射2", outletId: 2, StatisticalType: 1 },
+  ];
+
   const initConfig = useCallback(() => {
     const initData = {
       title: "客流大数据可视化平台",
@@ -105,8 +110,6 @@ const DataViewEditModal = forwardRef(({ open, onCancel, onConfirm, getContainer,
           initConfig();
         }
       );
-    } else {
-      console.log("82", "siteId is null");
     }
   }, [siteId, initConfig]);
 

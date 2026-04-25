@@ -43,6 +43,11 @@ const items = [
         icon: <BarChartOutlined />,
         state: 1,
       },
+      {
+        key: "groupAnalysis",
+        label: Language.JITUANFENXI,
+        icon: <CodepenOutlined />,
+      },
     ],
   },
   {

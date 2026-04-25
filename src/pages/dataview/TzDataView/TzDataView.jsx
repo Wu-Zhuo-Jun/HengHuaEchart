@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { TzDataViewMap, festivalNameMap } from "@/data/const";
+import { DatePicker } from "antd";
 import { siteAllMap } from "./siteMap";
 import Http from "@/config/Http";
 import {
@@ -24,8 +25,32 @@ import { Language } from "@/language/LocaleContext";
 import dayjs from "dayjs";
 import User from "@/data/UserData";
 import "./TzDataView.less";
-// import { siteList as mockSiteList } from "./mockData";
 
+const { RangePicker } = DatePicker;
+
+// 将日期转换为 year * 12 + month 用于月份比较
+const getYearMonth = (date) => date.year() * 12 + date.month();
+
+// 限制选择跨度不超过12个月
+const disabled12MonthsDate = (current, { from, type }) => {
+  if (from) {
+    const minDate = dayjs(from).subtract(11, "months").startOf("month");
+    const maxDate = dayjs(from).add(11, "months").endOf("month");
+    const today = dayjs().endOf("day");
+
+    switch (type) {
+      case "year":
+        return current.year() < minDate.year() || current.year() > maxDate.year();
+      case "month":
+        return getYearMonth(current) < getYearMonth(minDate) || getYearMonth(current) > getYearMonth(maxDate);
+      default:
+        // 日期选择时，禁止选择未来日期和超出12个月范围的日期
+        return current < minDate || current > (maxDate < today ? maxDate : today);
+    }
+  }
+  // 未选择开始日期时，禁止选择未来日期
+  return current && current > dayjs().endOf("day");
+};
 // 通州默认大屏配置
 const DEFAULT_CONFIG = {
   siteId: null,
@@ -49,6 +74,7 @@ const DataView = () => {
   const [config] = useState(DEFAULT_CONFIG);
   const [title, setTitle] = useState("北京市通州区党群服务阵地体系一屏通览");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [rangePickerDate, setRangePickerDate] = useState([dayjs(), dayjs()]);
   const siteIdRef = useRef(null);
   // 宽高比16:9，根据宽度计算高度
   const calculateHeight = (width) => {
@@ -70,7 +96,9 @@ const DataView = () => {
   const fullscreenHandlerRef = useRef(null);
   const resizeTimerRef = useRef(null);
   const mapPanelTimerRef = useRef(null); // panel的定时请求
+  const mapPanelRequestVersionRef = useRef(0); // 请求版本号，用于忽略过期响应
   const dataViewConfigTimerRef = useRef(null); // 大屏的定时请求
+  const groupAnalysisTimerRef = useRef(null); // 群分析数据的定时请求
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [isLoadingData, setIsLoadingData] = useState({
@@ -292,15 +320,6 @@ const DataView = () => {
       {},
       (res) => {
         setTagList(res.data || []);
-        // Http.getTagManagementGetAssocSites(
-        //   { tagIds: null },
-        //   (res2) => {
-        //     setSiteList(res2.data || []);
-        //     setSelectSiteList(res2.data || []);
-        //   },
-        //   null,
-        //   (error) => console.error("getAssocSites 失败:", error)
-        // );
       },
       null,
       (error) => {
@@ -401,6 +420,9 @@ const DataView = () => {
   );
 
   const reuqestMapPanelInfo = async () => {
+    // 递增版本号，后续返回的请求需对比版本，忽略过期响应
+    const requestVersion = ++mapPanelRequestVersionRef.current;
+
     const dateString = new Date().toISOString().split("T")[0];
     const now = dayjs(dateString);
     const currentYear = now.year();
@@ -475,6 +497,9 @@ const DataView = () => {
         realTime: 1,
       }),
     ]).then((results) => {
+      // 忽略过期请求：若版本号已变化，说明已有新请求发出
+      if (requestVersion !== mapPanelRequestVersionRef.current) return;
+
       const [thisYearResult, lastYearResult, thisMonthResult, lastMonthResult, todayResult, yesterdayResult] = results;
 
       // 提取数据，接口返回 result=1 时有有效数据
@@ -561,7 +586,7 @@ const DataView = () => {
         floorTransformData: true,
         doorRankingData: true,
         customerAttr: true,
-        groupAnalysisMemberDataLoading: true,
+        // groupAnalysisMemberDataLoading: true,
       });
     }
 
@@ -683,21 +708,6 @@ const DataView = () => {
       .catch((error) => {
         console.error("请求数据失败:", error);
       });
-
-    Http.getSiteRanking(
-      { siteIds: allIds, clearTime: 0, startDate: dateString, endDate: dateString },
-      (res) => {
-        setGroupAnalysisMemberData(getSiteRankingData(res.data));
-        setIsLoadingData((prevData) => ({
-          ...prevData,
-          groupAnalysisMemberDataLoading: false,
-        }));
-      },
-      null,
-      (error) => {
-        console.error("请求数据失败:", error);
-      }
-    );
 
     // 获取近7天数据并区分工作日和周末
     const last7DaysData = TimeUtils.getLast7DaysWithWeekday();
@@ -909,6 +919,63 @@ const DataView = () => {
     return result;
   };
 
+  // 排名分析数据定时请求（每5分钟，rangePickerDate 变化时重置）
+  useEffect(() => {
+    const resetAndStartTimer = () => {
+      // 立即发起一次请求
+      requestGroupAnalysisData();
+      // 清除已有定时器
+      if (groupAnalysisTimerRef.current) {
+        clearInterval(groupAnalysisTimerRef.current);
+      }
+      // 设置新的定时器，一分钟后再次请求
+      groupAnalysisTimerRef.current = setInterval(() => {
+        requestGroupAnalysisData();
+      }, 300000);
+    };
+
+    resetAndStartTimer();
+
+    return () => {
+      if (groupAnalysisTimerRef.current) {
+        clearInterval(groupAnalysisTimerRef.current);
+        groupAnalysisTimerRef.current = null;
+      }
+    };
+  }, [rangePickerDate]);
+
+  // 请求群分析数据（每5分钟定时请求 + rangePickerDate 变化时请求）
+  const requestGroupAnalysisData = () => {
+    if (!rangePickerDate || rangePickerDate.length !== 2) return;
+
+    const allIds = Object.values(siteMap)
+      .map((site) => site.siteId)
+      ?.join(",");
+
+    if (allIds.length === 0) return;
+
+    const dateString = rangePickerDate[0].format("YYYY-MM-DD");
+    const endDateString = rangePickerDate[1].format("YYYY-MM-DD");
+    setIsLoadingData((prevData) => ({
+      ...prevData,
+      groupAnalysisMemberDataLoading: true,
+    }));
+    Http.getSiteRanking(
+      { siteIds: allIds, clearTime: 0, startDate: dateString, endDate: endDateString },
+      (res) => {
+        setGroupAnalysisMemberData(getSiteRankingData(res.data));
+        setIsLoadingData((prevData) => ({
+          ...prevData,
+          groupAnalysisMemberDataLoading: false,
+        }));
+      },
+      null,
+      (error) => {
+        console.error("请求群分析数据失败:", error);
+      }
+    );
+  };
+
   // 更新时间
   useEffect(() => {
     const timer = setInterval(() => {
@@ -955,6 +1022,17 @@ const DataView = () => {
         return <RecentSevenDaysPanel chartData={recentSevenDaysData} isLoading={isLoadingData.recentSevenDaysData} />;
       default:
         return <div style={{ color: "#fff", padding: "20px" }}>组件内容区域</div>;
+    }
+  };
+
+  // 渲染组件内容
+  const renderTopComponent = (componentType) => {
+    // 根据组件类型传递相应的 props
+    switch (componentType) {
+      case "groupStatistics":
+        return <RangePicker value={rangePickerDate} onChange={(v) => setRangePickerDate(v)} size="small" disabledDate={disabled12MonthsDate} />;
+      default:
+        null;
     }
   };
 
@@ -1020,8 +1098,8 @@ const DataView = () => {
                   return (
                     <div key={index} className="TZdata-view-component-item" style={{ height: `${item.percentage}%` }}>
                       <div className="component-title">
-                        {/* <div className="component-title-icon"></div> */}
                         <div className="component-title-text">{getComponentLabel(item.component)}</div>
+                        {item.component && renderTopComponent(item.component)}
                       </div>
                       <div className="component-content">{renderComponent(item.component)}</div>
                     </div>

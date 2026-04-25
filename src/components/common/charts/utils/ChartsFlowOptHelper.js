@@ -622,9 +622,11 @@ class ChartsFlowOptHelper {
         },
       },
       grid: {
-        height: "80%",
-        top: "10%",
+        // height: "80%",
+        // top: "0%",
+        top:"40px",
         right: "0%",
+        bottom:"40px",
       },
       xAxis: {
         type: "category",
@@ -639,6 +641,18 @@ class ChartsFlowOptHelper {
         splitArea: {
           show: true,
         },
+        axisLabel: {
+          formatter:(value)=>{
+            const maxLength = 10;
+            if (value.length > maxLength) {
+                // 返回截断后的字符串，并在末尾添加省略号
+                return `${value.substring(0, maxLength - 1)}...`;
+            } else {
+                // 如果长度小于等于最大长度，则直接返回原字符串
+                return value;
+            }
+          }
+        }
       },
       visualMap: {
         show: false,

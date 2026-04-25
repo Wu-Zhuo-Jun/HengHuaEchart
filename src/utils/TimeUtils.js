@@ -127,6 +127,13 @@ class TimeUtils {
     };
   }
 
+  static getDayDateSlotByTs(timeStamp, format = "yyyy-MM-dd") {
+     const timeSlots = TimeUtils.getDayTimeSlotsByTs(timeStamp);
+    const startDate = TimeUtils.ts2Date(timeSlots.startTime, format);
+    const endDate = TimeUtils.ts2Date(timeSlots.endTime, format);
+    return [startDate, endDate];
+  }
+
   /**
    * 获取指定时间戳的日起始结束时间戳
    * @param {*} timeStamp
@@ -141,6 +148,13 @@ class TimeUtils {
       endTime: endOfDay.toSeconds() | 0,
     };
     return timeSlots;
+  }
+
+  static getDayTimeSlotByTs(timeStamp){
+    const dateTime = TimeUtils.getDayTimeSlotsByTs(timeStamp);
+    const startOfDay = dateTime.startOf("day");
+    const endOfDay = dateTime.endOf("day");
+    return [startOfDay.toSeconds() | 0, endOfDay.toSeconds() | 0];
   }
 
   /**

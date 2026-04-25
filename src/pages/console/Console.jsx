@@ -66,11 +66,11 @@ const items = [
         label: Language.CHURUKOUGUANLI,
         icon: <ClusterOutlined />,
       },
-      // {
-      //   key: "districtManagement",
-      //   label: Language.QUYUGUANLI,
-      //   icon: <ClusterOutlined />,
-      // },
+      {
+        key: "districtManagement",
+        label: Language.QUYUGUANLI,
+        icon: <ClusterOutlined />,
+      },
     ],
   },
   // {
@@ -86,17 +86,13 @@ const items = [
 ];
 
 const Console = () => {
-  const [collapsed, setCollapsed] = useState(true);
-  // const [selectedKeys, setSelectedKeys] = useState(['WeeklyReport', 'report']);
   const navigate = useNavigate();
   const location = useLocation();
   const selectedKeys = location.state?.keyPath || ["overview"];
-  // setSelectedKeys(location.state?.keyPath || ['WeeklyReport', 'report'])
   const contentRef = useRef(null);
   const { registerScrollContainer } = useScroll();
 
   const onClick = (e) => {
-    console.log("click ", e);
     const path = e.key;
     navigate(path, { state: { parent: "/console", keyPath: e.keyPath } });
   };

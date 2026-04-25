@@ -29,14 +29,14 @@ export const FestivalFlowPanel = ({ data }) => {
   );
 };
 
-export const GroupSiteRankingPanel = ({ data, ...props }) => {
+export const GroupSiteRankingPanel = ({ data,sort,onChange, ...props }) => {
   return (
     <div {...props}>
       <UIPanel title={Language.CHANGDIKELIUPAIHANG}>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column",height:"90%"}}>
           <div style={{ display: "flex", alignItems: "center", columnGap: "14px", marginBottom: "20px" }}>
-            <div style={{ fontSize: "14px", textAlign: "left", fontWeight: "600" }}>{Language.CHANGDIPAIHANGTOPSHI}</div>
-            <div className="icon-swap"></div>
+            <div className="icon-swap" onClick={onChange}></div>
+            <div style={{ fontSize: "14px", textAlign: "left", fontWeight: "600", color:"#333"}}>{sort == -1 ? Language.CHANGDIPAIHANGLASTSHI : Language.CHANGDIPAIHANGTOPSHI}</div>
           </div>
           <GroupSiteRankingTable columns={data && data.columns} dataSource={data && data.dataSource} />
         </div>

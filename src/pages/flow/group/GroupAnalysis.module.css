@@ -1,3 +1,17 @@
 .table{
     height: 660px;
 }
+
+.dualRowContent {
+    flex: 1;
+    height: 100%;
+    width: 704px;
+    min-width: 704px;
+    /* max-width: 704px; */
+    height: 345px;
+  }
+
+  .fullRow {
+    height: 320px;
+    width: 100%;
+  }

@@ -124,7 +124,6 @@ function VenueRanking() {
       window.dispatchEvent(new Event("resize"));
     }, 50);
   };
-  console.log(User.ranking, 124);
   return (
     <div className="venueRanking noScroll">
       <Tabs
@@ -137,10 +136,10 @@ function VenueRanking() {
         ]}
         onChange={handleTabChange}
       />
-      <div style={{ display: tab === "客流排行榜" ? "block" : "none" }}>
+      <div style={{ display: tab === "客流排行榜" ? "block" : "none", flex: 1, overflow: "hidden" }}>
         <FlowRankingPage groupClearTimeMap={User.groupClearTimeMap} groupOptions={groupOptions} />
       </div>
-      <div style={{ display: tab === "客群属性榜" ? "block" : "none" }}>
+      <div style={{ display: tab === "客群属性榜" ? "block" : "none", flex: 1, overflow: "hidden" }}>
         <FackRankingPage groupClearTimeMap={User.groupClearTimeMap} groupOptions={groupOptions} />
       </div>
     </div>

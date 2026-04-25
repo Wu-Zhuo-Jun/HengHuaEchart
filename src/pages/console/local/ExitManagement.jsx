@@ -12,6 +12,7 @@ import Message from '../../../components/common/Message';
 import TimeUtils from '../../../utils/TimeUtils';
 import locale from 'antd/es/date-picker/locale/en_US';
 import Selection from '../../../common/Selection';
+import useOutletStore from '@/stores/useOutletStore';
 
 const ExitManagementModel = {
     queryModel: {
@@ -43,6 +44,7 @@ const ExitManagement = ({ site, onClickOperate, updateTime }) => {
     });
 
     const [doorList, setDoorList] = useState([]);
+    const refreshOutletList = useOutletStore((state) => state.refreshOutletList);
 
     useEffect(() => {
         requestSiteDeviceList({ siteId: site.siteId }, (res) => {
@@ -57,6 +59,8 @@ const ExitManagement = ({ site, onClickOperate, updateTime }) => {
         setOpenEditDoorDrawer(false);
         if(update){
             requestGetDoorList(query);
+            // 编辑出入口后刷新缓存
+            refreshOutletList();
         }
         // setEditDoorData(null);
     }
@@ -77,6 +81,8 @@ const ExitManagement = ({ site, onClickOperate, updateTime }) => {
                         Message.success(Language.SHANCHUCHURUKOUCHENGGONG);
                         modal.destroy();
                         requestGetDoorList(query);
+                        // 删除出入口后刷新缓存
+                        refreshOutletList();
                     }else{
                         Message.error(res.msg);
                     }

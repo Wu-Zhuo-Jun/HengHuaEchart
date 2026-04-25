@@ -274,6 +274,17 @@ export class Language {
   static XINGQILIU = text("XINGQILIU");
   static XINGQIRI = text("XINGQIRI");
   static ZHANBI = text("ZHANBI");
+  static JITUANKELIUDUIBI = text("JITUANKELIUDUIBI");
+  static CHANGDIPAIHANGLASTSHI = text("CHANGDIPAIHANGLASTSHI");
+  static QINGXUANZEJIZHUNSHIJIAN = text("QINGXUANZEJIZHUNSHIJIAN");
+  static HEJI = text("HEJI");
+  static HOTSPOT = text("HOTSPOT");
+  static QUYUFENXI = text("QUYUFENXI");
+  static QUYUMINGCHENG = text("QUYUMINGCHENG");
+  static QUYURENCI = text("QUYURENCI");
+  static QUYURENSHU = text("QUYURENSHU");
+  static QUYUPICI = text("QUYUPICI");
+  static DAOFANGLV = text("DAOFANGLV");
 
   static MONTHS = [
     Language.YIYUE,
@@ -546,6 +557,10 @@ export class Language {
   static SHEWEIMOREN = text("SHEWEIMOREN");
   static MORENCHANGDI = text("MORENCHANGDI");
   static MORENCHANGDISHEZHICHENGGONG = text("MORENCHANGDISHEZHICHENGGONG");
+  static SHIJIANXUANZE = text("SHIJIANXUANZE");
+  static JITUANXUANZE = text("JITUANXUANZE");
+  static JIZHUNSHIJIAN = text("JIZHUNSHIJIAN");
+  static QINGXUANZE = text("QINGXUANZE");
 
   static ZHIDINGCHURUKOU = "指定出入口";
   static DUIBICHURUKOU = "对比出入口";

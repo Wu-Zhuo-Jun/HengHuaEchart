@@ -1,10 +1,10 @@
 import "./index.less";
-import { Button, Select, message, Spin } from "antd";
+import { Button, Select, Radio, message, Spin } from "antd";
 import { useCallback, useEffect, useState, useRef, useMemo, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { Language, text } from "@/language/LocaleContext";
 import dayjs from "dayjs";
-import { CustomerGroupChart, GenderStatisticsChart, AgeStatisticsChart } from "./components/Charts";
+import { CustomerGroupChart, GenderStatisticsChart } from "./components/Charts";
 import CustomerSurvery from "./components/CustomerSurvery";
 import { TimeGranulePicker } from "@/components/common/timeGranulePicker";
 import { TableDetail } from "./components/TableDetail";
@@ -12,13 +12,13 @@ import CommonUtils from "@/utils/CommonUtils";
 import StringUtils from "@/utils/StringUtils";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
 import Empty from "@/components/common/Empty";
-import { FlowSelect, ICPComponent, UIContentLoading } from "@/components/ui/UIComponent";
+import { FlowSelect, ICPComponent, UIContentLoading, UITooltipQuestion } from "@/components/ui/UIComponent";
 import Constant from "@/common/Constant";
 import ArrayUtils from "@/utils/ArrayUtils";
 
 import Http from "@/config/Http";
 import { useSite } from "@/context/SiteContext";
-import { ageEnums, genderEnums, faceEnums, ageEnumsOptions, genderEnumsOptions } from "../floorAnalyse/const";
+import { ageEnums, genderEnums, timeSelectMap, timeGranuleSpanLimits } from "@/data/const";
 
 /**顾客洞察 */
 function RegionAnalyse() {
@@ -41,6 +41,46 @@ function RegionAnalyse() {
   const [genderTimeGranule, setGenderTimeGranule] = useState("hour"); // 性别时间粒度，默认为小时
   const [ageTimeGranule, setAgeTimeGranule] = useState("hour"); // 年龄时间粒度，默认为小时
   const [limit, setLimit] = useState(null); // 限制
+  const [timeGranule, setTimeGranule] = useState("hour"); // 时间粒度，默认为小时
+  const [selectedRegions, setSelectedRegions] = useState([]); // 选中的区域
+  const [regionOptions, setRegionOptions] = useState([]); // 区域选项
+  const [statisticsPeriod, setStatisticsPeriod] = useState("fullDay"); // 统计时段：fullDay-全天查询, timeSlot-时段查询
+  const [startHour, setStartHour] = useState(null); // 时段查询开始时间
+  const [endHour, setEndHour] = useState(null); // 时段查询结束时间
+
+  // 开始时间选项（0-23点）
+  const startHourOptions = useMemo(() => {
+    return Array.from({ length: 24 }, (_, i) => ({
+      label: `${String(i).padStart(2, "0")}:00`,
+      value: i,
+    }));
+  }, []);
+
+  // 结束时间选项（1-24点），根据开始时间过滤
+  const endHourOptions = useMemo(() => {
+    if (startHour === null) {
+      return Array.from({ length: 24 }, (_, i) => ({
+        label: `${String(i + 1).padStart(2, "0")}:00`,
+        value: i + 1,
+      }));
+    }
+    return Array.from({ length: 24 - startHour }, (_, i) => ({
+      label: `${String(startHour + i + 1).padStart(2, "0")}:00`,
+      value: startHour + i + 1,
+    }));
+  }, [startHour]);
+
+  // 处理开始时间变化
+  const handleStartHourChange = useCallback(
+    (value) => {
+      setStartHour(value);
+      // 如果结束时间小于等于新的开始时间，清除结束时间
+      if (endHour !== null && endHour <= value) {
+        setEndHour(null);
+      }
+    },
+    [endHour]
+  );
 
   const [empty, setEmpty] = useState(true); // 空状态
   const [loading, setLoading] = useState(false); // 加载状态
@@ -79,6 +119,7 @@ function RegionAnalyse() {
 
   // 场地改变
   useEffect(() => {
+    setSelectedRegions([]); // 切换站点时清空已选区域
     const genderSelect = localStorage.getItem("customerInsight_genderSelect");
     if (genderSelect) {
       setGenderSelect(genderSelect.split(",").map((item) => Number(item)));
@@ -92,9 +133,81 @@ function RegionAnalyse() {
     }
   }, [siteId]);
 
-  const handleTimeChange = useCallback((value) => {
-    setTimeRange(value);
-  }, []);
+  // 加载区域列表
+  useEffect(() => {
+    if (!siteId) return;
+    Http.getSiteAreas(
+      { siteId, state: 0, page: 1, limit: 1000 },
+      (res) => {
+        if (res.result === 1) {
+          const list = Array.isArray(res.data) ? res.data : res.data?.data ?? [];
+          const options = list.map((item) => ({
+            value: item.areaId,
+            label: item.name,
+          }));
+          setRegionOptions(options);
+        }
+      },
+      null,
+      () => {
+        console.error("获取区域列表失败");
+      }
+    );
+  }, [siteId]);
+
+  // timeGranule 变化时校验 timeRange
+  useEffect(() => {
+    if (!timeRange || !timeRange[0] || !timeRange[1]) return;
+
+    const spanLimit = timeGranuleSpanLimits[timeGranule];
+    if (spanLimit !== null && spanLimit !== undefined) {
+      const spanDays = timeRange[1].diff(timeRange[0], "day");
+      if (spanDays > spanLimit) {
+        const truncatedEndDate = timeRange[0].add(spanLimit, "day");
+        const truncatedDates = [timeRange[0], truncatedEndDate];
+        const granuleLabelMap = { hour: "小时", day: "天", week: "周", month: "月" };
+        message.warning({
+          content: `按${granuleLabelMap[timeGranule]}查看，时间范围一次最多展示${spanLimit}天`,
+        });
+        setTimeRange(truncatedDates);
+        TimeGranulePickerRef.current?.setTimeRange(truncatedDates);
+      }
+    }
+  }, [timeGranule]);
+
+  const handleTimeChange = useCallback(
+    (value) => {
+      if (!value || !value[0] || !value[1]) {
+        setTimeRange(value);
+        return;
+      }
+
+      const spanLimit = timeGranuleSpanLimits[timeGranule];
+      // 如果该粒度没有限制，直接返回
+      if (spanLimit !== null && spanLimit !== undefined) {
+        const spanDays = value[1].diff(value[0], "day");
+
+        // 如果跨度超过限制，需要截断
+        if (spanDays > spanLimit) {
+          const truncatedEndDate = value[0].add(spanLimit, "day");
+          const truncatedDates = [value[0], truncatedEndDate];
+
+          // 显示警告消息
+          const granuleLabelMap = { hour: "小时", day: "天", week: "周", month: "月" };
+          message.warning({
+            content: `按${granuleLabelMap[timeGranule]}查看，时间范围一次最多展示${spanLimit}天`,
+          });
+
+          setTimeRange(truncatedDates);
+          TimeGranulePickerRef.current?.setTimeRange(truncatedDates);
+          return;
+        }
+      }
+
+      setTimeRange(value);
+    },
+    [timeGranule]
+  );
 
   // 查询
   const searchFun = async () => {
@@ -150,13 +263,6 @@ function RegionAnalyse() {
       setGenderTimeGranule(value);
     },
     [genderTimeGranule]
-  );
-
-  const handleAgeTimeGranuleChange = useCallback(
-    (value) => {
-      setAgeTimeGranule(value);
-    },
-    [ageTimeGranule]
   );
 
   // dayjs范围转时间戳
@@ -243,7 +349,6 @@ function RegionAnalyse() {
     var yAxis1 = new Array();
     var yAxis2 = new Array();
     const ageKeys = Object.keys(ageEnumsSelect);
-    console.log(xAxisTime, 246);
 
     // 根据x轴长度生成对应的y轴数据
     for (let i = 0; i < xAxis.length; i++) {
@@ -618,74 +723,30 @@ function RegionAnalyse() {
     };
   }, [baseData, siteData, curBaseData, preBaseData, genderEnumsSelect, ageEnumsSelect]);
 
-  const setAgeFunction = (value) => {
-    if (value === "ALL") {
-      setAgeSelect(["ALL"]);
-      localStorage.removeItem("customerInsight_ageSelect");
-    } else {
-      setAgeSelect((prevArray) => {
-        let newSelect;
-        if (prevArray.includes(value)) {
-          newSelect = prevArray.filter((item) => item !== value);
-        } else {
-          newSelect = prevArray.filter((item) => item !== "ALL");
-          newSelect.push(value);
-        }
-
-        // // 获取所有非 "ALL" 的选项值
-        // const allAgeValues = ageEnumsOptions.filter((item) => item.value !== "ALL").map((item) => item.value);
-
-        // // 检查是否已经选完了所有其他选项
-        // const hasAllValues = allAgeValues.every((val) => newSelect.includes(val));
-
-        // // 如果选完了所有选项，自动切换到 "ALL"
-        // if (hasAllValues && newSelect.length === allAgeValues.length) {
-        //   return ["ALL"];
-        // }
-
-        if (newSelect.length === 0) {
-          return ["ALL"];
-        }
-
-        localStorage.setItem("customerInsight_ageSelect", newSelect.join(","));
-        return newSelect;
-      });
-    }
-  };
-
-  const setGenderFunction = (value) => {
-    if (value === "ALL") {
-      setGenderSelect(["ALL"]);
-      localStorage.removeItem("customerInsight_genderSelect");
-    } else {
-      setGenderSelect((prevArray) => {
-        let newSelect;
-        if (prevArray.includes(value)) {
-          newSelect = prevArray.filter((item) => item !== value);
-        } else {
-          newSelect = prevArray.filter((item) => item !== "ALL");
-          newSelect.push(value);
-        }
-        if (newSelect.length === 0) {
-          return ["ALL"];
-        }
-        localStorage.setItem("customerInsight_genderSelect", newSelect.join(","));
-        return newSelect;
-      });
-    }
-  };
-
   const showColor = useMemo(() => {
     return !genderSelect.includes("ALL") || !ageSelect.includes("ALL");
   }, [genderSelect, ageSelect]);
 
   return (
     <Suspense fallback={<Spin size="large" />}>
-      <div className="OffSenceAnalyse">
+      <div className="RegionAnalyse">
         <div className="ui-search-bar">
           <div className="timeContrast" style={{ paddingBottom: "8px" }}>
             <span className="title">时间选择：</span>
+            <Select
+              size="default"
+              value={timeGranule}
+              style={{ width: 100, marginRight: "10px" }}
+              options={timeSelectMap}
+              onChange={(v) => {
+                setTimeGranule(v);
+              }}
+            />
             <TimeGranulePicker ref={TimeGranulePickerRef} onTimeChange={handleTimeChange} />
+            <span className="title" style={{ marginLeft: "16px" }}>
+              区域选择：
+            </span>
+            <Select mode="multiple" allowClear style={{ minWidth: 200, marginLeft: 4 }} placeholder="请选择区域" value={selectedRegions} onChange={setSelectedRegions} options={regionOptions} />
             <div style={{ marginLeft: "16px", cursor: "pointer", userSelect: "none" }} onClick={() => setExpand(!expand)}>
               <span style={{ marginRight: "4px", color: showColor ? "#1890ff" : "#333" }}>{expand ? "收起" : "展开"}</span>
               {expand ? <UpOutlined style={{ color: showColor ? "#1890ff" : "#333", fontSize: "12px" }} /> : <DownOutlined style={{ color: showColor ? "#1890ff" : "#333", fontSize: "12px" }} />}
@@ -702,20 +763,44 @@ function RegionAnalyse() {
           </div>
           <div className={`ui-search-bar-expand ${expand ? "ui-search-bar-expand-open" : ""}`}>
             <div className="timeContrast" style={{ paddingBottom: "8px" }}>
-              <span className="title">性别筛选：</span>
-              {genderEnumsOptions.map((item) => (
-                <div className={`btn ${genderSelect.includes(item.value) ? "select_btn" : ""}`} key={item.value} onClick={() => setGenderFunction(item.value)}>
-                  {item.label}
-                </div>
-              ))}
-            </div>
-            <div className="timeContrast">
-              <span className="title">年龄筛选：</span>
-              {ageEnumsOptions.map((item) => (
-                <div className={`btn ${ageSelect.includes(item.value) ? "select_btn" : ""}`} key={item.value} onClick={() => setAgeFunction(item.value)}>
-                  {item.label}
-                </div>
-              ))}
+              <span className="title">
+                统计时段
+                <UITooltipQuestion
+                  marginLeft="2px"
+                  marginRight="2px"
+                  title="统计时段分为“全天查询”、“时段查询”；全天查询：统计起止时间内每日的完整数据；时段查询：仅统计起止时间内所选时间窗口的数据。"
+                />
+                ：
+              </span>
+              <Radio.Group
+                options={[
+                  { value: "fullDay", label: "全天查询" },
+                  { value: "timeSlot", label: "时段查询" },
+                ]}
+                onChange={(e) => {
+                  setStatisticsPeriod(e.target.value);
+                  // 切换到全天查询时清空时段选择
+                  if (e.target.value === "fullDay") {
+                    setStartHour(null);
+                    setEndHour(null);
+                  }
+                }}
+                value={statisticsPeriod}
+                optionType="button"
+                buttonStyle="solid"
+              />
+              {statisticsPeriod === "timeSlot" && (
+                <>
+                  <span className="title" style={{ marginLeft: "16px" }}>
+                    开始时间：
+                  </span>
+                  <Select value={startHour} onChange={handleStartHourChange} options={startHourOptions} style={{ width: 100, marginLeft: 4 }} placeholder="请选择" />
+                  <span className="title" style={{ marginLeft: "16px" }}>
+                    结束时间：
+                  </span>
+                  <Select value={endHour} onChange={setEndHour} options={endHourOptions} style={{ width: 100, marginLeft: 4 }} placeholder="请选择" disabled={startHour === null} />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -755,23 +840,8 @@ function RegionAnalyse() {
                     />
                   </div>
                 </div>
-                {/* 年龄统计 */}
-                <div className="dualRow">
-                  <div className="dualRowContent">
-                    <AgeStatisticsChart
-                      isSameDay={isSameDay}
-                      timeGranule={ageTimeGranule}
-                      timeRangeReal={timeRangeReal}
-                      onTimeGranuleChange={handleAgeTimeGranuleChange}
-                      ageStatisticsData={ageStatisticsData}
-                      ageEnumsSelect={ageEnumsSelect}
-                      genderEnumsSelect={genderEnumsSelect}
-                      limit={limit}
-                    />
-                  </div>
-                </div>
                 {/* 数据详情 */}
-                <TableDetail data={tableDetailData} timeRange={timeRangeReal} genderEnumsSelect={genderEnumsSelect} ageEnumsSelect={ageEnumsSelect} />
+                <TableDetail data={tableDetailData} timeRange={timeRangeReal} />
                 <ICPComponent />
               </>
             )}

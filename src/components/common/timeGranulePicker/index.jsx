@@ -57,14 +57,7 @@ const TimeGranulePickerComponent = forwardRef((props, ref) => {
   const TimeGranulePickerRef = useRef(null);
   const [timeRange, setTimeRange] = useState([dayjs(), dayjs()]);
 
-  // 组件初始化时通知父组件当前时间状态
-  // useEffect(() => {
-  //   if (onTimeChange) {
-  //     onTimeChange(timeRange); // 默认时间粒度为小时
-  //   }
-  // }, []);
-
-  // // 时间范围变化处理
+  // 时间范围变化处理
   const timeRageoOnChange = useCallback(
     (dates) => {
       setTimeRange(dates);
@@ -84,13 +77,16 @@ const TimeGranulePickerComponent = forwardRef((props, ref) => {
       getTimeRange: () => timeRange,
       setTimeRange: (dates) => {
         setTimeRange(dates);
+        if (onTimeChange) {
+          onTimeChange(dates);
+        }
       },
       // 重置为默认值
       reset: () => {
         setTimeRange([dayjs(), dayjs()]);
       },
     }),
-    [timeRange]
+    [timeRange, onTimeChange]
   );
 
   return (

@@ -26,6 +26,7 @@ import "../src/assets/styles/public.css";
 import "../src/assets/styles/ant.css";
 import Flow from "./pages/flow/Flow";
 import Console from "./pages/console/Console";
+import HotSpot from "./pages/hotSpot/HotSpot";
 import SiteManagement from "./pages/console/groupsetting/SiteManagement";
 import GroupManagement from "./pages/console/groupsetting/GroupManagement";
 import DeviceManagement from "./pages/console/device/DeviceManagement";
@@ -42,6 +43,7 @@ const FloorAnalyse = React.lazy(() => import("@/pages/flow/floorAnalyse"));
 const CustomerInsight = React.lazy(() => import("@/pages/flow/customerInsight/index.jsx"));
 const OffSenceAnalyse = React.lazy(() => import("@/pages/flow/offSenceAnalyse/index.jsx"));
 const VenueRanking = React.lazy(() => import("@/pages/flow/group/VenueRanking"));
+const RegionAnalyse = React.lazy(() => import("@/pages/hotSpot/regionAnalyse/index.jsx"));
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -133,6 +135,12 @@ function App() {
               <Route path="DistrictManagement" element={<DistrictManagement />} />
               <Route path="accountManagement" element={<AccountManagement />} />
               <Route path="roleManagement" element={<RoleManagement />} />
+            </Route>
+          )}
+          {userId && User.checkRolePermission(Constant.ROLE_POWER.CONSOLE) && (
+            <Route path="hotSpot" element={<HotSpot />}>
+              <Route index element={<Navigate to="regionAnalyse" />} />
+              <Route path="regionAnalyse" element={<RegionAnalyse />} />
             </Route>
           )}
         </Route>

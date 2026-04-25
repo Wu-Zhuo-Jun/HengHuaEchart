@@ -99,3 +99,18 @@ export const festivalNameMap = {
   hanjia: Language.HANJIA,
 };
 
+// 时间粒度跨度限制（单位：天）
+export const timeGranuleSpanLimits = {
+  hour: 14,
+  day: 366,
+  week: null, // 不设限
+  month: null, // 不设限
+};
+
+// 时间粒度选项映射
+export const timeSelectMap = [
+  { value: "hour", label: "按小时" },
+  { value: "day", label: "按天" },
+  { value: "week", label: "按周" },
+  { value: "month", label: "按月" },
+];

@@ -93,7 +93,7 @@ function OutletAnalyse() {
       setSelectedOutletIds([]);
       fetchOutletList(siteId);
     }
-  }, [siteId, fetchOutletList, currentSiteId]);
+  }, [siteId, currentSiteId]);
 
   const handleTimeChange = useCallback((value) => {
     useOutletStore.setState({ analyseTimeRange: value ? value?.map((item) => item.valueOf()) : [] });
@@ -631,12 +631,12 @@ function OutletAnalyse() {
             style={{ width: 300 }}
             options={outletList[analyseDoorType]?.children || []}
             onSelect={(v) => {
-              const { newSelectedIds, actualIds } = handleOutletChange(analyseDoorType, v, analyseDoorId, "select");
+              const { newSelectedIds, actualIds } = handleOutletChange(analyseDoorType, v, selectedOutletIds, "select");
               setSelectedOutletIds(newSelectedIds);
               useOutletStore.setState({ analyseDoorId: actualIds });
             }}
             onDeselect={(v) => {
-              const { newSelectedIds, actualIds } = handleOutletChange(analyseDoorType, v, analyseDoorId, "deselect");
+              const { newSelectedIds, actualIds } = handleOutletChange(analyseDoorType, v, selectedOutletIds, "deselect");
               setSelectedOutletIds(newSelectedIds);
               useOutletStore.setState({ analyseDoorId: actualIds });
             }}

@@ -44,12 +44,19 @@ export const leftMenus = () => {
     label: Language.LIULIANG,
     path: "flow",
   });
+
   if (User.checkRolePermission(Constant.ROLE_POWER.CONSOLE)) {
     menus.push({
       label: Language.GONGZUOTAI,
       path: "console",
     });
   }
+  // if (User.checkRolePermission(Constant.ROLE_POWER.HOTSPOT)) {
+  menus.push({
+    label: Language.HOTSPOT,
+    path: "hotspot",
+  });
+  // }
   return menus;
 };
 

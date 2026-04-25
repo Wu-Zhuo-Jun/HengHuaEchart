@@ -349,16 +349,21 @@ const fromOpHour = ({ sHour = 9, eHour = 21 }) => {
 // 规范化区域状态
 const buildRegionFormState = (area) => {
   if (!area) return null;
-  const opHours = JSON.parse(area.opHours);
+  let parsedOpHours;
+  try {
+    parsedOpHours = typeof area.opHours === 'string' ? JSON.parse(area.opHours) : area.opHours;
+  } catch (e) {
+    parsedOpHours = null;
+  }
   let operationMode = "daily";
   let dailyTimeRange = DEFAULT_DAILY_RANGE;
   let weeklyTimeRanges = Array.from({ length: 7 }).map(() => DEFAULT_DAILY_RANGE);
-  if (opHours) {
-    operationMode = opHours.type == 2 ? "weekly" : "daily";
-    if (opHours.type == 1 && opHours.hours?.[0]) {
-      dailyTimeRange = fromOpHour(opHours.hours[0]);
-    } else if (opHours.type == 2 && Array.isArray(opHours.hours)) {
-      weeklyTimeRanges = opHours.hours.slice(0, 7).map((h) => fromOpHour(h));
+  if (parsedOpHours) {
+    operationMode = parsedOpHours.type == 2 ? "weekly" : "daily";
+    if (parsedOpHours.type == 1 && parsedOpHours.hours?.[0]) {
+      dailyTimeRange = fromOpHour(parsedOpHours.hours[0]);
+    } else if (parsedOpHours.type == 2 && Array.isArray(parsedOpHours.hours)) {
+      weeklyTimeRanges = parsedOpHours.hours.slice(0, 7).map((h) => fromOpHour(h));
     }
   }
 
@@ -377,10 +382,6 @@ const buildRegionFormState = (area) => {
 export const EditAreasDrawer = ({ title, onClose, open, areaData, loading, onEditAreas, ...props }) => {
   const [requesting, setRequesting] = useState(false);
   const [region, setRegion] = useState(null);
-
-  useEffect(() => {
-    console.log("381", region);
-  }, [region]);
 
   useEffect(() => {
     if (open && areaData && !loading) {

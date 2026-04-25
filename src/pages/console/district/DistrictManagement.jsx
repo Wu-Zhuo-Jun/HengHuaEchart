@@ -264,7 +264,6 @@ const DistrictManagement = () => {
     Http.getDoorSiteList(params, (res) => {
       if (res.result == 1) {
         let siteList = formatSiteList(res.data.sites, res.data.floors);
-        console.log("siteList", siteList);
         setSiteList(siteList);
       }
     });

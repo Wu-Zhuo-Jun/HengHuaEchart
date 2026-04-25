@@ -40,7 +40,7 @@ const Region = ({ site, onClickOperate, updateTime, onOpenPlanGraph }) => {
   const [openEditAreasDrawer, setOpenEditAreasDrawer] = useState(false);
   const [editAreasData, setEditAreasData] = useState(null);
   const [editAreasLoading, setEditAreasLoading] = useState(false);
-  const [doorAssocDrawerOpen, setDoorAssocDrawerOpen] = useState(false);
+  const [doorAssocDrawerOpen, setDoorAssocDrawerOpen] = useState(false); // 出入口关联drawer
   const [doorAssocDrawerArea, setDoorAssocDrawerArea] = useState(null);
   const [pager, setPager] = useState({ current: 1, pageSize: Constant.PAGE_SIZES[0], total: 0 });
   const [queryData, setQueryData] = useState({ state: defaultPlanGraphicState, search: null });
@@ -353,7 +353,7 @@ const Region = ({ site, onClickOperate, updateTime, onOpenPlanGraph }) => {
                     出入口关联
                   </div>
 
-                  <div
+                  {/* <div
                     className="font-style-1-16"
                     style={{
                       color: "#0052d9",
@@ -361,7 +361,7 @@ const Region = ({ site, onClickOperate, updateTime, onOpenPlanGraph }) => {
                     }}
                     onClick={() => onOpenPlanGraph?.(record)}>
                     平面图映射
-                  </div>
+                  </div> */}
 
                   <Popover
                     trigger="click"
@@ -422,13 +422,7 @@ const Region = ({ site, onClickOperate, updateTime, onOpenPlanGraph }) => {
       </div>
       <DeviceDrawer title={Language.SHEBEILIEBIAO} open={deviceDrawerOpen} door={deviceDrawerData} onClose={onCloseDeviceDrawer} />
       <EditAreasDrawer onClose={onCloseEditAreasDrawer} title="编辑区域" open={openEditAreasDrawer} areaData={editAreasData} loading={editAreasLoading} />
-      <DoorAssociationDrawer
-        open={doorAssocDrawerOpen}
-        siteId={site?.siteId}
-        areaId={doorAssocDrawerArea?.areaId}
-        areaName={doorAssocDrawerArea?.name}
-        onClose={onCloseDoorAssocDrawer}
-      />
+      <DoorAssociationDrawer open={doorAssocDrawerOpen} siteId={site?.siteId} areaId={doorAssocDrawerArea?.areaId} areaName={doorAssocDrawerArea?.name} onClose={onCloseDoorAssocDrawer} />
     </Flex>
   );
 };

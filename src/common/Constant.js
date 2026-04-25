@@ -59,6 +59,7 @@ const Constant = {
   },
   ROLE_POWER: {
     CONSOLE: 3,
+    HOTSPOT: 4,
   },
 };
 

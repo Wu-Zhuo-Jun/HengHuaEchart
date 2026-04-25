@@ -69,7 +69,7 @@ request{
 		{
 			name:'name' //区域名称
 			sType:1, //汇总类型 1.热区实时汇总 2.出入口实时汇总
-			opHours:[ //运营时间
+			opHours:{ //运营时间
 				{
 					type:1,//运营时间类型 1.每日固定时间 2.一周不同时间
 					hours:[ //当type=1的时候hours长度只能为1，type=2的时候长度只能为7并且按星期一到星期日排序
@@ -79,7 +79,7 @@ request{
 						}
 					]
 				}
-			]
+			}
 		}
 	]
 }
@@ -138,6 +138,18 @@ response{
 		}
 }
 
+areamanagement/deleteArea 删除区域
+request{
+	siteId:场地id,
+	areaId:区域id,
+}
+
+response{
+	result:错误码 (-11407=区域不存在),
+	msg:错误信息，
+}
+
+
 areamanagement/getAreaDoors 获取指定区域的出入口列表
 request{
 	type:类型, -1=可关联出入口 0=已关联出入口 1=已关联入区计数口 2=已关联外部计数口 
@@ -156,7 +168,6 @@ response{
 	msg:错误信息，
 	data:[
 		{
-			doorId:null
 			doorName:"name", //出入口名称
 			state:-1//映射状态 -1=未映射 1=已映射
 			devices:[ //绑定的设备
@@ -187,14 +198,14 @@ request{
 	type:类型,1=入区计数口 2=外部计数口 
 	siteId:场地id,
 	areaId:区域id,
-	doorIds:出入口id(多个出入口是逗号分隔)
+	doorIds:出入口id(多个出入口是逗号分隔),
 }
 
 response 
 {
 	result:错误码(-10613=出入口不存在,-11407=区域不存在,-11409=关联类型错误 -11410=重复关联区域),
 	msg:错误信息，
-} 
+}
 
 
 areamanagement/removeAssocDoor 出入口解除关联区域
@@ -210,22 +221,36 @@ response
 	msg:错误信息，
 }
 
-
-groupmanagement/getGroupSelection 获取集团选项
+areamanagement/getAreaMapping
 request{
-
+	siteId:场地id,
+	areaId:区域id,
 }
-response{
+
+response 
+{
 	result:错误码,
 	msg:错误信息，
-	data:[
-		{
-			groupId:"1", //集团id
-			parentId:"1", //父节点groupId =0时为没有父节点
-			groupName:"name", //集团名称
-			groupLevel:1, //节点层级 1为最顶级节点
-		}
-	]
+	data:{
+	  imgUrl:"abc" //映射图链接
+	  mapping:[{ points: [{ x: 0.6239259294075435, y: 0.26118340569297943 }], title: "映射2" ,type: 1,id: 1},
+	 { points: [{ x: 0.6239259294075435, y: 0.26118340569297943 }], title: "映射2" ,type: 2,id: 1}]
+	}
+}
+
+areamanagement/setAreaMapping
+request{
+	siteId:场地id,
+	areaId:区域id,
+	img:映射图片文件(可缺省)
+	data:[{ points: [{ x: 0.6239259294075435, y: 0.26118340569297943 }], title: "映射2" ,type: 1,id: 1},
+	{ points: [{ x: 0.6239259294075435, y: 0.26118340569297943 }], title: "映射2" ,type: 2,id: 1}] //(json编码后的字符串)当type=1时id为热区id 当type=2时id为出入口id,如果指定id有映射配置，当前操作没有该id的映射配置时则为删除操作
+}
+
+response 
+{
+	result:错误码,
+	msg:错误信息，
 }
 
 

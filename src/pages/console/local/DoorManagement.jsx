@@ -13,6 +13,7 @@ import Http from "../../../config/Http";
 import ArrayUtils from "../../../utils/ArrayUtils";
 import Message from "../../../components/common/Message";
 import TimeUtils from "../../../utils/TimeUtils";
+import useOutletStore from "@/stores/useOutletStore";
 
 const DoorManagementModel = {
   queryModel: {
@@ -55,9 +56,13 @@ const DoorManagement = () => {
     });
   };
 
+  const refreshOutletList = useOutletStore((state) => state.refreshOutletList);
+
   const onCloseAddDoorPage = (type, siteId) => {
     if (type == "success") {
       setUpdateTime(TimeUtils.now());
+      // 刷新出入口列表缓存
+      refreshOutletList();
     }
     setCreateDoorSite(null);
   };
@@ -258,7 +263,6 @@ const DoorManagement = () => {
     Http.getDoorSiteList(params, (res) => {
       if (res.result == 1) {
         let siteList = formatSiteList(res.data.sites, res.data.floors);
-        console.log("siteList", siteList);
         setSiteList(siteList);
       }
     });

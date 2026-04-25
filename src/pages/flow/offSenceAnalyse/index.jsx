@@ -31,21 +31,20 @@ export default function OffSenceAnalyse() {
 
   const [isSameDay, setIsSameDay] = useState(false);
   const [isCurrentDay, setIsCurrentDay] = useState(false);
-  // const [tableDetailData, setTableDetailData] = useState(null);
 
   const [timeRange, setTimeRange] = useState([dayjs(), dayjs()]); // 时间范围，默认为今天
+  const timeRangeRef = useRef(timeRange);
 
   const [timeGranule, setTimeGranule] = useState("hour"); // 客流趋势时间粒度，默认为小时
   const [offSenceTimeGranule, setOffSenceTimeGranule] = useState("hour"); // 出入口分析时间粒度，默认为小时
-  // const [visitingPeakType, setVisitingPeakType] = useState("osVisit"); // 峰值分析类型
   const [limit, setLimit] = useState(null); // 限制
   const [doorAnalysisOrder, setDoorAnalysisOrder] = useState("upOrder"); // 出入口分析排序方式
   const [doorAnalysisFlowType, setDoorAnalysisFlowType] = useState("passNum"); // 出入口分析流量类型
 
   const [doorList, setDoorList] = useState([]); // 总客流出入口列表
   const [osDoorList, setOsDoorList] = useState([]); // 场外客流出入口列表
-  const [baseType, setBaseType] = useState("ALL"); // 类型 os ALL
-  const [tempBaseType, setTempBaseType] = useState("ALL"); // 临时
+  const [baseType, setBaseType] = useState(null); // 类型 os ALL
+  // const [tempBaseType, setTempBaseType] = useState("ALL"); // 临时
 
   const [doorAnalysisBaseData, setDoorAnalysisBaseData] = useState(null); // 出入口分析基础数据
 
@@ -59,27 +58,29 @@ export default function OffSenceAnalyse() {
   useEffect(() => {
     const OVER_STORE_FLOW_PERMISSION = User.checkMasterPermission(Constant.MASTER_POWER.OVER_STORE_COUNT);
     const OUTSIDE_FLOW_PERMISSION = User.checkMasterPermission(Constant.MASTER_POWER.OUTSIDE_COUNT);
-
+    console.log(OVER_STORE_FLOW_PERMISSION, OUTSIDE_FLOW_PERMISSION, 61);
     setHasPermission({ OVER_STORE_FLOW: OVER_STORE_FLOW_PERMISSION, OUTSIDE_FLOW: OUTSIDE_FLOW_PERMISSION });
-    if (OVER_STORE_FLOW_PERMISSION && OUTSIDE_FLOW_PERMISSION) {
+    if (OVER_STORE_FLOW_PERMISSION) {
       setBaseType("ALL");
-
       return;
     }
+
     if (OUTSIDE_FLOW_PERMISSION) {
       setBaseType("OS");
-
       return;
     }
-
-    setBaseType(null);
   }, []);
 
   // 场地改变后获取场外分析数据
   useEffect(() => {
     if (siteId) {
       getOffSenceAnalysisDoorList();
+      getOffSenceAnalysisTotalDoorList();
       searchFun();
+
+      // if ( && siteId) {
+      //   searchFun();
+      // }
     }
   }, [siteId]);
 
@@ -98,11 +99,6 @@ export default function OffSenceAnalyse() {
     }
     return [];
   }, [hasPermission]);
-
-  // 同步baseType
-  useEffect(() => {
-    setTempBaseType(baseType);
-  }, [baseType]);
 
   // 当baseType改变时，更新doorAnalysisFlowType
   useEffect(() => {
@@ -123,49 +119,77 @@ export default function OffSenceAnalyse() {
     };
   }, []);
 
+  // 首次进入时，确保 baseType 确定且列表数据就绪后才请求热力图
+  const initDoorAnalysisFetchedRef = useRef(false);
+  useEffect(() => {
+    initDoorAnalysisFetchedRef.current = false;
+  }, [siteId]);
+
+  // baseType 首次确定后，自动请求热力图数据（不动现有逻辑）
+  useEffect(() => {
+    if (!baseType || initDoorAnalysisFetchedRef.current) return;
+    if (baseType === "ALL" && hasPermission.OVER_STORE_FLOW && doorList.length > 0) {
+      initDoorAnalysisFetchedRef.current = true;
+      getOffSenceDoorAnalysisFlowFunction(doorList.map((item) => item.value));
+    } else if (baseType === "OS" && hasPermission.OUTSIDE_FLOW && osDoorList.length > 0) {
+      initDoorAnalysisFetchedRef.current = true;
+      getOffSenceDoorAnalysisFlowFunction(osDoorList.map((item) => item.value));
+    }
+  }, [baseType, hasPermission, doorList.length, osDoorList.length]);
+
   const handleTimeChange = useCallback((value) => {
+    timeRangeRef.current = value;
     setTimeRange(value);
   }, []);
 
-  // 获取出入口分析门口列表
-  const getOffSenceAnalysisDoorList = () => {
-    Http.getOffSenceAnalysisDoorList({ siteId: siteId }, (res) => {
+  // 获取出入口分析总客流门口列表
+  const getOffSenceAnalysisTotalDoorList = () => {
+    Http.getCompareDoorListData({ siteId: siteId }, (res) => {
       if (res.result === 1) {
         const arr = res.data.reduce((acc, item) => {
           if (item.isAllType === 1) acc.push({ label: item.doorName, value: item.doorId });
           return acc;
         }, []);
-        const osArr = res.data.reduce((acc, item) => {
-          if (item.isOutType === 1) acc.push({ label: item.doorName, value: item.doorId });
-          return acc;
-        }, []);
-        // setLoading(true);
         setDoorList(arr);
-        setOsDoorList(osArr);
-        if (baseType === "ALL" && arr.length > 0) {
-          const doorIds = arr.map((item) => item.value);
-          console.log(doorIds, 147);
-          getOffSenceDoorAnalysisFlow(doorIds);
-        } else if (baseType === "OS" && osArr.length > 0) {
-          const doorIds = osArr.map((item) => item.value);
-          getOffSenceDoorAnalysisFlow(doorIds);
-        }
-        // setLoading(false);
       } else {
         message.warning({ content: res.msg });
       }
     });
   };
 
-  // 获取出入口分析数据
-  const getOffSenceDoorAnalysisFlow = (doorIdsParam) => {
+  // 获取出入口分析过店门口列表
+  const getOffSenceAnalysisDoorList = () => {
+    Http.getOffSenceAnalysisDoorList({ siteId: siteId }, (res) => {
+      if (res.result === 1) {
+        const osArr = res.data.reduce((acc, item) => {
+          acc.push({ label: item.doorName, value: item.doorId });
+          return acc;
+        }, []);
+        setOsDoorList(osArr);
+      } else {
+        message.warning({ content: res.msg });
+      }
+    });
+  };
+
+  // useEffect(() => {
+  //   if (baseType === "ALL" && doorList.length > 0 && hasPermission.OVER_STORE_FLOW) {
+  //     getOffSenceDoorAnalysisFlowFunction(doorList.map((item) => item.value));
+  //   } else if (baseType === "OS" && osDoorList.length > 0 && hasPermission.OUTSIDE_FLOW) {
+  //     getOffSenceDoorAnalysisFlowFunction(osDoorList.map((item) => item.value));
+  //   } else {
+  //     setDoorAnalysisBaseData(null);
+  //   }
+  // }, [baseType, doorList, osDoorList]);
+
+  // 获取出入口分析数据(热力图)
+  const getOffSenceDoorAnalysisFlowFunction = (doorIdsParam) => {
     if (!siteId || !timeRange || !timeRange[0] || !timeRange[1]) {
       return;
     }
 
     // 如果未显式传入，则使用当前类型下的全部出入口
     const doorIds = doorIdsParam && Array.isArray(doorIdsParam) && doorIdsParam.length > 0 ? doorIdsParam : (baseType === "ALL" ? doorList : osDoorList).map((item) => item.value);
-    console.log(doorIds, 169);
     if (!Array.isArray(doorIds) || doorIds.length === 0) {
       setDoorAnalysisBaseData(null);
       return;
@@ -181,7 +205,9 @@ export default function OffSenceAnalyse() {
 
     Http.getOffSenceDoorAnalysisFlow(params, (res) => {
       try {
-        if (res.result === 1) {
+        console.log(184);
+        if (res.result == 1) {
+          console.log(res.data, 185);
           setDoorAnalysisBaseData(res.data);
         } else {
           message.warning({ content: res.msg });
@@ -253,7 +279,7 @@ export default function OffSenceAnalyse() {
             setEmpty(false);
             // 查询主数据成功后，如果有选中的出入口，则获取出入口分析数据
 
-            // getOffSenceDoorAnalysisFlow();
+            // getOffSenceDoorAnalysisFlowFunction();
           } else {
             message.warning({ content: Response.msg });
           }
@@ -471,7 +497,6 @@ export default function OffSenceAnalyse() {
     if (!Array.isArray(doorAnalysisBaseData)) {
       return { xAxis: [], yAxis: [], series: [], xAxisTooltips: [], isPercent: false };
     }
-
     // 根据baseType选择出入口列表
     const outletList = baseType === "ALL" ? doorList : osDoorList;
     const doorIds = outletList.map((item) => item.value);
@@ -480,7 +505,10 @@ export default function OffSenceAnalyse() {
       return { xAxis: [], yAxis: [], series: [], xAxisTooltips: [], isPercent: false };
     }
 
-    if (!timeRange || !timeRange[0] || !timeRange[1]) {
+    const timeRangeCurrent = timeRangeRef.current;
+    console.log(timeRangeCurrent, "timeRangeCurrent");
+
+    if (!timeRangeCurrent || !timeRangeCurrent[0] || !timeRangeCurrent[1]) {
       return { xAxis: [], yAxis: [], series: [], xAxisTooltips: [], isPercent: false };
     }
 
@@ -506,7 +534,7 @@ export default function OffSenceAnalyse() {
     let yAxis = [];
 
     try {
-      const { xAxis, xAxisTime, xAxisTooltips } = CommonUtils.generateXAxisFromTimeRangeForHeatMap(timeRange, _timeGranule);
+      const { xAxis, xAxisTime, xAxisTooltips } = CommonUtils.generateXAxisFromTimeRangeForHeatMap(timeRangeCurrent, _timeGranule);
 
       let doorMap = {};
       doorIds?.forEach((item) => {
@@ -705,20 +733,13 @@ export default function OffSenceAnalyse() {
             <span className="title">时间选择：</span>
             <TimeGranulePicker ref={TimeGranulePickerRef} onTimeChange={handleTimeChange} />
             <div style={{ marginLeft: "16px" }}>分析类型：</div>
-            <Select
-              value={tempBaseType}
-              style={{ paddingLeft: "0px", width: 179 }}
-              options={DoorTypeMap}
-              defaultValue={tempBaseType}
-              placeholder="请选择"
-              onChange={(value) => setTempBaseType(value)}
-            />
+            <Select value={baseType} style={{ paddingLeft: "0px", width: 179 }} options={DoorTypeMap} placeholder="请选择" onChange={(value) => setBaseType(value)} />
             <Button
               style={{ marginLeft: "16px" }}
               type="primary"
               size="default"
               onClick={() => {
-                setBaseType(tempBaseType);
+                // setBaseType(tempBaseType);
                 const OVER_STORE_FLOW_PERMISSION = User.checkMasterPermission(Constant.MASTER_POWER.OVER_STORE_COUNT);
                 const OUTSIDE_FLOW_PERMISSION = User.checkMasterPermission(Constant.MASTER_POWER.OUTSIDE_COUNT);
                 if (!OVER_STORE_FLOW_PERMISSION && !OUTSIDE_FLOW_PERMISSION) {
@@ -726,6 +747,7 @@ export default function OffSenceAnalyse() {
                   return;
                 }
                 searchFun();
+                getOffSenceDoorAnalysisFlowFunction();
               }}>
               查询
             </Button>

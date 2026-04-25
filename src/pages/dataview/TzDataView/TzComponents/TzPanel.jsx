@@ -516,7 +516,7 @@ export const GroupStatisticsPanel = React.memo(({ data, deduplication, isLoading
       <div style={{ flex: 4.4, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column", fontSize: "0.9rem" }}>
         {/* 表头 */}
         <div style={{ display: "flex", flexDirection: "row", flexShrink: 0 }}>
-          <div style={{ flex: "0 0 2.2rem", textAlign: "left", padding: "0.08rem" }}>{Language.PAIMING}</div>
+          <div style={{ flex: "0 0 2.2rem", textAlign: "left", padding: "0.08rem" }}>序号</div>
           <div style={{ flex: 2.8, textAlign: "center", padding: "0.08rem" }}>服务中心</div>
           <div style={{ flex: 1, textAlign: "center", padding: "0.08rem" }}>服务人次</div>
           {deduplication === 1 ? <div style={{ flex: 1, textAlign: "center", padding: "0.08rem" }}>服务人数</div> : null}

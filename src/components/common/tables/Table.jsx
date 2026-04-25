@@ -163,7 +163,7 @@ export const FestivalTable = ({ data }) => {
   );
 };
 
-export const GroupSiteRankingTable = ({ columns, dataSource }) => {
+export const GroupSiteRankingTable = React.memo(({ columns, dataSource }) => {
   const columnsList = [];
   if (columns) {
     columns.map((item, index) => {
@@ -204,8 +204,10 @@ export const GroupSiteRankingTable = ({ columns, dataSource }) => {
       />
     );
   };
-  return <UITable className="table-group-site-ranking" columns={columnsList} dataSource={dataSource ? dataSource : []} pagination={false} scroll={{ x: "max-content", y: "auto" }} />;
-};
+  return (
+    <UITable className="table-group-site-ranking" columns={columnsList} dataSource={dataSource ? dataSource : []} pagination={false} scroll={{ x: "max-content", y: "auto" }} />
+  ) 
+});
 
 export const FlowDetailTable = ({ data }) => {
   return <UITable className="table-group-site-ranking" columns={data ? data.columns : []} tableLayout="auto" dataSource={data ? data.list : []}></UITable>;

@@ -31,10 +31,11 @@ const useOutletStore = create(
       /**
        * 根据场地ID获取出入口列表
        * @param {string|number} siteId - 场地ID
+       * @param {boolean} forceRefresh - 是否强制刷新（忽略缓存）
        */
-      fetchOutletList: async (siteId) => {
-        // 如果场地ID与当前相同且已有数据，则不重复请求
-        if (get().currentSiteId === siteId && get().outletList.ALL.children.length > 0) {
+      fetchOutletList: async (siteId, forceRefresh = false) => {
+        // 如果场地ID与当前相同、已有数据、且非强制刷新，则不重复请求
+        if (!forceRefresh && get().currentSiteId === siteId && get().outletList.ALL.children.length > 0) {
           return;
         }
 
@@ -151,6 +152,23 @@ const useOutletStore = create(
           state.error = null;
           state.currentSiteId = null;
         });
+      },
+
+      /**
+       * 强制刷新出入口列表
+       * 清除缓存后重新请求接口获取最新数据
+       */
+      refreshOutletList: () => {
+        const siteId = get().currentSiteId;
+        if (siteId) {
+          set((state) => {
+            // 重置列表为空（保留全选选项）
+            Object.keys(state.outletList).forEach((key) => {
+              state.outletList[key].children = [{ label: "全选", value: "ALL", key: "ALL", disabled: false }];
+            });
+          });
+          get().fetchOutletList(siteId, true);
+        }
       },
 
       /**

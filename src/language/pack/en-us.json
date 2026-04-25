@@ -423,7 +423,15 @@
   "QINGSHURUJUESESHUOMING": "Enter Role Description",
 
   "CHANGDIGUANLI_TIP": "View and configure the venues associated with the account",
-  "JITUANGUANLI_TIP": "View and configure the affiliated group of the venue",
+  "HOTSPOT": "Hotspot",
+  "QUYUFENXI": "Area Analysis",
+  "QUYUMINGCHENG": "District Name",
+  "QUYURENCI": "District Visits",
+  "QUYURENSHU": "District People",
+  "QUYUPICI": "District Batches",
+  "DAOFANGLV": "Visit Rate",
+
+  "CHANGDIGUANLI_TIP": "View and configure the venues associated with the account",
   "SHEBEIGUANLI_TIP": "Manage the association and operation status of devices",
   "WEIZHIGUANLI_TIP": "Manage the related configuration of the entrances and exits in the venue",
   "SHANCHUQUNZU_TIP": "This operation will affect related data, continue?",

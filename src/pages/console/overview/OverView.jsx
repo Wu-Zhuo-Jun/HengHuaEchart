@@ -188,8 +188,6 @@ const OverView = () => {
   const getSiteInfo = () => {
     Http.getConsoleInfo(siteId, (res) => {
       if (res.result == 1) {
-        console.log("getSiteInfo", res.data);
-
         setSiteInfo({
           ...siteInfo,
           siteName: res.data.siteName,

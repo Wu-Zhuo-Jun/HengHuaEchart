@@ -62,6 +62,7 @@ const TimeComparisonPage = React.memo((props) => {
   useEffect(() => {
     if (siteId) {
       setAppiontSite(null);
+      setSelectedOutletIds([]);
       fetchOutletList(siteId);
     }
   }, [siteId, fetchOutletList]);
@@ -669,6 +670,7 @@ const TimeComparisonPage = React.memo((props) => {
             options={outletTypeList}
             onChange={(v) => {
               setOutletType(v);
+              setSelectedOutletIds([]);
               setAppiontSite([]);
             }}
           />

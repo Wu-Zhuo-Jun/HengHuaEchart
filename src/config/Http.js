@@ -56,6 +56,8 @@ export class Cmd {
   static CMD_GET_AREA_DOORS = Config.API_URL + "/areamanagement/getAreaDoors";
   static CMD_ADD_ASSOC_DOOR = Config.API_URL + "/areamanagement/addAssocDoor";
   static CMD_REMOVE_ASSOC_DOOR = Config.API_URL + "/areamanagement/removeAssocDoor";
+  static CMD_SET_AREA_MAPPING = Config.API_URL + "/areamanagement/setAreaMapping";
+  static CMD_GET_AREA_MAPPING = Config.API_URL + "/areamanagement/getAreaMapping";
 
   static CMD_GET_HOME_STAT = Config.API_URL + "/home/getHomeStat";
   static CMD_GET_HOME_DATA = Config.API_URL + "/home/getHomeData";
@@ -68,7 +70,7 @@ export class Cmd {
   static CMD_GET_FLOOR_LIST = Config.API_URL + "/flooranalysis/getFloors";
   static CMD_GET_FLOOR_DATA = Config.API_URL + "/flooranalysis/getFloorAnalysisStats";
   static CMD_GET_CUSTOMER_INSIGHT_DATA = Config.API_URL + "/customeranalysis/getCustomerAnalysis";
-  static CMD_GET_OFFSENCE_ANALYSIS_DOOR_LIST = Config.API_URL + "/doorcompare/getCompareDoorList";
+  static CMD_GET_OFFSENCE_ANALYSIS_DOOR_LIST = Config.API_URL + "/outsideanalysis/getOutsideDoorList";
   static CMD_GET_OFFSENCE_ANALYSIS_STATS = Config.API_URL + "/outsideanalysis/getOutsideAnalysis";
   static CMD_GET_OFFSENCE_DOOR_ANALYSIS_FLOW = Config.API_URL + "/outsideanalysis/getOutSideDoorAnalysisFlow";
 
@@ -96,6 +98,9 @@ export class Cmd {
   static CMD_GET_SITE_RANKING = Config.API_URL + "/siteAnalysis/getRanking";
   static CMD_GET_FLOW_TOTAL = Config.API_URL + "/siteAnalysis/getFlowTotal";
   static CMD_GET_FESTIVAL_TOTAL = Config.API_URL + "/siteAnalysis/getFestivalTotal";
+
+  static CMD_GET_GROUPANALYSIS = Config.API_URL + "/groupanalysis/getGroupAnalysis";
+  static CMD_GET_GROUPANALYSIS_COMPARE = Config.API_URL + "/groupanalysis/getGroupCompareTrend";
 }
 
 class Http {
@@ -132,6 +137,35 @@ class Http {
     data.key = User.key;
     data.userId = User.userId;
     Http.postForm(cmd, data, success, token, error);
+  }
+
+  /**
+   * 上传 FormData（含文件），自动注入 key / userId
+   */
+  static postFile(cmd, formData, success, token = null, error = null) {
+    let config = {
+      timeout: 60000,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+    if (token) {
+      config.cancelToken = token;
+    }
+    formData.append("key", User.key);
+    formData.append("userId", User.userId);
+    axios
+      .create(config)
+      .post(cmd, formData)
+      .then((res) => {
+        if (success) {
+          res.data.result = Number(res.data.result);
+          success(res.data);
+        }
+      })
+      .catch((err) => {
+        error?.call(null, err);
+      });
   }
 
   static login(data, success, error) {
@@ -477,6 +511,16 @@ class Http {
     Http.post(Cmd.CMD_REMOVE_ASSOC_DOOR, params, success, token, error);
   }
 
+  /** 获取区域映射列表 */
+  static getAreaMapping(params, success, token, error) {
+    Http.post(Cmd.CMD_GET_AREA_MAPPING, params, success, token, error);
+  }
+
+  /** 设置区域映射 */
+  static setAreaMapping(params, success, token, error) {
+    Http.post(Cmd.CMD_SET_AREA_MAPPING, params, success, token, error);
+  }
+
   /** 标签管理-获取标签列表-通州 */
   static getTagManagementGetTagList(params, success, token, error) {
     Http.post(Cmd.CMD_GET_TAG_LIST, params, success, token, error);
@@ -520,6 +564,19 @@ class Http {
   /** 大屏预览-获取大屏模板列表  */
   static getDashboardList(params, success, token, error) {
     Http.post(Cmd.CMD_GET_DASHBOARD_LIST, params, success, token, error);
+  }
+
+  static getGroupAnalysis(params, success, token, error) {
+    Http.post(Cmd.CMD_GET_GROUPANALYSIS, params, success, token, error);
+  }
+
+  static getGroupCompareTrend(params, success, token, error) {
+    Http.post(Cmd.CMD_GET_GROUPANALYSIS_COMPARE, params, success, token, error);
+  }
+
+  /** 区域映射-含图片上传（FormData） */
+  static setAreaMappingFile(formData, success, token, error) {
+    Http.postFile(Cmd.CMD_SET_AREA_MAPPING, formData, success, token, error);
   }
 }
 export default Http;
